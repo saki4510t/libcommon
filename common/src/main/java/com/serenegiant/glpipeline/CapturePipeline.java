@@ -19,14 +19,14 @@ package com.serenegiant.glpipeline;
 */
 
 import android.graphics.Bitmap;
-import android.graphics.Matrix;
 import android.opengl.GLES20;
+import android.opengl.Matrix;
 import android.util.Log;
 
-import com.serenegiant.gl.GLConst;
+import com.serenegiant.gl.GLDrawer2D;
+import com.serenegiant.gl.GLManager;
 import com.serenegiant.gl.GLOffscreen;
 import com.serenegiant.gl.GLUtils;
-import com.serenegiant.glutils.IMirror;
 import com.serenegiant.graphics.BitmapHelper;
 import com.serenegiant.graphics.MatrixUtils;
 import com.serenegiant.utils.Pool;
@@ -34,14 +34,20 @@ import com.serenegiant.utils.ThreadPool;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReentrantLock;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.annotation.Size;
 import androidx.annotation.WorkerThread;
+
+import static com.serenegiant.glutils.IMirror.MIRROR_VERTICAL;
 
 /**
  * 静止画キャプチャ機能を追加したProxyPipeline実装
+ * このクラスはアップストリームからのテクスチャを変更せずそのまま次のパイプランへ送る
  * パイプライン → CapturePipeline (→ パイプライン)
  *                → Bitmap → onCaptureコールバック呼び出し
  */
@@ -74,6 +80,8 @@ public class CapturePipeline extends ProxyPipeline {
 	}
 
 	@NonNull
+	private final GLManager mManager;
+	@NonNull
 	private final ReentrantLock mLock = new ReentrantLock();
 	@NonNull
 	private final Callback mCallback;
@@ -102,10 +110,18 @@ public class CapturePipeline extends ProxyPipeline {
 	@Nullable
 	private ByteBuffer mWorkBuffer;
 	/**
-	 * 映像読み取り用のワークビットマップ
+	 * モデルビュー変換行列
+	 */
+	@Size(value=16)
+	@NonNull
+	private final float[] mMvpMatrix = new float[16];
+	@Nullable
+	private GLDrawer2D mDrawer;
+	/**
+	 * オフスクリーン描画用のGLOffscreen
 	 */
 	@Nullable
-	private Bitmap mWorkBitmap;
+	private GLOffscreen mGLOffscreen = null;
 
 	/**
 	 * OOM抑制・高速化のためにキャプチャに使うBitmapを管理するビットマッププール
@@ -149,12 +165,29 @@ public class CapturePipeline extends ProxyPipeline {
 	/**
 	 * コンストラクタ
 	 */
-	public CapturePipeline(@NonNull final Callback callback) {
+	public CapturePipeline(@NonNull final GLManager manager, @NonNull final Callback callback) {
 		super();
 		if (DEBUG) Log.v(TAG, "コンストラクタ");
+		mManager = manager;
 		mCallback = callback;
 		mCaptureCnt = mNumCaptures = 0;
 		mLastCaptureMs = mIntervalsMs = 0L;
+		Matrix.setIdentityM(mMvpMatrix, 0);
+	}
+
+	@Override
+	protected void internalRelease() {
+		if (DEBUG) Log.v(TAG, "internalRelease:");
+		releaseAll();
+		super.internalRelease();
+	}
+
+	public void setMvpMatrix(@NonNull @Size(min=16) final float[] matrix, final int offset) {
+		System.arraycopy(matrix, offset, mMvpMatrix, 0, 16);
+		final GLDrawer2D drawer = mDrawer;
+		if (drawer != null) {
+			drawer.setMvpMatrix(matrix, offset);
+		}
 	}
 
 	/**
@@ -245,67 +278,108 @@ public class CapturePipeline extends ProxyPipeline {
 		if ((mWorkBuffer == null) || (mWorkBuffer.capacity() < bytes)) {
 			mWorkBuffer = ByteBuffer.allocateDirect(bytes).order(ByteOrder.LITTLE_ENDIAN);
 		}
-		if ((mWorkBitmap == null) || (mWorkBitmap.getByteCount() < bytes)) {
-			mWorkBitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
-		}
 		try {
-			if (DEBUG) Log.v(TAG, "texMatrix=" + MatrixUtils.toGLMatrixString(texMatrix) + ",isOES=" + isOES);
-			// GLSurfaceを使ったオフスクリーンへバックバッファとしてテクスチャを割り当てる
-			final GLOffscreen readSurface = GLOffscreen.wrap(isGLES3,
-				isOES ? GL_TEXTURE_EXTERNAL_OES : GLConst.GL_TEXTURE_2D,
-				GLES20.GL_TEXTURE4, texId, width, height, false);
-			try {
-				// テクスチャをバックバッファとするオフスクリーンからglReadPixelsでByteBufferへ画像データを読み込む
-				readSurface.makeCurrent();
+			if (DEBUG) Log.v(TAG, "doCapture:texMatrix=" + MatrixUtils.toGLMatrixString(texMatrix) + ",isOES=" + isOES);
+			mManager.makeDefault();
+			if ((mDrawer == null) || (isGLES3 != mDrawer.isGLES3) || (isOES != mDrawer.isOES())) {
+				// 初回またはGLPipelineを繋ぎ変えたあとにテクスチャが変わるかもしれない
+				if (mDrawer != null) {
+					mDrawer.release();
+				}
+				if (DEBUG) Log.v(TAG, "doCapture:create GLDrawer2D,mvpMatrix=" + MatrixUtils.toGLMatrixString(mMvpMatrix));
+				mDrawer = GLDrawer2D.create(isGLES3, isOES);
+				mDrawer.setMvpMatrix(mMvpMatrix, 0);
+				if (!isOES) {
+					if (DEBUG) Log.v(TAG, "doCapture:flip vertical");
+					// XXX DrawerPipelineTestでGL_TEXTURE_2D/GL_TEXTURE_EXTERNAL_OESを映像ソースとして
+					//     GLUtils#glCopyTextureToBitmapでBitmap変換時のテクスチャ変換行列適用と
+					//     DrawerPipelineを0, 1, 2, 3個連結した場合の結果から全ての組み合わせでテストが通るのは、
+					//     GLUtils#glCopyTextureToBitmapとは逆で、
+					//     ・GL_TEXTURE_EXTERNAL_OESの時はそのまま
+					//     ・GL_TEXTURE_2Dの時は上下反転させないとだめみたい
+					mDrawer.setMirror(MIRROR_VERTICAL);
+				}
+			}
+			if ((mGLOffscreen == null)
+				|| ((mGLOffscreen.getWidth() != width) || (mGLOffscreen.getHeight() != height))) {
+				// オフスクリーン描画用のGLOffscreenが存在しないかリサイズされたとき
+				if (mGLOffscreen != null) {
+					mGLOffscreen.release();
+				}
+				if (DEBUG) Log.v(TAG, "doCapture:create GLOffscreen");
+				mManager.makeDefault();
+				mGLOffscreen = GLOffscreen.newInstance(
+					isGLES3, GLES20.GL_TEXTURE0,
+					width, height);
+			}
+			final GLDrawer2D drawer = mDrawer;
+			final GLOffscreen offscreen = mGLOffscreen;
+			if ((drawer != null) && (offscreen != null)) {
+				// オフスクリーンSurfaceへ描画
+				offscreen.makeCurrent();
+				// 本来は映像が全面に描画されるので#glClearでクリアする必要はないけど
+				// ハングアップする機種があるのでクリアしとく
+				GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT);
+				// テキスチャ変換行列とモデルビュー変換行列で描画
+				drawer.draw(GLES20.GL_TEXTURE0, texId, texMatrix, 0);
+				// glReadPixelsでBitmapへ読み込む
 				mWorkBuffer.clear();
 				GLUtils.glReadPixels(mWorkBuffer, width, height);
-			} finally {
-				readSurface.release();
-			}
-			final Bitmap bitmap = mPool.obtain(width, height);
-			if (bitmap != null) {
-				try {
-					final Matrix matrix = MatrixUtils.toAndroidMatrix(texMatrix);
-					if (isOES || !matrix.isIdentity()) {
-						if (isOES) {
-							// FIXME GL_TEXTURE_EXTERNAL_OESの時はなぜか上下反転させないといけない？
-							//       GL_TEXTURE_2Dの時に反転させると結果が一致しない
-							MatrixUtils.setMirror(matrix, IMirror.MIRROR_VERTICAL);
+				offscreen.swap();
+				final Bitmap bitmap = mPool.obtain(width, height);
+				if (bitmap != null) {
+					try {
+						// コールバック用のBitmapへ書き込む
+						bitmap.copyPixelsFromBuffer(mWorkBuffer);
+						// これをスレッドプールで呼び出すと優先順位が低くてなかなか呼び出されずにプールが空になってしまう
+						mCallback.onCapture(bitmap);
+					} finally {
+						if (bitmap.isRecycled()) {
+							mPool.release(bitmap);
+						} else {
+							mPool.recycle(bitmap);
 						}
-						// ワーク用Bitmapへ書き込む
-						mWorkBitmap.copyPixelsFromBuffer(mWorkBuffer);
-						// テクスチャ変換行列を適用する
-						// XXX ここでBitmapが生成されるのを避けるのは困難
-						//     ワーク用のBitmapをもう1つ用意してそれをバックバッファとするCanvasを作って
-						//     matrixを適用してCanvasへ描画してBitmap#copyPixelsToBufferだといけそうだけど
-						//     上下反転以外だと画像がおかしくなりそう
-						final Bitmap scaled = Bitmap.createBitmap(mWorkBitmap, 0, 0, width, height, matrix, true);
-						// バッファに書き戻す
-						mWorkBuffer.clear();
-						scaled.copyPixelsToBuffer(mWorkBuffer);
-						mWorkBuffer.flip();
-						scaled.recycle();
 					}
-					// コールバック用のBitmapへ書き込む
-					bitmap.copyPixelsFromBuffer(mWorkBuffer);
-					// これをスレッドプールで呼び出すと優先順位が低くてなかなか呼び出されずにプールが空になってしまう
-					mCallback.onCapture(bitmap);
-				} catch (final Exception e) {
-					Log.w(TAG, e);
-				} finally {
-					if (bitmap.isRecycled()) {
-						mPool.release(bitmap);
-					} else {
-						mPool.recycle(bitmap);
-					}
+				} else if (DEBUG) {
+					Log.d(TAG, "doCapture:couldn't get bitmap from pool");
 				}
-			} else if (DEBUG) {
-				Log.d(TAG, "doCapture:couldn't get bitmap from pool");
 			}
 		} catch (final Exception e) {
 			ThreadPool.queueEvent(() -> {
 				mCallback.onError(e);
 			});
+		}
+	}
+
+	private void releaseAll() {
+		if (DEBUG) Log.v(TAG, "releaseAll:");
+		if (mManager.isValid()) {
+			final CountDownLatch latch = new CountDownLatch(1);
+			try {
+				mManager.runOnGLThread(() -> {
+					if (DEBUG) Log.v(TAG, "releaseAll#run:");
+					try {
+						mManager.makeDefault();
+						if (mDrawer != null) {
+							mDrawer.release();
+							mDrawer = null;
+						}
+						if (mGLOffscreen != null) {
+							mGLOffscreen.release();
+							mGLOffscreen = null;
+						}
+					} finally {
+						latch.countDown();
+					}
+				});
+				if (!latch.await(1000L, TimeUnit.MILLISECONDS)) {
+					Log.v(TAG, "releaseAll:timeout");
+				}
+			} catch (final Exception e) {
+				if (DEBUG) Log.w(TAG, e);
+			}
+		} else if (DEBUG) {
+			Log.w(TAG, "releaseAll:unexpectedly GLManager is already released!");
 		}
 	}
 

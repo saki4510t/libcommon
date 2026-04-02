@@ -99,7 +99,7 @@ public class CapturePipelineTest {
 		final AtomicReference<Bitmap> result = new AtomicReference<>();
 		final Semaphore sem = new Semaphore(0);
 		final AtomicInteger cnt = new AtomicInteger();
-		final CapturePipeline capturePipeline = new CapturePipeline(new CapturePipeline.Callback() {
+		final CapturePipeline capturePipeline = new CapturePipeline(manager, new CapturePipeline.Callback() {
 			@Override
 			public void onCapture(@NonNull final Bitmap bitmap) {
 				if (cnt.incrementAndGet() == 1) {
@@ -180,7 +180,7 @@ public class CapturePipelineTest {
 		final AtomicReference<Bitmap> result = new AtomicReference<>();
 		final AtomicInteger cnt = new AtomicInteger();
 		final AtomicBoolean requestStop = new AtomicBoolean();
-		final CapturePipeline capturePipeline = new CapturePipeline(new CapturePipeline.Callback() {
+		final CapturePipeline capturePipeline = new CapturePipeline(manager, new CapturePipeline.Callback() {
 			@Override
 			public void onCapture(@NonNull final Bitmap bitmap) {
 				if (cnt.incrementAndGet() == 1) {
@@ -241,7 +241,7 @@ public class CapturePipelineTest {
 		final AtomicReference<Bitmap> result = new AtomicReference<>();
 		final Semaphore sem = new Semaphore(0);
 		final AtomicInteger cnt = new AtomicInteger();
-		final CapturePipeline capturePipeline = new CapturePipeline(new CapturePipeline.Callback() {
+		final CapturePipeline capturePipeline = new CapturePipeline(manager, new CapturePipeline.Callback() {
 			@Override
 			public void onCapture(@NonNull final Bitmap bitmap) {
 				if (cnt.incrementAndGet() == NUM_FRAMES) {
@@ -324,7 +324,7 @@ public class CapturePipelineTest {
 		final AtomicReference<Bitmap> result = new AtomicReference<>();
 		final AtomicInteger cnt = new AtomicInteger();
 		final AtomicBoolean requestStop = new AtomicBoolean();
-		final CapturePipeline capturePipeline = new CapturePipeline(new CapturePipeline.Callback() {
+		final CapturePipeline capturePipeline = new CapturePipeline(manager, new CapturePipeline.Callback() {
 			@Override
 			public void onCapture(@NonNull final Bitmap bitmap) {
 				if (cnt.incrementAndGet() == NUM_FRAMES) {

@@ -35,6 +35,7 @@ import android.widget.TextView
 import androidx.annotation.LayoutRes
 import androidx.annotation.StringRes
 import androidx.annotation.WorkerThread
+import com.serenegiant.gl.GLManager
 import com.serenegiant.glpipeline.CapturePipeline
 import com.serenegiant.math.Fraction
 import com.serenegiant.media.OnFrameAvailableListener
@@ -104,7 +105,7 @@ abstract class AbstractCameraFragment : BaseFragment() {
 			v.pipelineMode = pipelineMode
 			v.enableFaceDetect = enableFaceDetect
 		}
-		mCapture = CapturePipeline(mCaptureCallback)
+		mCapture = CapturePipeline(GLManager()/*FIXME View側が内包しているGLManagerを使わないといけない*/, mCaptureCallback)
 	}
 
 	public override fun internalOnResume() {
