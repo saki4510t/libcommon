@@ -309,6 +309,7 @@ public class GLDrawer2D implements GLConst {
 		mLock.lock();
 		try {
 			System.arraycopy(matrix, offset, mMvpMatrix, 0, 16);
+			// FIXME mMirrorを適用したほうがいい？それともmMirrorをMIRROR_NORMALへリセットしたほうがいい？
 		} finally {
 			mLock.unlock();
 		}
