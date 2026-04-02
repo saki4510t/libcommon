@@ -215,7 +215,7 @@ public class SurfaceRendererPipeline extends ProxyPipeline
 				mMirror = mirror;
 				mManager.runOnGLThread(() -> {
 					if (mRendererTarget != null) {
-						mRendererTarget.setMirror(mirror);
+						mRendererTarget.setMirror(IMirror.flipVertical(mMirror));
 					}
 				});
 			}
