@@ -21,12 +21,18 @@ package com.serenegiant.libcommon.viewmodel
 import android.Manifest
 import android.annotation.SuppressLint
 import android.app.Application
+import android.graphics.Bitmap
 import android.graphics.SurfaceTexture
+import android.opengl.Matrix
+import android.os.Environment
 import android.util.Log
 import android.view.OrientationEventListener
 import android.view.SurfaceHolder
 import android.view.TextureView
 import androidx.annotation.RequiresPermission
+import androidx.annotation.Size
+import androidx.annotation.WorkerThread
+import androidx.documentfile.provider.DocumentFile
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
@@ -37,9 +43,12 @@ import com.serenegiant.camera.CameraConst
 import com.serenegiant.camera.CameraPipelineSource
 import com.serenegiant.camera.CameraSize
 import com.serenegiant.gl.GLManager
+import com.serenegiant.glpipeline.CapturePipeline
 import com.serenegiant.glpipeline.SurfaceRendererPipeline
 import com.serenegiant.glpipeline.append
+import com.serenegiant.mediastore.MediaStoreUtils
 import com.serenegiant.system.BuildCheck
+import com.serenegiant.utils.FileUtils
 import com.serenegiant.view.ViewUtils
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -49,6 +58,12 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 
+/**
+ * CameraSourcePipelineFragment用のViewModel
+ * テスト用にTextureViewでもSurfaceViewでも使えるように
+ * TextureView.SurfaceTextureListenerと
+ * SurfaceHolder.Callbackの両方を実装
+ */
 class CameraSourcePipelineViewModel(app: Application)
 	: AndroidViewModel(app),
 	TextureView.SurfaceTextureListener,
@@ -56,11 +71,16 @@ class CameraSourcePipelineViewModel(app: Application)
 	DefaultLifecycleObserver {
 
 	private val mGLManager = GLManager()
-//	private val mRenderer = DrawerPipeline(mGLManager)
+//	private val mRenderer = DrawerPipeline(mGLManager)	// パススルーモード以外のときはCapturePipelineへモデルビュー変換行列を適用してはいけない
 	private val mRenderer = SurfaceRendererPipeline(mGLManager)
+	private val mCapture: CapturePipeline by lazy { CapturePipeline(mGLManager, mCaptureCallback) }
 	private var mSourcePipeline: CameraPipelineSource? = null
 	private var mResumed = false
 	private var mUpdateOrientationJob: Job? = null
+	@Size(value = 16)
+	private val mRotationMatrix = FloatArray(16)
+	@Size(value = 16)
+	private val mWorkMatrix = FloatArray(16)
 
 	/**
 	 * 対応解像度一覧
@@ -89,6 +109,9 @@ class CameraSourcePipelineViewModel(app: Application)
 	 */
 	private val deviceRotation90 = _deviceRotation90.asStateFlow()
 
+	private val _thumbnailDocument = MutableStateFlow<DocumentFile?>(null)
+	val thumbnailDocument = _thumbnailDocument.asStateFlow()
+
 	/**
 	 * 端末の物理的な向きが変化したときのイベントを取得する(画面の向きが変化したときだけではない)
 	 */
@@ -111,6 +134,45 @@ class CameraSourcePipelineViewModel(app: Application)
 		}
 	}
 
+	/**
+	 * CapturePipelineでビットマップとしてキャプチャしたときのコールバック
+	 */
+	private val mCaptureCallback = object : CapturePipeline.Callback {
+		@WorkerThread
+		override fun onCapture(bitmap: Bitmap) {
+			if (DEBUG) Log.v(TAG, "onCapture:bitmap=$bitmap")
+			try {
+				val context = getApplication<Application>()
+				val ext = "png"
+				val outputFile = MediaStoreUtils.getContentDocument(
+					context, "image/$ext",
+					"${Environment.DIRECTORY_DCIM}/${FileUtils.DIR_NAME}",
+					"${FileUtils.getDateTimeString()}.$ext", null
+				)
+				if (DEBUG) Log.v(TAG, "takePicture: save to $outputFile")
+				val output = context.contentResolver.openOutputStream(outputFile.uri)
+				if (output != null) {
+					try {
+						bitmap.compress(Bitmap.CompressFormat.PNG, 80, output)
+					} finally {
+						output.close()
+						MediaStoreUtils.updateContentUri(context, outputFile)
+						_thumbnailDocument.value = outputFile
+					}
+				}
+				if (DEBUG) Log.v(TAG, "onCapture:finished")
+			} catch (e: Exception) {
+				Log.w(TAG, e)
+			}
+		}
+
+		@WorkerThread
+		override fun onError(t: Throwable) {
+			Log.w(TAG, t)
+		}
+	}
+
+//--------------------------------------------------------------------------------
 	/**
 	 * TextureView.SurfaceTextureListenerの実装
 	 */
@@ -178,6 +240,7 @@ class CameraSourcePipelineViewModel(app: Application)
 				pipeline.release()
 			}
 		}
+		mCapture.release()
 		mRenderer.release()
 		mGLManager.release()
 		super.onCleared()
@@ -226,6 +289,10 @@ class CameraSourcePipelineViewModel(app: Application)
 		if (DEBUG) Log.v(TAG, "onDestroy:")
 	}
 
+	/**
+	 * 映像サイズ変更要求
+	 * @param sz
+	 */
 	fun setVideoSize(sz: CameraSize) {
 		if (DEBUG) Log.v(TAG, "setVideoSize:$sz")
 		val source = mSourcePipeline
@@ -239,6 +306,20 @@ class CameraSourcePipelineViewModel(app: Application)
 		}
 	}
 
+	/**
+	 * 静止画撮影要求
+ 	 */
+	fun triggerStillCapture() {
+		if (DEBUG) Log.v(TAG, "triggerStillCapture:")
+		viewModelScope.launch {
+			mCapture.trigger()
+		}
+	}
+
+	/**
+	 * 映像表示用のSurface/SurfaceTextureが生成されたときの処理
+	 * @param surface Surface/SurfaceTexture等
+	 */
 	private fun onSurfaceCreated(surface: Any) {
 		if (DEBUG) Log.v(TAG, "onSurfaceCreated:$surface")
 		mRenderer.setSurface(surface)
@@ -248,10 +329,14 @@ class CameraSourcePipelineViewModel(app: Application)
 			Camera1SourcePipeline(getApplication(), mGLManager)
 		}
 		source.append(mRenderer)
+		source.append(mCapture)
 		mSourcePipeline = source
 		connect(source)
 	}
 
+	/**
+	 * カメラへ接続開始
+	 */
 	@SuppressLint("MissingPermission")
 	private fun connect(source: CameraPipelineSource) {
 		if (DEBUG) Log.v(TAG, "connect:$source")
@@ -260,7 +345,7 @@ class CameraSourcePipelineViewModel(app: Application)
 				withContext(Dispatchers.IO) {
 					source.connect()
 				}
-				mRenderer.setMvpMatrix(source.getMvpMatrix(), 0)
+				updateOrientation(source, ViewUtils.getRotationDegrees(getApplication<Application>()))
 				_supportedSizeList.value = source.supportedSizeList.toList()
 			}
 			mUpdateOrientationJob = viewModelScope.launch {
@@ -271,7 +356,7 @@ class CameraSourcePipelineViewModel(app: Application)
 							withContext(Dispatchers.IO) {
 								source.updateOrientation(screenRotationDegree)
 							}
-							mRenderer.setMvpMatrix(source.getMvpMatrix(), 0)
+							updateOrientation(source, screenRotationDegree)
 						}
 					}
 				}
@@ -279,10 +364,29 @@ class CameraSourcePipelineViewModel(app: Application)
 		}
 	}
 
+	private fun updateOrientation(source: CameraPipelineSource, screenRotationDegree: Int) {
+		val mvpMatrix = source.getMvpMatrix()
+		mRenderer.setMvpMatrix(mvpMatrix, 0)
+		// XXX SurfaceRendererPipelineとパススルーモードのDrawerPipelineを使うときは
+		//     元映像がそのまま引き渡されるのでCapturePipelineへモデルビュー変換行列を
+		//     適用しないといけない
+		Matrix.setIdentityM(mRotationMatrix, 0)
+		if ((screenRotationDegree % 180 != 0) && (source is Camera2SourcePipeline)) {
+			// Camera2 APIで画面がランドスケープのときは180度回転してしまうので補正
+			Matrix.setRotateM(mRotationMatrix, 0, 180.0f, 0.0f, 0.0f, 1.0f)
+		}
+		Matrix.multiplyMM(mWorkMatrix, 0, mvpMatrix, 0, mRotationMatrix, 0)
+		mCapture.setMvpMatrix(mWorkMatrix, 0)
+	}
+
+	/**
+	 * 映像表示用のSurfaceが破棄されたときの処理
+	 */
 	private fun onSurfaceDestroyed() {
 		if (DEBUG) Log.v(TAG, "onSurfaceDestroyed:")
 		mUpdateOrientationJob?.cancel()
 		mRenderer.remove()
+		mCapture.remove()
 		mRenderer.setSurface(null)
 		val pipeline = mSourcePipeline
 		mSourcePipeline = null
