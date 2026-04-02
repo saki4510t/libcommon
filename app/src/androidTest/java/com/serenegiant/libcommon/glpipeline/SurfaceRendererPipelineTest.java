@@ -39,6 +39,7 @@ import org.junit.runner.RunWith;
 
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -83,8 +84,11 @@ public class SurfaceRendererPipelineTest {
 	/**
 	 * ImageSourcePipelineからの映像ソースをImageSourcePipelineでSurfaceへ
 	 * 描画してGLSurfaceReceiverで読み取れることを検証
-	 * Bitmap -> ImageSourcePipeline → SurfaceRendererPipeline
-	 * 		→ (Surface) → GLSurfaceReceiver → GLSurface.wrap → glReadPixels → Bitmap
+	 * ImageSourcePipelineからなのでSurfaceRendererPipelineへの映像ソースはGL_TEXTURE_2Dテクスチャ
+	 * Bitmap -> ImageSourcePipeline
+	 * 		→ SurfaceRendererPipeline
+	 * 			↓
+	 * 			Surface → GLSurfaceReceiver → GLSurface.wrap → glReadPixels → Bitmap
 	 */
 	@Test
 	public void surfaceRendererPipelineTest() {
@@ -128,9 +132,93 @@ public class SurfaceRendererPipelineTest {
 	}
 
 	/**
+	 * SurfaceSourcePipelineからの映像ソースをImageSourcePipelineでSurfaceへ
+	 * 描画してGLSurfaceReceiverで読み取れることを検証
+	 * SurfaceSourcePipelineからなのSurfaceRendererPipelineへの映像ソースはGL_TEXTURE_EXTERNAL_OESテクスチャ
+	 * Bitmap → inputImagesAsync → (Surface) → SurfaceSourcePipeline
+	 *		→ SurfaceRendererPipeline
+	 * 			↓
+	 * 			Surface → GLSurfaceReceiver → GLSurface.wrap → glReadPixels → Bitmap
+	 */
+	@Test
+	public void surfaceRendererPipelineOESTest() {
+		final Bitmap original = BitmapHelper.makeCheckBitmap(
+			WIDTH, HEIGHT, 15, 12, Bitmap.Config.ARGB_8888);
+//		dump(bitmap);
+
+		final GLManager manager = mManager;
+
+		final Semaphore sourceSem = new Semaphore(0);
+		final SurfaceSourcePipeline source = new SurfaceSourcePipeline(
+			manager, WIDTH, HEIGHT,
+			new GLPipelineSurfaceSource.PipelineSourceCallback() {
+				@Override
+				public void onCreate(@NonNull final Surface surface) {
+					Log.v(TAG, "CapturePipelineTest#onCreate:" + surface);
+					sourceSem.release();
+				}
+
+				@Override
+				public void onDestroy() {
+					Log.v(TAG, "CapturePipelineTest#onDestroy:");
+				}
+			});
+		try {
+			// Surfaceの生成を待機
+			assertTrue(sourceSem.tryAcquire(1200, TimeUnit.MILLISECONDS));
+		} catch (InterruptedException e) {
+			fail();
+		}
+		final Surface inputSurface = source.getInputSurface();
+		assertNotNull(inputSurface);
+
+		// 映像を受け取ってBitmapに変換するためのGLSurfaceReceiverを準備
+		final Semaphore cntSem = new Semaphore(0);
+		final AtomicReference<Bitmap> result = new AtomicReference<>();
+		final AtomicInteger cnt = new AtomicInteger();
+		final GLSurfaceReceiver receiver = createGLSurfaceReceiver(
+			manager, WIDTH, HEIGHT, NUM_FRAMES, cntSem, result, cnt);
+		assertNotNull(receiver);
+		final Surface surface = receiver.getSurface();
+		assertNotNull(surface);
+
+		// テストするSurfaceRendererPipelineを生成
+		final SurfaceRendererPipeline renderer = new SurfaceRendererPipeline(manager);
+		renderer.setSurface(surface);
+
+		// パイプラインを接続
+		// 映像ソースがSurfaceSourcePipelineなのでGL_TEXTURE_EXTERNAL_OESテクスチャを受け取る
+		source.setPipeline(renderer);
+		assertTrue(validatePipelineOrder(source, source, renderer));
+
+		final AtomicBoolean requestStop = new AtomicBoolean();
+
+		// 実際の映像はSurfaceを経由して映像を書き込む
+		inputImagesAsync(original, inputSurface, NUM_FRAMES + 2, requestStop);
+
+		try {
+			assertTrue(cntSem.tryAcquire(NUM_FRAMES * 50L, TimeUnit.MILLISECONDS));
+			requestStop.set(true);
+			source.release();
+			assertEquals(NUM_FRAMES, cnt.get());
+			final Bitmap b = result.get();
+//			dump(b);
+			assertNotNull(b);
+			// 元のビットマップと同じかどうかを検証
+			assertTrue(bitmapEquals(original, b, true));
+		} catch (final InterruptedException e) {
+			Log.d(TAG, "interrupted", e);
+			fail();
+		} finally {
+			renderer.release();
+		}
+	}
+
+	/**
 	 * ImageSourcePipelineからの映像をSurfaceRendererPipelineでSurfaceへ転送
 	 * Surfaceの映像をカメラ等のからの映像とみなしてSurfaceSourcePipelineで映像ソースとして
 	 * 供給できるかどうかを検証
+	 * ImageSourcePipelineからなのでSurfaceRendererPipelineへの映像ソースはGL_TEXTURE_2Dテクスチャ
 	 * Bitmap → ImageSourcePipeline
 	 * 		→ SurfaceRendererPipeline
 	 * 			↓
