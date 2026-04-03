@@ -16,6 +16,8 @@
             <option value="$PROJECT_DIR$/common/core" />
             <option value="$PROJECT_DIR$/common/gl" />
             <option value="$PROJECT_DIR$/common/media" />
+            <option value="$PROJECT_DIR$/common/net" />
+            <option value="$PROJECT_DIR$/common/usb" />
           </set>
         </option>
       </GradleProjectSettings>

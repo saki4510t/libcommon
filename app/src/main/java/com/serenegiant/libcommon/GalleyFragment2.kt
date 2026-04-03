@@ -29,8 +29,8 @@ import androidx.fragment.app.FragmentTransaction
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.serenegiant.mediastore.MediaInfo
-import com.serenegiant.mediastore.MediaStoreCursorRecyclerAdapter
-import com.serenegiant.mediastore.MediaStoreRecyclerAdapterListener
+import com.serenegiant.widget.MediaStoreCursorRecyclerAdapter
+import com.serenegiant.widget.MediaStoreRecyclerAdapterListener
 import com.serenegiant.widget.RecyclerViewWithEmptyView
 
 /**
@@ -77,8 +77,10 @@ class GalleyFragment2 : BaseFragment() {
 		recyclerView.setHasFixedSize(true)
 		recyclerView.layoutManager = GridLayoutManager(requireContext(), 4)
 //		recyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
-		mMediaStoreAdapter = MediaStoreCursorRecyclerAdapter(
-			requireContext(), R.layout.grid_item_media, false)
+		mMediaStoreAdapter =
+			MediaStoreCursorRecyclerAdapter(
+				requireContext(), R.layout.grid_item_media, false
+			)
 		mMediaStoreAdapter!!.setListener(mListener)
 		recyclerView.adapter = mMediaStoreAdapter
 	}

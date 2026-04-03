@@ -18,5 +18,7 @@ rootProject.name = "libcommon"
 include ':app'
 include ':common'
 include ':common:core'
-include ':common:media'
 include ':common:gl'
+include ':common:media'
+include ':common:net'
+include ':common:usb'

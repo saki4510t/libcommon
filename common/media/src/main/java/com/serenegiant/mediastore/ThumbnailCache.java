@@ -27,7 +27,7 @@ import android.provider.MediaStore;
 import android.util.Log;
 import android.util.Size;
 
-import com.serenegiant.common.BuildConfig;
+import com.serenegiant.media.BuildConfig;
 import com.serenegiant.graphics.BitmapHelper;
 import com.serenegiant.nio.DiskLruCache;
 import com.serenegiant.content.ContextUtils;

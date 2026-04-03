@@ -55,9 +55,9 @@ public class MediaStoreUtils {
 	public static final int MEDIA_ALL = 0;
 	public static final int MEDIA_IMAGE = 1;
 	public static final int MEDIA_VIDEO = 2;
-	protected static final int MEDIA_TYPE_NUM = 3;
+	public static final int MEDIA_TYPE_NUM = 3;
 
-	protected static final String[] PROJ_MEDIA = {
+	public static final String[] PROJ_MEDIA = {
 		MediaStore.MediaColumns._ID,				// index=0  for Cursor, column number=1  in SQL statement
 		MediaStore.MediaColumns.TITLE,				// index=1  for Cursor, column number=2  in SQL statement
 		// MEDIA_TYPE_NONE, MEDIA_TYPE_IMAGE, MEDIA_TYPE_AUDIO, MEDIA_TYPE_VIDEO, MEDIA_TYPE_PLAYLIST
@@ -71,7 +71,7 @@ public class MediaStoreUtils {
 //		MediaStore.MediaColumns.DATE_ADDED,			// index=9  for Cursor, column number=10 in SQL statement
 	};
 
-	protected static final String[] PROJ_MEDIA_IMAGE = {
+	public static final String[] PROJ_MEDIA_IMAGE = {
 		MediaStore.MediaColumns._ID,				// index=0  for Cursor, column number=1  in SQL statement
 		MediaStore.MediaColumns.TITLE,				// index=1  for Cursor, column number=2  in SQL statement
 		// MEDIA_TYPE_NONE, MEDIA_TYPE_IMAGE, MEDIA_TYPE_AUDIO, MEDIA_TYPE_VIDEO, MEDIA_TYPE_PLAYLIST
@@ -113,11 +113,11 @@ public class MediaStoreUtils {
 		+ MediaStore.Files.FileColumns.MEDIA_TYPE_VIDEO;
 
 	// MEDIA_ALL, MEDIA_IMAGE, MEDIA_VIDEOの順にすること
-	protected static final String[] SELECTIONS = {SELECTION_MEDIA_ALL, SELECTION_MEDIA_IMAGE, SELECTION_MEDIA_VIDEO};
+	public static final String[] SELECTIONS = {SELECTION_MEDIA_ALL, SELECTION_MEDIA_IMAGE, SELECTION_MEDIA_VIDEO};
 
 	// these values should be fit to PROJ_MEDIA
-	protected static final int PROJ_INDEX_ID = 0;
-	protected static final int PROJ_INDEX_TITLE = 1;
+	public static final int PROJ_INDEX_ID = 0;
+	public static final int PROJ_INDEX_TITLE = 1;
 	protected static final int PROJ_INDEX_MIME_TYPE = 2;
 	protected static final int PROJ_INDEX_DATA = 3;
 	protected static final int PROJ_INDEX_DISPLAY_NAME = 4;

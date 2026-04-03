@@ -132,7 +132,7 @@ public class MediaInfo implements Parcelable {
 	 * @param cursor
 	 * @return
 	 */
-	MediaInfo loadFromCursor(@NonNull final Cursor cursor) {
+	public MediaInfo loadFromCursor(@NonNull final Cursor cursor) {
 		return loadFromCursor(cursor, cursor.getInt(cursor.getColumnIndexOrThrow(MediaStore.Files.FileColumns.MEDIA_TYPE)));
 	}
 

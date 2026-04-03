@@ -28,7 +28,7 @@ import android.view.ViewGroup
 import android.widget.AdapterView
 import android.widget.GridView
 import androidx.fragment.app.FragmentTransaction
-import com.serenegiant.mediastore.MediaStoreAdapter
+import com.serenegiant.widget.MediaStoreAdapter
 
 /**
  * 端末内の静止画・動画一覧を表示するためのFragment
@@ -68,7 +68,11 @@ class GalleyFragment : BaseFragment() {
 	 */
 	private fun initView(rootView: View) {
 		val gridView = rootView.findViewById<GridView>(R.id.media_gridview)
-		mMediaStoreAdapter = MediaStoreAdapter(requireContext(), R.layout.grid_item_media, false)
+		mMediaStoreAdapter = MediaStoreAdapter(
+			requireContext(),
+			R.layout.grid_item_media,
+			false
+		)
 		gridView.adapter = mMediaStoreAdapter
 		gridView.onItemClickListener = mOnItemClickListener
 	}

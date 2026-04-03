@@ -30,7 +30,6 @@ android {
 	}
 
 	buildFeatures {
-	    buildConfig = true
 	}
 
 	kotlinOptions.jvmTarget = "17"
@@ -55,7 +54,7 @@ dependencies {
 	implementation "androidx.lifecycle:lifecycle-common-java8:$androidXLifecycleKtx"
 	implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:$kotlinCoroutinesVersion"
 
-	implementation project(':common:core')
+	api project(':common:core')
 }
 
 def repo = new File(rootDir, "repository")

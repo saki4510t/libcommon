@@ -24,7 +24,7 @@ import android.util.AttributeSet
 import android.util.Log
 import android.view.Surface
 import com.serenegiant.gl.GLUtils
-import com.serenegiant.graphics.SurfaceDrawable
+import com.serenegiant.gl.SurfaceDrawable
 import com.serenegiant.math.Fraction
 import com.serenegiant.media.OnFrameAvailableListener
 import java.lang.UnsupportedOperationException
@@ -68,17 +68,19 @@ class CameraImageView @JvmOverloads constructor(
 			GLUtils.getSupportedGLVersion(),
 			object : SurfaceDrawable.Callback {
 
-			override fun onCreateSurface(surface: Surface) {
-				if (DEBUG) Log.v(TAG, "onCreateSurface:$surface")
-				mCameraDelegator.startPreview(
-					CameraDelegator.DEFAULT_PREVIEW_WIDTH, CameraDelegator.DEFAULT_PREVIEW_HEIGHT)
-			}
+				override fun onCreateSurface(surface: Surface) {
+					if (DEBUG) Log.v(TAG, "onCreateSurface:$surface")
+					mCameraDelegator.startPreview(
+						CameraDelegator.DEFAULT_PREVIEW_WIDTH,
+						CameraDelegator.DEFAULT_PREVIEW_HEIGHT
+					)
+				}
 
-			override fun onDestroySurface() {
-				if (DEBUG) Log.v(TAG, "onDestroySurface:")
-				mCameraDelegator.stopPreview()
-			}
-		})
+				override fun onDestroySurface() {
+					if (DEBUG) Log.v(TAG, "onDestroySurface:")
+					mCameraDelegator.stopPreview()
+				}
+			})
 		setImageDrawable(mDrawable)
 		scaleType = ScaleType.CENTER_CROP
 	}

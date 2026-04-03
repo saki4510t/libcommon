@@ -1,6 +1,7 @@
 plugins {
 	id 'com.android.library'
 	id 'org.jetbrains.kotlin.android'
+	id 'org.jetbrains.kotlin.kapt'
 	id 'org.jetbrains.dokka'
 	id 'maven-publish'
 }
@@ -56,7 +57,7 @@ android {
 
 	buildFeatures {
 	    buildConfig = true
-		dataBinding = true
+		dataBinding = true	// appでデータバインディングを使っているとこれを削除できない…
 	}
 
 	kotlinOptions.jvmTarget = "17"
@@ -84,9 +85,11 @@ dependencies {
 	implementation "androidx.lifecycle:lifecycle-common-java8:$androidXLifecycleKtx"
 	implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:$kotlinCoroutinesVersion"
 
-//	implementation project(':common:core')
-//	implementation project(':common:gl')
-//	implementation project(':common:media')
+	api project(':common:core')
+	api project(':common:gl')
+	api project(':common:media')
+	api project(':common:net')
+	api project(':common:usb')
 }
 
 def repo = new File(rootDir, "repository")

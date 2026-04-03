@@ -6,7 +6,7 @@ plugins {
 }
 
 android {
-	namespace 'com.serenegiant.media'
+	namespace 'com.serenegiant.net'
 	compileSdk versionCompiler
 
 	compileOptions {
@@ -20,11 +20,6 @@ android {
 
 		testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
 		consumerProguardFiles "consumer-rules.pro"
-
-		// AGP 4.1.0以降でライブラリプロジェクトのBuildConfigにVERSION_CODEとVERSION_NAMEが
-		// 含まれなくなってしまったのでワークアラウンドを追加
-		buildConfigField 'int', 'VERSION_CODE', "${rootProject.versionCodeNum}"
-		buildConfigField 'String', 'VERSION_NAME', "\"${rootProject.versionNameString}\""
 	}
 
 	buildTypes {
@@ -35,7 +30,6 @@ android {
 	}
 
 	buildFeatures {
-	    buildConfig = true
 	}
 
 	kotlinOptions.jvmTarget = "17"
@@ -61,7 +55,6 @@ dependencies {
 	implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:$kotlinCoroutinesVersion"
 
 	api project(':common:core')
-	api project(':common:gl')
 }
 
 def repo = new File(rootDir, "repository")
@@ -76,7 +69,7 @@ afterEvaluate {
 		publications {
 			release(MavenPublication) {
 				groupId = 'com.serenegiant'
-				artifactId = 'common-media'
+				artifactId = 'common-net'
 				version = versionNameString
 				from components.release
 				pom {

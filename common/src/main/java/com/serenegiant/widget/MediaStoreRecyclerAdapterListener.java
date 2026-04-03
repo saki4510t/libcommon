@@ -1,4 +1,4 @@
-package com.serenegiant.mediastore;
+package com.serenegiant.widget;
 /*
  * libcommon
  * utility/helper classes for myself
@@ -19,6 +19,8 @@ package com.serenegiant.mediastore;
 */
 
 import android.view.View;
+
+import com.serenegiant.mediastore.MediaInfo;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;

@@ -13,8 +13,8 @@ import androidx.documentfile.provider.SAFRootTreeDocumentFile
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.serenegiant.libcommon.databinding.FragmentSafFilerBinding
-import com.serenegiant.documentfile.DocumentTreeRecyclerAdapter
-import com.serenegiant.documentfile.DocumentTreeRecyclerAdapter.DocumentTreeRecyclerAdapterListener
+import com.serenegiant.widget.DocumentTreeRecyclerAdapter
+import com.serenegiant.widget.DocumentTreeRecyclerAdapter.DocumentTreeRecyclerAdapterListener
 import java.io.IOException
 
 /*

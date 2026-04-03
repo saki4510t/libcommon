@@ -1,4 +1,4 @@
-package com.serenegiant.mediastore;
+package com.serenegiant.widget;
 /*
  * libcommon
  * utility/helper classes for myself
@@ -42,6 +42,9 @@ import android.widget.TextView;
 
 import com.serenegiant.common.R;
 import com.serenegiant.graphics.BitmapHelper;
+import com.serenegiant.mediastore.ImageLoader;
+import com.serenegiant.mediastore.LoaderDrawable;
+import com.serenegiant.mediastore.MediaInfo;
 import com.serenegiant.utils.ThreadPool;
 import com.serenegiant.view.ViewUtils;
 
@@ -440,6 +443,11 @@ public class MediaStoreImageAdapter extends PagerAdapter {
 		protected Bitmap checkCache(final long id) {
 			return null;
 		}
+
+		@Override
+		public void onBoundsChange(@NonNull final Rect bounds) {
+			super.onBoundsChange(bounds);
+		}
 	}
 
 	private static class MyImageLoader extends ImageLoader {
@@ -465,7 +473,7 @@ public class MediaStoreImageAdapter extends PagerAdapter {
 					final int cx = bounds.centerX();
 					final int cy = bounds.centerY();
 					bounds.set(cx - w / 2, cy - h / w, cx + w / 2, cy + h / 2);
-					mParent.onBoundsChange(bounds);
+					((ImageLoaderDrawable)mParent).onBoundsChange(bounds);
 				}
 			} catch (final IOException e) {
 				if (DEBUG) Log.w(TAG, e);

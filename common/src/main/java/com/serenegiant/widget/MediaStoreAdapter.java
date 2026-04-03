@@ -1,4 +1,4 @@
-package com.serenegiant.mediastore;
+package com.serenegiant.widget;
 /*
  * libcommon
  * utility/helper classes for myself
@@ -41,6 +41,10 @@ import android.widget.TextView;
 
 import com.serenegiant.common.R;
 import com.serenegiant.graphics.BitmapHelper;
+import com.serenegiant.mediastore.MediaInfo;
+import com.serenegiant.mediastore.ThumbnailCache;
+import com.serenegiant.mediastore.ThumbnailLoader;
+import com.serenegiant.mediastore.ThumbnailLoaderDrawable;
 import com.serenegiant.utils.ThreadPool;
 import com.serenegiant.view.ViewUtils;
 
