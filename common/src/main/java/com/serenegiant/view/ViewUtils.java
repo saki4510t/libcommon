@@ -274,12 +274,12 @@ public class ViewUtils {
 		return x0 * y1 - x1 * y0;
 	}
 
-	public static final float crossProduct(final Vector v1, final Vector v2) {
+	public static final float crossProduct(final Vector2d v1, final Vector2d v2) {
 		return v1.x * v2.y - v2.x * v1.y;
 	}
 
-	private static final Vector sPtInPoly_v1 = new Vector();
-	private static final Vector sPtInPoly_v2 = new Vector();
+	private static final Vector2d sPtInPoly_v1 = new Vector2d();
+	private static final Vector2d sPtInPoly_v2 = new Vector2d();
 	/**
 	 * check whether the point is in the clockwise 2D polygon
 	 * @param x
@@ -310,22 +310,22 @@ public class ViewUtils {
 	/**
 	 * helper for intersection check etc.
 	 */
-	public static final class Vector {
+	public static final class Vector2d {
 
 		public float x, y;
 
-		public Vector() {
+		public Vector2d() {
 		}
 
 /*		public Vector(Vector src) {
 			set(src);
 		} */
 
-		public Vector(final float x, final float y) {
+		public Vector2d(final float x, final float y) {
 			set(x, y);
 		}
 
-		public Vector set(final float x, final float y) {
+		public Vector2d set(final float x, final float y) {
 			this.x = x;
 			this.y = y;
 			return this;
@@ -357,8 +357,8 @@ public class ViewUtils {
 			return this;
 		} */
 
-		public Vector sub(final Vector other) {
-			return new Vector(x - other.x, y - other.y);
+		public Vector2d sub(final Vector2d other) {
+			return new Vector2d(x - other.x, y - other.y);
 		}
 
 /*		public Vector sub(final float x, final float y) {
@@ -371,7 +371,7 @@ public class ViewUtils {
 			return this;
 		} */
 
-		public Vector dec(final float x, final float y) {
+		public Vector2d dec(final float x, final float y) {
 			this.x -= x;
 			this.y -= y;
 			return this;
@@ -380,12 +380,12 @@ public class ViewUtils {
 
 	public static final class LineSegment {
 
-		public final Vector p1;
-		public final Vector p2;
+		public final Vector2d p1;
+		public final Vector2d p2;
 
 		public LineSegment (final float x0, final float y0, final float x1, final float y1) {
-			p1 = new Vector(x0, y0);
-			p2 = new Vector(x1, y1);
+			p1 = new Vector2d(x0, y0);
+			p2 = new Vector2d(x1, y1);
 		}
 
 		public LineSegment set(final float x0, final float y0, final float x1, final float y1) {
@@ -411,8 +411,8 @@ public class ViewUtils {
 		boolean result = false;
 		final int n = segs != null ? segs.length : 0;
 
-		final Vector a = seg.p2.sub(seg.p1);
-		Vector b, c, d;
+		final Vector2d a = seg.p2.sub(seg.p1);
+		Vector2d b, c, d;
 		for (int i= 0; i < n; i++) {
 			c = segs[i].p1.sub(seg.p1);
 			d = segs[i].p2.sub(seg.p1);
