@@ -18,21 +18,13 @@ package com.serenegiant.system;
  *  limitations under the License.
 */
 
-import android.annotation.SuppressLint;
-import android.app.Activity;
-import android.app.AlarmManager;
-import android.app.PendingIntent;
-import android.content.ComponentName;
 import android.content.Context;
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager.NameNotFoundException;
 import android.os.Build;
 import android.preference.PreferenceManager;
 import android.util.Log;
-
-import com.serenegiant.content.ContextUtils;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -60,54 +52,52 @@ public final class CrashExceptionHandler implements UncaughtExceptionHandler {
 		Thread.setDefaultUncaughtExceptionHandler(new CrashExceptionHandler(app_context));
 	}
 
-	/**
-	 * アプリがクラッシュした際に指定したPendingIntentを実行するように設定
-	 * @param context
-	 * @param restartIntent
-	 */
-	@Deprecated
-	public static void setAutoRestart(@NonNull final Context context,
-		@NonNull final PendingIntent restartIntent,
-		final long delayMs) {
-
-		final UncaughtExceptionHandler original = Thread.getDefaultUncaughtExceptionHandler();
-		final UncaughtExceptionHandler handler = new UncaughtExceptionHandler() {
-			@Override
-			public void uncaughtException(@NonNull final Thread thread, @NonNull final Throwable throwable) {
-				try {
-					final AlarmManager am = ContextUtils.requireSystemService(context, AlarmManager.class);
-					am.set(AlarmManager.RTC_WAKEUP, System.currentTimeMillis() + delayMs, restartIntent);
-				} finally {
-					original.uncaughtException(thread, throwable);
-				}
-			}
-		};
-		Thread.setDefaultUncaughtExceptionHandler(handler);
-	}
-
-	/**
-	 * アプリがクラッシュしたときに指定したActivityを起動するように設定
-	 * @param context
-	 * @param activityClass
-	 */
-	@SuppressLint("InlinedApi")
-	@SuppressWarnings("deprecation")
-	@Deprecated
-	public static void setAutoRestart(@NonNull final Context context,
-		@NonNull final Class<? extends Activity> activityClass,
-		final long delayMs) {
-
-		int flags = PendingIntent.FLAG_CANCEL_CURRENT;
-		if (BuildCheck.isAPI31()) {
-			flags |= PendingIntent.FLAG_IMMUTABLE;
-		}
-		final PendingIntent intent = PendingIntent.getActivity(
-			context.getApplicationContext(),
-			REQUEST_RESTART_ACTIVITY,
-			Intent.makeMainActivity(new ComponentName(context, activityClass)),
-			flags);
-		setAutoRestart(context, intent, delayMs);
-	}
+//	/**
+//	 * アプリがクラッシュした際に指定したPendingIntentを実行するように設定
+//	 * @param context
+//	 * @param restartIntent
+//	 */
+//	public static void setAutoRestart(@NonNull final Context context,
+//		@NonNull final PendingIntent restartIntent,
+//		final long delayMs) {
+//
+//		final UncaughtExceptionHandler original = Thread.getDefaultUncaughtExceptionHandler();
+//		final UncaughtExceptionHandler handler = new UncaughtExceptionHandler() {
+//			@Override
+//			public void uncaughtException(@NonNull final Thread thread, @NonNull final Throwable throwable) {
+//				try {
+//					final AlarmManager am = ContextUtils.requireSystemService(context, AlarmManager.class);
+//					am.set(AlarmManager.RTC_WAKEUP, System.currentTimeMillis() + delayMs, restartIntent);
+//				} finally {
+//					original.uncaughtException(thread, throwable);
+//				}
+//			}
+//		};
+//		Thread.setDefaultUncaughtExceptionHandler(handler);
+//	}
+//
+//	/**
+//	 * アプリがクラッシュしたときに指定したActivityを起動するように設定
+//	 * @param context
+//	 * @param activityClass
+//	 */
+//	@SuppressLint("InlinedApi")
+//	@SuppressWarnings("deprecation")
+//	public static void setAutoRestart(@NonNull final Context context,
+//		@NonNull final Class<? extends Activity> activityClass,
+//		final long delayMs) {
+//
+//		int flags = PendingIntent.FLAG_CANCEL_CURRENT;
+//		if (BuildCheck.isAPI31()) {
+//			flags |= PendingIntent.FLAG_IMMUTABLE;
+//		}
+//		final PendingIntent intent = PendingIntent.getActivity(
+//			context.getApplicationContext(),
+//			REQUEST_RESTART_ACTIVITY,
+//			Intent.makeMainActivity(new ComponentName(context, activityClass)),
+//			flags);
+//		setAutoRestart(context, intent, delayMs);
+//	}
 
 /*	public static final void sendReport(final Context context) {
 		final File file = getFileStreamPath(this, LOG_NAME);

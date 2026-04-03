@@ -32,19 +32,13 @@ public class ShaderConst implements GLConst {
 	public static final String SHADER_VERSION_ES31 = "#version 310 es\n";
 	public static final String SHADER_VERSION_ES32 = "#version 320 es\n";
 
-	@Deprecated
-	public static final String HEADER_2D = "";
 	public static final String HEADER_2D_ES2 = "";
 	public static final String HEADER_2D_ES3 = "";
-	@Deprecated
-	public static final String SAMPLER_2D = "sampler2D";
 	public static final String SAMPLER_2D_ES2 = "sampler2D";
 	public static final String SAMPLER_2D_ES3 = "sampler2D";
 
 	public static final String HEADER_OES_ES2 = "#extension GL_OES_EGL_image_external : require\n";
 	public static final String HEADER_OES_ES3 = "#extension GL_OES_EGL_image_external_essl3 : require\n";
-	@Deprecated
-	public static final String SAMPLER_OES = "samplerExternalOES";
 	public static final String SAMPLER_OES_ES2 = "samplerExternalOES";
 	public static final String SAMPLER_OES_ES3 = "samplerExternalOES";
 

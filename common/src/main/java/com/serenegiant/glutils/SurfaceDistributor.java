@@ -178,16 +178,6 @@ public class SurfaceDistributor implements IRendererHolder {
 	 * IRendererHolderの実装
 	 * @return
 	 */
-	@Nullable
-	@Override
-	public EGLBase.IContext<?> getContext() {
-		return mGlManager.getGLContext().getContext();
-	}
-
-	/**
-	 * IRendererHolderの実装
-	 * @return
-	 */
 	@Override
 	public Surface getSurface() {
 		return mGLSurfaceReceiver.getSurface();

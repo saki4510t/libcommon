@@ -35,38 +35,7 @@ import androidx.annotation.Nullable;
  * XXX API>=28でasync=trueならHandler#createAsyncを使ってもよいかも
  */
 public class HandlerThreadHandler extends Handler {
-	private static final String TAG = "HandlerThreadHandler";
-
-	/**
-	 * インスタンス生成用ヘルパーメソッド
-	 * @return
-	 */
-	@Deprecated
-	@SuppressLint("NewApi")
-	public static final HandlerThreadHandler createHandler() {
-		return createHandler(TAG, null, Process.THREAD_PRIORITY_DEFAULT, false);
-	}
-
-	/**
-	 * インスタンス生成用ヘルパーメソッド
-	 * @param priority The priority to run the thread at. The value supplied must be from
-	 * 			{@link android.os.Process} and not from java.lang.Thread.
-	 * @return
-	 */
-	@Deprecated
-	public static final HandlerThreadHandler createHandler(final int priority) {
-		return createHandler(TAG, null, priority, false);
-	}
-
-	/**
-	 * インスタンス生成用ヘルパーメソッド
-	 * @param async Lopperの同期バリアの影響を受けずに非同期実行するかどうか，API<22なら無視される
-	 * @return
-	 */
-	@Deprecated
-	public static final HandlerThreadHandler createHandler(final boolean async) {
-		return createHandler(TAG, null, Process.THREAD_PRIORITY_DEFAULT, async);
-	}
+	private static final String TAG = HandlerThreadHandler.class.getSimpleName();
 
 	/**
 	 * インスタンス生成用ヘルパーメソッド
@@ -106,45 +75,6 @@ public class HandlerThreadHandler extends Handler {
 		final String name, final int priority, final boolean async) {
 
 		return createHandler(TAG, null, priority, async);
-	}
-
-	/**
-	 * インスタンス生成用ヘルパーメソッド
-	 * @param callback
-	 * @return
-	 */
-	@Deprecated
-	public static final HandlerThreadHandler createHandler(
-		@Nullable final Callback callback) {
-
-		return createHandler(TAG, callback, Process.THREAD_PRIORITY_DEFAULT, false);
-	}
-
-	/**
-	 * インスタンス生成用ヘルパーメソッド
-	 * @param callback
-	 * @param priority The priority to run the thread at. The value supplied must be from
-	 * 			{@link android.os.Process} and not from java.lang.Thread.
-	 * @return
-	 */
-	@Deprecated
-	public static final HandlerThreadHandler createHandler(
-		@Nullable final Callback callback, final int priority) {
-
-		return createHandler(TAG, callback, priority, false);
-	}
-
-	/**
-	 * インスタンス生成用ヘルパーメソッド
-	 * @param callback
-	 * @param async Lopperの同期バリアの影響を受けずに非同期実行するかどうか，API<22なら無視される
-	 * @return
-	 */
-	@Deprecated
-	public static final HandlerThreadHandler createHandler(
-		@Nullable final Callback callback, final boolean async) {
-
-		return createHandler(TAG, callback, Process.THREAD_PRIORITY_DEFAULT, async);
 	}
 
 	/**

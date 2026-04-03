@@ -198,39 +198,6 @@ public final class USBMonitor extends UsbDetector implements Const {
 		return mUsbPermission.requestPermission(device);
 	}
 
-	/**
-	 * パーミッションを要求する
-	 * @param context
-	 * @param device
-	 * @throws IllegalStateException
-	 * @deprecated UsbPermissionの同名メソッドを使う
-	 */
-	@Deprecated
-	public static void requestPermission(
-		@NonNull final Context context,
-		@NonNull final UsbDevice device)
-			throws IllegalArgumentException {
-		UsbPermission.requestPermission(context, device, UsbPermission.DEFAULT_CALLBACK);
-	}
-
-	/**
-	 * パーミッションを要求する
-	 * @param context
-	 * @param device
-	 * @param callback
-	 * @throws IllegalStateException
-	 * @deprecated UsbPermissionの同名メソッドを使う
-	 */
-	@Deprecated
-	public static void requestPermission(
-		@NonNull final Context context,
-		@NonNull final UsbDevice device,
-		@NonNull final Callback callback)
-			throws IllegalArgumentException {
-
-		UsbPermission.requestPermission(context, device, callback);
-	}
-
 //--------------------------------------------------------------------------------
 	/**
 	 * 指定したUsbDeviceをopenする

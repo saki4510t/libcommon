@@ -28,7 +28,6 @@ import android.graphics.SurfaceTexture;
 import android.graphics.drawable.Drawable;
 import android.opengl.GLES20;
 import android.opengl.GLES30;
-import android.opengl.Matrix;
 import android.os.Build;
 import android.util.Log;
 import android.view.Surface;
@@ -158,61 +157,6 @@ public class GLUtils implements GLConst {
 			return glVersion >= 3;
 		} catch (final Exception e) {
 			throw new IllegalStateException(e);
-		}
-	}
-
-	/**
-	 * モデルビュー変換行列に左右・上下反転をセット
-	 * @param mvp
-	 * @param mirror
-	 * @deprecated MatrixUtilsの同名メソッドを使うこと
-	 */
-	@Deprecated
-	public static void setMirror(@NonNull @Size(min=16) final float[] mvp, @MirrorMode final int mirror) {
-		switch (mirror) {
-		case MIRROR_NORMAL -> {
-			mvp[0] = Math.abs(mvp[0]);
-			mvp[5] = Math.abs(mvp[5]);
-		}
-		case MIRROR_HORIZONTAL -> {
-			mvp[0] = -Math.abs(mvp[0]);    // flip left-right
-			mvp[5] = Math.abs(mvp[5]);
-		}
-		case MIRROR_VERTICAL -> {
-			mvp[0] = Math.abs(mvp[0]);
-			mvp[5] = -Math.abs(mvp[5]);    // flip up-side down
-		}
-		case MIRROR_BOTH -> {
-			mvp[0] = -Math.abs(mvp[0]);    // flip left-right
-			mvp[5] = -Math.abs(mvp[5]);    // flip up-side down
-		}
-		}
-	}
-
-	/**
-	 * 現在のモデルビュー変換行列をxy平面で指定した角度回転させる
-	 * @param mvp
-	 * @param degrees
-	 * @deprecated MatrixUtilsの同名メソッドを使うこと
-	 */
-	@Deprecated
-	public static void rotate(@NonNull @Size(min=16) final float[] mvp, final int degrees) {
-		if ((degrees % 180) != 0) {
-			Matrix.rotateM(mvp, 0, degrees, 0.0f, 0.0f, 1.0f);
-		}
-	}
-
-	/**
-	 * モデルビュー変換行列にxy平面で指定した角度回転させた回転行列をセットする
-	 * @param mvp
-	 * @param degrees
-	 * @deprecated MatrixUtilsの同名メソッドを使うこと
-	 */
-	@Deprecated
-	public static void setRotation(@NonNull @Size(min=16) final float[] mvp, final int degrees) {
-		Matrix.setIdentityM(mvp, 0);
-		if ((degrees % 180) != 0) {
-			Matrix.rotateM(mvp, 0, degrees, 0.0f, 0.0f, 1.0f);
 		}
 	}
 

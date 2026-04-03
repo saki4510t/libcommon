@@ -54,13 +54,6 @@ public class MediaEffectPipeline extends ProxyPipeline
 	private static final boolean DEBUG = false;	// set false on production
 	private static final String TAG = MediaEffectPipeline.class.getSimpleName();
 
-	/**
-	 * @deprecated use com.serenegiant.mediaeffect.EffectsBuilder
-	 */
-	@Deprecated
-	public interface EffectsBuilder extends com.serenegiant.mediaeffect.EffectsBuilder {
-	}
-
 	@NonNull
 	private final GLManager mManager;
 	@NonNull

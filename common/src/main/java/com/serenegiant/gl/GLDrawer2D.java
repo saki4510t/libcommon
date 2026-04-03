@@ -563,39 +563,6 @@ public class GLDrawer2D implements GLConst {
 	}
 
 	/**
-	 * テクスチャ名生成のヘルパーメソッド
-	 * GLHelper#initTexを呼び出すだけ
-	 * @param texUnit
-	 * @return texture ID
-	 */
-	@Deprecated
-	public int initTex(@TexUnit final int texUnit) {
-		return GLUtils.initTex(texTarget, texUnit, GLES20.GL_NEAREST);
-	}
-
-	/**
-	 * テクスチャ名生成のヘルパーメソッド
-	 * GLHelper#initTexを呼び出すだけ
-	 * @param texUnit
-	 * @param filterParam
-	 * @return
-	 */
-	@Deprecated
-	public int initTex(@TexUnit final int texUnit, final int filterParam) {
-		return GLUtils.initTex(texTarget, texUnit, filterParam);
-	}
-
-	/**
-	 * テクスチャ名破棄のヘルパーメソッド
-	 * GLHelper.deleteTexを呼び出すだけ
-	 * @param hTex
-	 */
-	@Deprecated
-	public void deleteTex(final int hTex) {
-		GLUtils.deleteTex(hTex);
-	}
-
-	/**
 	 * 頂点シェーダー・フラグメントシェーダーを変更する
 	 * GLコンテキスト/EGLレンダリングコンテキスト内で呼び出さないとダメ
 	 * glUseProgramが呼ばれた状態で返る

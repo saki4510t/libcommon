@@ -57,10 +57,6 @@ public abstract class IAudioSampler {
 		public void onError(@NonNull  Throwable t);
 	}
 
-	@Deprecated
-	public interface SoundSamplerCallback extends AudioSamplerCallback {
-	}
-
 	/**
 	 * バッファリング用に生成する音声データレコードの最大生成する
 	 */

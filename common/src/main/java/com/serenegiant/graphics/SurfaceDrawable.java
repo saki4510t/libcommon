@@ -301,11 +301,6 @@ public class SurfaceDrawable extends Drawable {
 		return mGlManager.getEgl();
 	}
 
-	@Deprecated
-	protected EGLBase.IContext<?> getContext() {
-		return mGlManager.getGLContext().getContext();
-	}
-
 	protected boolean isGLES3() {
 		return mGlManager.isGLES3();
 	}

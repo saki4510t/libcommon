@@ -53,9 +53,7 @@ public class FileUtils {
 	 * @param context
 	 * @param uniqueName
 	 * @return キャッシュディレクトリパス
-	 * @deprecated FileUtilsの同名メソッドを使うこと
 	 */
-	@Deprecated
 	public static String getCacheDir(@NonNull final Context context, final String uniqueName) {
 		// 外部ストレージが使える場合はそっちのディレクトリを、そうでない場合は内部のディレクトリを使う
 		final String cachePath =

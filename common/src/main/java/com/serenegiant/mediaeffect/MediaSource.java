@@ -32,7 +32,7 @@ import com.serenegiant.gl.GLOffscreen;
 
 public class MediaSource implements IMediaSource {
 	private static final boolean DEBUG = false;
-	private static final String TAG = "MediaSource";
+	private static final String TAG = MediaSource.class.getSimpleName();
 
 	public final boolean isGLES3;
 	private final int mTexUnit;
@@ -187,19 +187,6 @@ public class MediaSource implements IMediaSource {
 			mOutputScreen.release();
 			mOutputScreen = null;
 		}
-	}
-
-	@Deprecated
-	public MediaSource bind() {
-		mSourceScreen.makeCurrent();
-		return this;
-	}
-
-	@Deprecated
-	public MediaSource unbind() {
-		mSourceScreen.swap();
-		reset();
-		return this;
 	}
 
 	/**

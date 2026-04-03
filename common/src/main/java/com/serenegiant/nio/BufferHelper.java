@@ -264,16 +264,6 @@ public class BufferHelper {
 	 * @param coords
 	 * @return
 	 */
-	@Deprecated
-	public static FloatBuffer createFloatBuffer(@NonNull final float[] coords) {
-		return createBuffer(coords);
-	}
-
-	/**
-	 * 引数のfloat配列と同じ長さのFloatBufferを生成して引数の値をセットする
-	 * @param coords
-	 * @return
-	 */
 	public static FloatBuffer createBuffer(@NonNull final float[] coords) {
 		// Allocate a direct ByteBuffer, using 4 bytes per float, and copy coords into it.
 		final FloatBuffer result

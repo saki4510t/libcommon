@@ -624,9 +624,7 @@ public class PermissionUtils {
 //	 * 							再度shouldShowRequestPermissionRationaleがヒットしてループしてしまうのを防ぐため
 //	 * @param callback
 //	 * @return このメソッドを呼出した時点で指定したパーミッションを保持しているかどうか
-//	 * @deprecated 動作確認のためだけに作ったので通常は使わないこと
 //	 */
-//	@Deprecated
 //	public static boolean requestPermission(
 //		@NonNull final Fragment fragment,
 //		@NonNull final String permission,
@@ -692,9 +690,7 @@ public class PermissionUtils {
 //	 * 							再度shouldShowRequestPermissionRationaleがヒットしてループしてしまうのを防ぐため
 //	 * @param callback
 //	 * @return このメソッドを呼出した時点で指定したパーミッションを保持しているかどうか
-//	 * @deprecated 動作確認のためだけに作ったので通常は使わないこと
 //	 */
-//	@Deprecated
 //	public static boolean requestPermission(
 //		@NonNull final AppCompatActivity activity,
 //		@NonNull final String permission,

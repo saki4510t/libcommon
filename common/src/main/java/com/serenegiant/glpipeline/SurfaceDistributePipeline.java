@@ -401,12 +401,6 @@ public class SurfaceDistributePipeline extends ProxyPipeline implements IMirror 
 			return mGLContext;
 		}
 
-		@NonNull
-		@Override
-		public EGLBase.IContext<?> getContext() {
-			return mGLContext.getContext();
-		}
-
 		@Override
 		public int getGlVersion() {
 			return mGLContext.getGlVersion();

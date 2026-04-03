@@ -74,7 +74,6 @@ public abstract class AbstractDistributeTask implements IMirror {
 	private int mVideoWidth, mVideoHeight;
 	@MirrorMode
 	private int mMirror = MIRROR_NORMAL;
-	private int mRotation = 0;
 	private volatile boolean mIsFirstFrameRendered;
 	private volatile boolean mHasNewFrame;
 	private volatile boolean mReleased;
@@ -361,21 +360,6 @@ public abstract class AbstractDistributeTask implements IMirror {
 	@AnyThread
 	public int height() {
 		return mVideoHeight;
-	}
-
-	@Deprecated
-	public void rotation(final int degree) {
-		if (DEBUG) Log.v(TAG, "mirror:" + degree);
-		checkFinished();
-		if (mRotation != degree) {
-			offer(REQUEST_ROTATE, degree);
-		}
-	}
-
-	@Deprecated
-	@AnyThread
-	public int rotation() {
-		return mRotation;
 	}
 
 	public GLDrawer2D getDrawer() {
@@ -767,7 +751,6 @@ public abstract class AbstractDistributeTask implements IMirror {
 	@WorkerThread
 	private void handleRotate(final int id, final int degree) {
 		if (DEBUG) Log.v(TAG, "handleRotate:" + id);
-		mRotation = degree;
 		if (id == 0) {
 			final int n = mTargets.size();
 			for (int i = 0; i < n; i++) {
@@ -847,9 +830,6 @@ public abstract class AbstractDistributeTask implements IMirror {
 	public abstract EGLBase getEgl();
 	@NonNull
 	public abstract GLContext getGLContext();
-	@Deprecated
-	@NonNull
-	public abstract EGLBase.IContext<?> getContext();
 	public abstract int getGlVersion();
 	public abstract void makeCurrent();
 	public abstract boolean isGLES3();

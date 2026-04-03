@@ -115,19 +115,6 @@ public abstract class AbstractRendererHolder implements IRendererHolder {
 		return mRendererTask.getGLContext();
 	}
 
-	@Deprecated
-	@SuppressWarnings("deprecation")
-	@Nullable
-	@Override
-	public EGLBase.IContext<?> getContext() {
-		return mRendererTask.getContext();
-	}
-
-	@Deprecated
-	public int getGlVersion() {
-		return mRendererTask.getGlVersion();
-	}
-
 	/**
 	 * マスター用の映像を受け取るためのSurfaceを取得
 	 * @return
@@ -504,13 +491,6 @@ public abstract class AbstractRendererHolder implements IRendererHolder {
 		@Override
 		public GLContext getGLContext() {
 			return mGlManager.getGLContext();
-		}
-
-		@Deprecated
-		@NonNull
-		@Override
-		public EGLBase.IContext<?> getContext() {
-			return mGlManager.getGLContext().getContext();
 		}
 
 		@Override

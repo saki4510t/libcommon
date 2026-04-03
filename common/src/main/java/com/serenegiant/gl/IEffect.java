@@ -29,25 +29,6 @@ public interface IEffect {
 	 * 継承して独自の映像効果を追加する時はEFFECT_NUMよりも大きい値を使うこと
 	 * @param effect
 	 */
-	@Deprecated
-	public default void changeEffect(final int effect) {
-		setEffect(effect);
-	}
-
-	/**
-	 * 現在の映像効果番号を取得
-	 * @return
-	 */
-	@Deprecated
-	public default int getCurrentEffect() {
-		return getEffect();
-	}
-
-	/**
-	 * 映像効果をセット
-	 * 継承して独自の映像効果を追加する時はEFFECT_NUMよりも大きい値を使うこと
-	 * @param effect
-	 */
 	public void setEffect(final int effect);
 	/**
 	 * 現在の映像効果番号を取得
