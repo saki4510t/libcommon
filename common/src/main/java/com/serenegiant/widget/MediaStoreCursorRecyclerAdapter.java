@@ -44,7 +44,7 @@ import com.serenegiant.mediastore.ThumbnailCache;
 import com.serenegiant.mediastore.ThumbnailLoader;
 import com.serenegiant.mediastore.ThumbnailLoaderDrawable;
 import com.serenegiant.utils.ThreadPool;
-import com.serenegiant.view.ViewUtils;
+import com.serenegiant.view.ViewFindUtils;
 
 import java.io.IOException;
 
@@ -610,8 +610,8 @@ public class MediaStoreCursorRecyclerAdapter
 		public ViewHolder(@NonNull final View v) {
 			super(v);
 			v.setTag(R.id.info, info);
-			mImageView = ViewUtils.findIconView(v);
-			mTitleView = ViewUtils.findTitleView(v);
+			mImageView = ViewFindUtils.findIconView(v);
+			mTitleView = ViewFindUtils.findTitleView(v);
 		}
 
 	}

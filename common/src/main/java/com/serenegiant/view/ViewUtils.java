@@ -28,22 +28,16 @@ import android.view.LayoutInflater;
 import android.view.Surface;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.ViewParent;
 import android.view.WindowManager;
-import android.widget.ImageView;
-import android.widget.TextView;
 
-import com.serenegiant.common.R;
 import com.serenegiant.system.BuildCheck;
 import com.serenegiant.content.ContextUtils;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 
-import androidx.annotation.IdRes;
 import androidx.annotation.IntDef;
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.annotation.StyleRes;
 import androidx.annotation.UiThread;
 
@@ -254,145 +248,6 @@ public class ViewUtils {
 	@Orientation
 	public static int getOrientation(@NonNull final Context context) {
 		return context.getResources().getConfiguration().orientation;
-	}
-
-//--------------------------------------------------------------------------------
-	@IdRes
-	private static final int[] ICON_IDS = {
-		R.id.thumbnail,
-		android.R.id.icon,
-		R.id.icon,
-		R.id.image,
-	};
-
-	@IdRes
-	private static final int[] TITLE_IDS = {
-		R.id.title,
-		R.id.content,
-		android.R.id.title,
-		android.R.id.text1,
-		android.R.id.text2,
-	};
-
-	/**
-	 * サムネイル・アイコン表示用にImageViewを探す
-	 * id = R.id.thumbnail, android.R.id.icon, R.id.icon, R.id.image
-	 * @param view
-	 * @return
-	 */
-	@Nullable
-	public static ImageView findIconView(@NonNull final View view) {
-		return findView(view, ICON_IDS, ImageView.class);
-	}
-
-	/**
-	 * サムネイル・アイコン表示用にImageViewを探す
-	 * @param view
-	 * @param ids
-	 * @return
-	 */
-	@Nullable
-	public static ImageView findIconView(
-		@NonNull final View view,
-		@NonNull @IdRes final int[] ids) {
-
-		return findView(view, ids, ImageView.class);
-	}
-
-	/**
-	 * タイトル表示用にTextViewを探す
-	 * id = android.R.id.title, R.id.title
-	 * @param view
-	 * @return
-	 */
-	@Nullable
-	public static TextView findTitleView(@NonNull final View view) {
-		return findView(view, TITLE_IDS, TextView.class);
-	}
-
-	/**
-	 * タイトル表示用にTextViewを探す
-	 * @param view
-	 * @param ids
-	 * @return
-	 */
-	@Nullable
-	public static TextView findTitleView(
-		@NonNull final View view,
-		@NonNull @IdRes final int[] ids) {
-
-		return findView(view, ids, TextView.class);
-	}
-
-	/**
-	 * 指定したViewから指定したidで指定した型のViewを探す
-	 * @param view
-	 * @param ids
-	 * @param clazz
-	 * @param <T>
-	 * @return
-	 */
-	@SuppressWarnings("unchecked")
-	@Nullable
-	public static <T extends View> T findView(
-		@NonNull final View view,
-		@NonNull @IdRes final int[] ids,
-		@NonNull final Class<T> clazz) {
-
-		T result = null;
-		if (clazz.isInstance(view)) {
-			result = (T) view;
-		} else {
-			for (final int id: ids) {
-				final View v = view.findViewById(id);
-				if (clazz.isInstance(v)) {
-					result = (T)v;
-					break;
-				}
-			}
-		}
-
-		return result;
-	}
-
-	/**
-	 * Viewまたは親Viewから指定したidで指定した型のViewを探す
-	 * @param view
-	 * @param ids
-	 * @param clazz
-	 * @param <T>
-	 * @return
-	 */
-	@SuppressWarnings("unchecked")
-	@Nullable
-	public static <T extends View> T findViewInParent(
-		@NonNull final View view,
-		@NonNull @IdRes final int[] ids,
-		@NonNull final Class<T> clazz) {
-
-		T result = null;
-LOOP:	for (final int id: ids) {
-			if (id == View.NO_ID) continue;
-			final View v = view.findViewById(id);
-			if (clazz.isInstance(v)) {
-				result = (T)v;
-				break LOOP;
-			}
-			if (result == null) {
-				ViewParent parent = view.getParent();
-				for (; (parent != null) && (result == null); parent = parent.getParent()) {
-					if (parent instanceof View) {
-						final View vv = ((View)parent).findViewById(id);
-						if (clazz.isInstance(vv)) {
-							result = (T)vv;
-							break LOOP;
-						}
-					}
-				}
-			}
-		}
-
-		return result;
 	}
 
 }

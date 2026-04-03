@@ -30,7 +30,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.serenegiant.common.R;
-import com.serenegiant.view.ViewUtils;
+import com.serenegiant.view.ViewFindUtils;
 
 import java.util.List;
 
@@ -74,7 +74,7 @@ public class BluetoothDeviceInfoAdapter extends ArrayAdapter<BluetoothDeviceInfo
 			final ViewHolder holder = new ViewHolder();
 			holder.nameTv = rootView.findViewById(R.id.name);
 			holder.addressTv = rootView.findViewById(R.id.address);
-			holder.icon = ViewUtils.findIconView(rootView);
+			holder.icon = ViewFindUtils.findIconView(rootView);
 			rootView.setTag(holder);
 		}
 		final ViewHolder holder = (ViewHolder)rootView.getTag();

@@ -46,7 +46,7 @@ import com.serenegiant.mediastore.ThumbnailCache;
 import com.serenegiant.mediastore.ThumbnailLoader;
 import com.serenegiant.mediastore.ThumbnailLoaderDrawable;
 import com.serenegiant.utils.ThreadPool;
-import com.serenegiant.view.ViewUtils;
+import com.serenegiant.view.ViewFindUtils;
 
 import static com.serenegiant.mediastore.MediaStoreUtils.*;
 
@@ -165,8 +165,8 @@ public class MediaStoreAdapter extends CursorAdapter {
 		holder = (ViewHolder)view.getTag(R.id.mediastorephotoadapter);
 		if (holder == null) {
 			holder = new ViewHolder();
-			holder.mImageView = ViewUtils.findIconView(view);
-			holder.mTitleView = ViewUtils.findTitleView(view);
+			holder.mImageView = ViewFindUtils.findIconView(view);
+			holder.mTitleView = ViewFindUtils.findTitleView(view);
 			view.setTag(R.id.mediastorephotoadapter, holder);
 		}
 		return holder;

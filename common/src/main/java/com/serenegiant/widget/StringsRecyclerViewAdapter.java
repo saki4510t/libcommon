@@ -20,7 +20,7 @@ package com.serenegiant.widget;
 
 import android.widget.TextView;
 
-import com.serenegiant.view.ViewUtils;
+import com.serenegiant.view.ViewFindUtils;
 
 import java.util.List;
 
@@ -62,7 +62,7 @@ public class StringsRecyclerViewAdapter extends ArrayListRecyclerViewAdapter<Str
 		final int position) {
 
 		holder.mItem = getItem(position);
-		final TextView tv = ViewUtils.findTitleView(holder.mView);
+		final TextView tv = ViewFindUtils.findTitleView(holder.mView);
 		if (tv != null) {
 			tv.setText(holder.mItem);
 		} else {

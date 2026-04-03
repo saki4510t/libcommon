@@ -36,7 +36,7 @@ import com.serenegiant.common.R;
 import com.serenegiant.documentfile.SAFUtils;
 import com.serenegiant.system.HandlerThreadHandler;
 import com.serenegiant.system.HandlerUtils;
-import com.serenegiant.view.ViewUtils;
+import com.serenegiant.view.ViewFindUtils;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -562,7 +562,7 @@ public class DocumentTreeRecyclerAdapter
 
 		public ViewHolder(final View view) {
 			super(view);
-			mTitleTv = ViewUtils.findTitleView(view);
+			mTitleTv = ViewFindUtils.findTitleView(view);
 			if (mTitleTv == null) {
 				throw new IllegalArgumentException("TextView not found");
 			}

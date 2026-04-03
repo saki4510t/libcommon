@@ -46,7 +46,7 @@ import com.serenegiant.mediastore.ImageLoader;
 import com.serenegiant.mediastore.LoaderDrawable;
 import com.serenegiant.mediastore.MediaInfo;
 import com.serenegiant.utils.ThreadPool;
-import com.serenegiant.view.ViewUtils;
+import com.serenegiant.view.ViewFindUtils;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -151,8 +151,8 @@ public class MediaStoreImageAdapter extends PagerAdapter {
 			if (holder == null) {
 				holder = new ViewHolder();
 			}
-			holder.mImageView = ViewUtils.findIconView(view);
-			holder.mTitleView = ViewUtils.findTitleView(view);
+			holder.mImageView = ViewFindUtils.findIconView(view);
+			holder.mTitleView = ViewFindUtils.findTitleView(view);
 			info.loadFromCursor(getCursor(position));
 			// ローカルキャッシュ
 			Drawable drawable = holder.mImageView.getDrawable();

@@ -31,7 +31,7 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
-import com.serenegiant.view.ViewUtils;
+import com.serenegiant.view.ViewFindUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -92,7 +92,7 @@ public class ValueSelectorAdapter extends ArrayAdapter<ValueSelectorAdapter.Valu
 			final TextView label;
 			rootView = mInflater.inflate(mLayoutId, parent, false);
 			final ViewHolder holder = new ViewHolder();
-			holder.titleTv = ViewUtils.findTitleView(rootView);
+			holder.titleTv = ViewFindUtils.findTitleView(rootView);
 			rootView.setOnTouchListener(mOnTouchListener);
 			rootView.setTag(holder);
 		}

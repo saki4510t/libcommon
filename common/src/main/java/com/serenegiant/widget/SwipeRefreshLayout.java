@@ -40,7 +40,7 @@ import android.widget.AbsListView;
 import android.widget.ListView;
 
 import com.serenegiant.common.R;
-import com.serenegiant.view.ViewUtils;
+import com.serenegiant.view.ViewFindUtils;
 
 import androidx.annotation.ColorInt;
 import androidx.annotation.ColorRes;
@@ -478,7 +478,7 @@ public class SwipeRefreshLayout extends ViewGroup
 		if (mCircleView == null) {
 			// progress viewを探す
 			final int[] ids = new int[] { mProgressViewId, R.id.progressView };
-			View progressView = ViewUtils.findViewInParent(this, ids, View.class);
+			View progressView = ViewFindUtils.findViewInParent(this, ids, View.class);
 			if (progressView == null) {
 				if (DEBUG) Log.v(LOG_TAG, "onAttachedToWindow:progress viewが指定されていないので内部生成する");
 				mOwnProgressView = true;
