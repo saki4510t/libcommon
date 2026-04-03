@@ -30,6 +30,7 @@ import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 
+import com.serenegiant.math.IntersectionUtils;
 import com.serenegiant.system.DisplayMetricsUtils;
 import com.serenegiant.widget.ITransformView;
 
@@ -174,7 +175,7 @@ public abstract class TouchViewTransformer extends ViewTransformer
 	 * 移動範囲制限のためのLineSegment配列
 	 */
 	@NonNull
-	private final ViewUtils.LineSegment[] mLimitSegments = new ViewUtils.LineSegment[4];
+	private final IntersectionUtils.LineSegment[] mLimitSegments = new IntersectionUtils.LineSegment[4];
 	/**
 	 * 表示内容の実際のサイズ
 	 */
@@ -583,7 +584,7 @@ public abstract class TouchViewTransformer extends ViewTransformer
 			mCurrentDegrees = 0.f;
 		}
 		mIsRestored = false;
-		mIsRotating = Math.abs(((int)(mCurrentDegrees / 360.f)) * 360.f - mCurrentDegrees) > ViewUtils.EPS;
+		mIsRotating = Math.abs(((int)(mCurrentDegrees / 360.f)) * 360.f - mCurrentDegrees) > IntersectionUtils.EPS;
 
 		// set limit rectangle that the image can move
 		mLimitRect.set(getDrawingRect());
@@ -747,30 +748,30 @@ public abstract class TouchViewTransformer extends ViewTransformer
 			|| mLimitRect.contains(mTransCoords[4], mTransCoords[5])
 			|| mLimitRect.contains(mTransCoords[6], mTransCoords[7])
 			// check whether at least one corner of limitRect is in the image bounds
-			|| ViewUtils.ptInPoly(mLimitRect.left, mLimitRect.top, mTransCoords)
-			|| ViewUtils.ptInPoly(mLimitRect.right, mLimitRect.top, mTransCoords)
-			|| ViewUtils.ptInPoly(mLimitRect.right, mLimitRect.bottom, mTransCoords)
-			|| ViewUtils.ptInPoly(mLimitRect.left, mLimitRect.bottom, mTransCoords);
+			|| IntersectionUtils.ptInPoly(mLimitRect.left, mLimitRect.top, mTransCoords)
+			|| IntersectionUtils.ptInPoly(mLimitRect.right, mLimitRect.top, mTransCoords)
+			|| IntersectionUtils.ptInPoly(mLimitRect.right, mLimitRect.bottom, mTransCoords)
+			|| IntersectionUtils.ptInPoly(mLimitRect.left, mLimitRect.bottom, mTransCoords);
 		if (!canMove) {
 			// when no corner is in, we need additional check whether at least
 			// one side of image bounds intersect with the limit rectangle
 			if (mLimitSegments[0] == null) {
-				mLimitSegments[0] = new ViewUtils.LineSegment(mLimitRect.left, mLimitRect.top, mLimitRect.right, mLimitRect.top);
-				mLimitSegments[1] = new ViewUtils.LineSegment(mLimitRect.right, mLimitRect.top, mLimitRect.right, mLimitRect.bottom);
-				mLimitSegments[2] = new ViewUtils.LineSegment(mLimitRect.right, mLimitRect.bottom, mLimitRect.left, mLimitRect.bottom);
-				mLimitSegments[3] = new ViewUtils.LineSegment(mLimitRect.left, mLimitRect.bottom, mLimitRect.left, mLimitRect.top);
+				mLimitSegments[0] = new IntersectionUtils.LineSegment(mLimitRect.left, mLimitRect.top, mLimitRect.right, mLimitRect.top);
+				mLimitSegments[1] = new IntersectionUtils.LineSegment(mLimitRect.right, mLimitRect.top, mLimitRect.right, mLimitRect.bottom);
+				mLimitSegments[2] = new IntersectionUtils.LineSegment(mLimitRect.right, mLimitRect.bottom, mLimitRect.left, mLimitRect.bottom);
+				mLimitSegments[3] = new IntersectionUtils.LineSegment(mLimitRect.left, mLimitRect.bottom, mLimitRect.left, mLimitRect.top);
 			}
-			final ViewUtils.LineSegment side = new ViewUtils.LineSegment(mTransCoords[0], mTransCoords[1], mTransCoords[2], mTransCoords[3]);
-			canMove = ViewUtils.checkIntersect(side, mLimitSegments);
+			final IntersectionUtils.LineSegment side = new IntersectionUtils.LineSegment(mTransCoords[0], mTransCoords[1], mTransCoords[2], mTransCoords[3]);
+			canMove = IntersectionUtils.checkIntersect(side, mLimitSegments);
 			if (!canMove) {
 				side.set(mTransCoords[2], mTransCoords[3], mTransCoords[4], mTransCoords[5]);
-				canMove = ViewUtils.checkIntersect(side, mLimitSegments);
+				canMove = IntersectionUtils.checkIntersect(side, mLimitSegments);
 				if (!canMove) {
 					side.set(mTransCoords[4], mTransCoords[5], mTransCoords[6], mTransCoords[7]);
-					canMove = ViewUtils.checkIntersect(side, mLimitSegments);
+					canMove = IntersectionUtils.checkIntersect(side, mLimitSegments);
 					if (!canMove) {
 						side.set(mTransCoords[6], mTransCoords[7], mTransCoords[0], mTransCoords[1]);
-						canMove = ViewUtils.checkIntersect(side, mLimitSegments);
+						canMove = IntersectionUtils.checkIntersect(side, mLimitSegments);
 					}
 				}
 			}
@@ -787,13 +788,13 @@ public abstract class TouchViewTransformer extends ViewTransformer
 
 				if (right < mLimitRect.left) {
 					dx = mLimitRect.left - right;
-				} else if (left + ViewUtils.EPS > mLimitRect.right) {
-					dx = mLimitRect.right - left - ViewUtils.EPS;
+				} else if (left + IntersectionUtils.EPS > mLimitRect.right) {
+					dx = mLimitRect.right - left - IntersectionUtils.EPS;
 				}
 				if (bottom < mLimitRect.top) {
 					dy = mLimitRect.top - bottom;
-				} else if (top + ViewUtils.EPS > mLimitRect.bottom) {
-					dy = mLimitRect.bottom - top - ViewUtils.EPS;
+				} else if (top + IntersectionUtils.EPS > mLimitRect.bottom) {
+					dy = mLimitRect.bottom - top - IntersectionUtils.EPS;
 				}
 			}
 			if ((dx != 0) || (dy != 0)) {
@@ -956,7 +957,7 @@ public abstract class TouchViewTransformer extends ViewTransformer
 			// restore the Matrix
 			restoreMatrix();
 			mCurrentDegrees = calcAngle(event);
-			mIsRotating = Math.abs(((int)(mCurrentDegrees / 360.f)) * 360.f - mCurrentDegrees) > ViewUtils.EPS;
+			mIsRotating = Math.abs(((int)(mCurrentDegrees / 360.f)) * 360.f - mCurrentDegrees) > IntersectionUtils.EPS;
 			if (mIsRotating && mContentMatrix.postRotate(mCurrentDegrees, mPivotX, mPivotY)) {
 				// when Matrix is changed, apply to target view
 				setTransform(mContentMatrix);
@@ -991,8 +992,8 @@ public abstract class TouchViewTransformer extends ViewTransformer
 			final float y1 = event.getY(ix1) - event.getY(ix0);
 			//
 			final double s = (x0 * x0 + y0 * y0) * (x1 * x1 + y1 * y1);
-			final double cos = ViewUtils.dotProduct(x0, y0, x1, y1) / Math.sqrt(s);
-			angle = ViewUtils.TO_DEGREE * (float)Math.acos(cos) * Math.signum(ViewUtils.crossProduct(x0, y0, x1, y1));
+			final double cos = IntersectionUtils.dotProduct(x0, y0, x1, y1) / Math.sqrt(s);
+			angle = IntersectionUtils.TO_DEGREE * (float)Math.acos(cos) * Math.signum(IntersectionUtils.crossProduct(x0, y0, x1, y1));
 		}
 		return angle;
 	}
