@@ -19,6 +19,7 @@ ext {
 
 	versionCompiler = 34
 	versionTarget = 34
+	versionMin = 19
 
 	// variable that can be referenced to keep support libs consistent
 	jUnitVersion = '4.13.2'

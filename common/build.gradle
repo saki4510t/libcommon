@@ -35,7 +35,7 @@ android {
    	}
 
     defaultConfig {
-        minSdkVersion 19
+        minSdkVersion versionMin
         targetSdkVersion versionTarget
 		// AGP 4.1.0以降でライブラリプロジェクトのBuildConfigにVERSION_CODEとVERSION_NAMEが
 		// 含まれなくなってしまったのでワークアラウンドを追加
