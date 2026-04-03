@@ -26,7 +26,7 @@ import com.serenegiant.gl.GLManager;
 import com.serenegiant.glutils.GLSurfaceCapture;
 import com.serenegiant.glutils.ImageReader;
 import com.serenegiant.graphics.BitmapHelper;
-import com.serenegiant.utils.HandlerThreadHandler;
+import com.serenegiant.system.HandlerThreadHandler;
 
 import org.junit.After;
 import org.junit.Before;

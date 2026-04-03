@@ -38,8 +38,8 @@ import androidx.core.content.IntentCompat;
 import android.text.TextUtils;
 import android.util.Log;
 
-import com.serenegiant.utils.HandlerThreadHandler;
-import com.serenegiant.utils.HandlerUtils;
+import com.serenegiant.system.HandlerThreadHandler;
+import com.serenegiant.system.HandlerUtils;
 
 import java.io.IOException;
 import java.io.InputStream;

@@ -38,9 +38,9 @@ import android.text.TextUtils;
 import android.util.Log;
 
 import com.serenegiant.system.BuildCheck;
-import com.serenegiant.system.ContextUtils;
+import com.serenegiant.content.ContextUtils;
 import com.serenegiant.utils.ObjectHelper;
-import com.serenegiant.utils.XmlHelper;
+import com.serenegiant.content.XmlHelper;
 
 import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;

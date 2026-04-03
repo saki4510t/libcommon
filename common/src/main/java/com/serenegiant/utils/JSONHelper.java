@@ -18,6 +18,8 @@ package com.serenegiant.utils;
  *  limitations under the License.
 */
 
+import com.serenegiant.nio.ArrayUtils;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;

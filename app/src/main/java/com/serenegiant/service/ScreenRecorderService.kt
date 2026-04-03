@@ -58,8 +58,8 @@ import com.serenegiant.media.VideoConfig
 import com.serenegiant.mediastore.MediaStoreUtils
 import com.serenegiant.notification.NotificationCompat
 import com.serenegiant.system.BuildCheck
-import com.serenegiant.system.PermissionUtils
-import com.serenegiant.utils.FileUtils
+import com.serenegiant.content.PermissionUtils
+import com.serenegiant.system.FileUtils
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch

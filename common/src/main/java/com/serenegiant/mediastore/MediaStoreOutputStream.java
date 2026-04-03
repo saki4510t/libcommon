@@ -23,7 +23,7 @@ import android.content.Context;
 import android.net.Uri;
 import android.os.ParcelFileDescriptor;
 
-import com.serenegiant.utils.UriHelper;
+import com.serenegiant.content.UriHelper;
 
 import java.io.FileDescriptor;
 import java.io.FileNotFoundException;

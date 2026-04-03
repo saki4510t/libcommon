@@ -28,8 +28,6 @@ import android.media.MediaFormat;
 import android.media.MediaMuxer;
 import android.net.Uri;
 
-import com.serenegiant.system.BuildCheck;
-
 import androidx.annotation.NonNull;
 import androidx.documentfile.provider.DocumentFile;
 

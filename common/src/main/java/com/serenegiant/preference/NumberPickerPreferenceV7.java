@@ -24,7 +24,7 @@ import android.util.AttributeSet;
 import android.util.Log;
 
 import com.serenegiant.common.R;
-import com.serenegiant.utils.TypedArrayUtils;
+import com.serenegiant.content.TypedArrayUtils;
 
 import java.util.Locale;
 

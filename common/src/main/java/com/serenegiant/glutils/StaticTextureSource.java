@@ -29,6 +29,7 @@ import android.util.Log;
 import com.serenegiant.gl.GLConst;
 import com.serenegiant.gl.GLDrawer2D;
 import com.serenegiant.gl.GLManager;
+import com.serenegiant.graphics.IMirror;
 import com.serenegiant.math.Fraction;
 import com.serenegiant.media.OnFrameAvailableListener;
 

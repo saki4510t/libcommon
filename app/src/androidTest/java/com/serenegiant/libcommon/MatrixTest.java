@@ -21,7 +21,7 @@ package com.serenegiant.libcommon;
 import android.graphics.Matrix;
 import android.util.Log;
 
-import com.serenegiant.glutils.IMirror;
+import com.serenegiant.graphics.IMirror;
 import com.serenegiant.graphics.MatrixUtils;
 
 import org.junit.Test;
@@ -31,7 +31,6 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Size;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 
-import static com.serenegiant.libcommon.TestUtils.*;
 import static org.junit.Assert.*;
 
 @RunWith(AndroidJUnit4.class)

@@ -36,7 +36,7 @@ import com.serenegiant.glpipeline.GLPipelineSurfaceSource.PipelineSourceCallback
 import com.serenegiant.glpipeline.SurfaceDistributePipeline
 import com.serenegiant.glpipeline.SurfaceEffectSourcePipeline
 import com.serenegiant.glpipeline.SurfaceSourcePipeline
-import com.serenegiant.glutils.IMirror
+import com.serenegiant.graphics.IMirror
 import com.serenegiant.graphics.MatrixUtils
 import com.serenegiant.math.Fraction
 import com.serenegiant.media.OnFrameAvailableListener

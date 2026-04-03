@@ -30,8 +30,8 @@ import androidx.annotation.WorkerThread
 import com.serenegiant.camera.CameraConst
 import com.serenegiant.camera.CameraUtils
 import com.serenegiant.media.OnFrameAvailableListener
-import com.serenegiant.utils.HandlerThreadHandler
-import com.serenegiant.utils.HandlerUtils
+import com.serenegiant.system.HandlerThreadHandler
+import com.serenegiant.system.HandlerUtils
 import java.io.IOException
 import java.util.concurrent.CopyOnWriteArraySet
 

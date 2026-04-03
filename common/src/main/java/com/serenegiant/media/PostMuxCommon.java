@@ -23,7 +23,7 @@ import android.media.MediaFormat;
 import android.text.TextUtils;
 import android.util.Log;
 
-import com.serenegiant.io.ChannelHelper;
+import com.serenegiant.nio.ChannelHelper;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;

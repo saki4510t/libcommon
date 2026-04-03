@@ -34,7 +34,7 @@ import android.view.TextureView;
 import android.view.View;
 
 import com.serenegiant.common.R;
-import com.serenegiant.glutils.IMirror;
+import com.serenegiant.graphics.IMirror;
 import com.serenegiant.view.ITouchViewTransformer;
 import com.serenegiant.view.MeasureSpecDelegater;
 import com.serenegiant.view.TouchViewTransformer;

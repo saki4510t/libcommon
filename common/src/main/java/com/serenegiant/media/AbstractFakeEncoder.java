@@ -27,7 +27,7 @@ import android.util.Log;
 import android.view.Surface;
 
 import com.serenegiant.media.exceptions.TimeoutException;
-import com.serenegiant.utils.BufferHelper;
+import com.serenegiant.nio.BufferHelper;
 import com.serenegiant.system.BuildCheck;
 import com.serenegiant.system.Time;
 

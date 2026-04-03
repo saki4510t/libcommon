@@ -29,7 +29,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.serenegiant.common.R;
-import com.serenegiant.utils.TypedArrayUtils;
+import com.serenegiant.content.TypedArrayUtils;
 import com.serenegiant.view.ViewUtils;
 
 import androidx.annotation.IdRes;

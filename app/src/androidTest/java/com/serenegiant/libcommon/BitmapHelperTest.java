@@ -22,7 +22,7 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 
-import com.serenegiant.glutils.IMirror;
+import com.serenegiant.graphics.IMirror;
 import com.serenegiant.graphics.BitmapHelper;
 
 import org.junit.After;

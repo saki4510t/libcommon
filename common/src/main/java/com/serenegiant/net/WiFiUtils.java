@@ -23,7 +23,7 @@ import android.content.Context;
 import android.net.wifi.WifiManager;
 import android.util.Log;
 
-import com.serenegiant.system.ContextUtils;
+import com.serenegiant.content.ContextUtils;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.RequiresPermission;

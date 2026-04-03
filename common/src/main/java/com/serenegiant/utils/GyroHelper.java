@@ -29,7 +29,7 @@ import androidx.annotation.Nullable;
 import android.util.Log;
 import android.view.Surface;
 
-import com.serenegiant.system.ContextUtils;
+import com.serenegiant.content.ContextUtils;
 
 import java.lang.ref.WeakReference;
 import java.util.List;

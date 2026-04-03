@@ -30,7 +30,7 @@ import com.serenegiant.media.MediaFileUtils
 import com.serenegiant.mediastore.MediaStoreUtils
 import com.serenegiant.service.ServiceRecorder
 import com.serenegiant.system.BuildCheck
-import com.serenegiant.utils.FileUtils
+import com.serenegiant.system.FileUtils
 import com.serenegiant.widget.EffectCameraGLSurfaceView
 import com.serenegiant.widget.GLPipelineView
 import kotlinx.coroutines.Dispatchers

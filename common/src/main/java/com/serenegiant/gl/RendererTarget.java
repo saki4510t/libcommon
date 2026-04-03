@@ -27,7 +27,7 @@ import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 
 import com.serenegiant.egl.EGLBase;
-import com.serenegiant.glutils.IMirror;
+import com.serenegiant.graphics.IMirror;
 import com.serenegiant.graphics.MatrixUtils;
 import com.serenegiant.system.Time;
 

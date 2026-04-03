@@ -52,7 +52,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.XmlRes;
 
-import static com.serenegiant.utils.XmlHelper.getAttribute;
+import static com.serenegiant.content.XmlHelper.getAttribute;
 
 public final class DeviceFilter implements Parcelable {
 

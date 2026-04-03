@@ -25,7 +25,7 @@ import androidx.annotation.Nullable;
 import androidx.annotation.Size;
 
 import com.serenegiant.gl.GLUtils;
-import com.serenegiant.glutils.IMirror;
+import com.serenegiant.graphics.IMirror;
 import com.serenegiant.graphics.MatrixUtils;
 
 import java.nio.ByteBuffer;

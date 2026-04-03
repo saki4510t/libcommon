@@ -27,6 +27,7 @@ import com.serenegiant.gl.GLDrawer2D;
 import com.serenegiant.gl.GLEffectDrawer2D;
 import com.serenegiant.gl.GLManager;
 import com.serenegiant.gl.RendererTarget;
+import com.serenegiant.graphics.IMirror;
 import com.serenegiant.math.Fraction;
 
 import java.util.concurrent.CountDownLatch;

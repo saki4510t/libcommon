@@ -55,7 +55,7 @@ public class MediaEffect implements IMediaEffect {
 	 * @param src
 	 */
 	@Override
-	public void apply(@NonNull final ISource src) {
+	public void apply(@NonNull final IMediaSource src) {
 		if (mEnabled && (mEffect != null)) {
 			mEffect.apply(src.getSourceTexId()[0],
 				src.getWidth(), src.getHeight(),

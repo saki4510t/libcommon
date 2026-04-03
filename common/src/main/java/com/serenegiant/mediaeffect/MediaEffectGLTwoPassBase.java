@@ -92,7 +92,7 @@ public class MediaEffectGLTwoPassBase extends MediaEffectGLBase {
 	}
 
 	@Override
-	public void apply(@NonNull final ISource src) {
+	public void apply(@NonNull final IMediaSource src) {
 		if (!mEnabled) return;
 		final GLOffscreen output_tex = src.getOutputTargetTexture();
 		final int[] srcTexIds = src.getSourceTexId();

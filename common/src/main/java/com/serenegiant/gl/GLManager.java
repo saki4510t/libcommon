@@ -25,8 +25,8 @@ import android.util.Log;
 import android.view.Choreographer;
 
 import com.serenegiant.egl.EGLBase;
-import com.serenegiant.utils.HandlerThreadHandler;
-import com.serenegiant.utils.HandlerUtils;
+import com.serenegiant.system.HandlerThreadHandler;
+import com.serenegiant.system.HandlerUtils;
 
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;

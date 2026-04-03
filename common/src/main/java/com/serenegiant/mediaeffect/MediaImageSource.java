@@ -26,6 +26,9 @@ import com.serenegiant.gl.GLOffscreen;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+/**
+ * 静止画を映像ソースとして使うためのMediaSource/IMediaSource実装
+ */
 public class MediaImageSource extends MediaSource {
 	@NonNull
 	private final GLOffscreen mImageOffscreen;
@@ -47,7 +50,7 @@ public class MediaImageSource extends MediaSource {
 	 * @param bitmap
 	 * @return
 	 */
-	public ISource setSource(@NonNull final Bitmap bitmap) {
+	public IMediaSource setSource(@NonNull final Bitmap bitmap) {
 		mImageOffscreen.loadBitmap(bitmap);
 		reset();
 		return this;
@@ -59,7 +62,7 @@ public class MediaImageSource extends MediaSource {
 	 * @return
 	 */
 	@Override
-	public ISource reset() {
+	public IMediaSource reset() {
 		super.reset();
 		if (mImageOffscreen != null) {
 			mSrcTexIds[0] = mImageOffscreen.getTexId();
@@ -74,7 +77,7 @@ public class MediaImageSource extends MediaSource {
 	 * @return
 	 */
 	@Override
-	public ISource apply(@NonNull final IMediaEffect effect) {
+	public IMediaSource apply(@NonNull final IMediaEffect effect) {
 		if (mSourceScreen != null) {
 			if (firstApply) {
 				firstApply = false;

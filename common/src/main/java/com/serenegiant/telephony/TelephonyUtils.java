@@ -23,7 +23,7 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.telephony.TelephonyManager;
 
-import com.serenegiant.system.ContextUtils;
+import com.serenegiant.content.ContextUtils;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;

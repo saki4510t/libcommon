@@ -27,8 +27,8 @@ import android.widget.Toast
 import androidx.annotation.StringRes
 import androidx.fragment.app.Fragment
 import com.serenegiant.system.BuildCheck
-import com.serenegiant.utils.HandlerThreadHandler
-import com.serenegiant.utils.HandlerUtils
+import com.serenegiant.system.HandlerThreadHandler
+import com.serenegiant.system.HandlerUtils
 
 open class BaseFragment : Fragment() {
 

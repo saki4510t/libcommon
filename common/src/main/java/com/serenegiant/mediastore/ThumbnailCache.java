@@ -29,8 +29,8 @@ import android.util.Size;
 
 import com.serenegiant.common.BuildConfig;
 import com.serenegiant.graphics.BitmapHelper;
-import com.serenegiant.io.DiskLruCache;
-import com.serenegiant.system.ContextUtils;
+import com.serenegiant.nio.DiskLruCache;
+import com.serenegiant.content.ContextUtils;
 
 import java.io.File;
 import java.io.FileDescriptor;

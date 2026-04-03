@@ -38,7 +38,7 @@ import com.serenegiant.usb.UsbDetector
 import com.serenegiant.usb.UsbDeviceInfo
 import com.serenegiant.usb.UsbPermission
 import com.serenegiant.usb.UsbUtils
-import com.serenegiant.utils.BufferHelper
+import com.serenegiant.nio.BufferHelper
 import com.serenegiant.view.ViewUtils
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay

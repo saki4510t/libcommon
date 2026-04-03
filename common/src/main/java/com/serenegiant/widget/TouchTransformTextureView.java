@@ -32,7 +32,7 @@ import android.util.Log;
 import android.view.MotionEvent;
 
 import com.serenegiant.common.R;
-import com.serenegiant.glutils.IMirror;
+import com.serenegiant.graphics.IMirror;
 import com.serenegiant.system.DisplayMetricsUtils;
 import com.serenegiant.view.ViewUtils;
 

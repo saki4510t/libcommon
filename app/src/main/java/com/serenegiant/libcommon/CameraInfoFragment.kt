@@ -41,11 +41,10 @@ import com.serenegiant.camera.CameraUtils
 import com.serenegiant.graphics.ImageFormatUtils
 import com.serenegiant.libcommon.databinding.FragmentCameraInfoBinding
 import com.serenegiant.system.BuildCheck
-import com.serenegiant.system.ContextUtils
-import com.serenegiant.system.PermissionUtils
+import com.serenegiant.content.ContextUtils
+import com.serenegiant.content.PermissionUtils
 import com.serenegiant.view.ViewUtils
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlinx.coroutines.yield

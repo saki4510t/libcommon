@@ -48,7 +48,7 @@ import com.serenegiant.glpipeline.SurfaceRendererPipeline
 import com.serenegiant.glpipeline.append
 import com.serenegiant.mediastore.MediaStoreUtils
 import com.serenegiant.system.BuildCheck
-import com.serenegiant.utils.FileUtils
+import com.serenegiant.system.FileUtils
 import com.serenegiant.view.ViewUtils
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job

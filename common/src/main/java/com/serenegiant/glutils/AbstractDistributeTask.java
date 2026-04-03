@@ -29,6 +29,7 @@ import com.serenegiant.gl.GLContext;
 import com.serenegiant.gl.GLDrawer2D;
 import com.serenegiant.gl.GLEffectDrawer2D;
 import com.serenegiant.gl.RendererTarget;
+import com.serenegiant.graphics.IMirror;
 import com.serenegiant.graphics.MatrixUtils;
 import com.serenegiant.math.Fraction;
 import com.serenegiant.utils.ThreadUtils;

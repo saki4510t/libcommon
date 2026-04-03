@@ -45,7 +45,7 @@ import android.view.WindowManager;
 import android.widget.TextView;
 
 import com.serenegiant.common.R;
-import com.serenegiant.utils.TypedArrayUtils;
+import com.serenegiant.content.TypedArrayUtils;
 
 public class DialogPreferenceV7 extends Preference
 	implements DialogInterface.OnClickListener, DialogInterface.OnDismissListener {

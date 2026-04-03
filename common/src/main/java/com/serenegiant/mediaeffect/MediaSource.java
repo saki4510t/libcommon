@@ -30,7 +30,7 @@ import com.serenegiant.gl.GLConst;
 import com.serenegiant.gl.GLDrawer2D;
 import com.serenegiant.gl.GLOffscreen;
 
-public class MediaSource implements ISource {
+public class MediaSource implements IMediaSource {
 	private static final boolean DEBUG = false;
 	private static final String TAG = "MediaSource";
 
@@ -70,7 +70,7 @@ public class MediaSource implements ISource {
 	 * @return
 	 */
 	@Override
-	public ISource reset() {
+	public IMediaSource reset() {
 		firstApply = true;
 		mSrcTexIds[0] = mSourceScreen.getTexId();
 		Matrix.setIdentityM(mSourceScreen.getTexMatrix(), 0);
@@ -86,7 +86,7 @@ public class MediaSource implements ISource {
 	 * @return
 	 */
 	@Override
-	public ISource resize(final int width, final int height) {
+	public IMediaSource resize(final int width, final int height) {
 		if (DEBUG) Log.v(TAG, String.format("resize(%d,%d):", width, height));
 		if (mWidth != width || mHeight != height) {
 			if (mSourceScreen != null) {
@@ -116,7 +116,7 @@ public class MediaSource implements ISource {
 	 * @return
 	 */
 	@Override
-	public ISource apply(@NonNull final IMediaEffect effect) {
+	public IMediaSource apply(@NonNull final IMediaEffect effect) {
 		if (mSourceScreen != null) {
 			if (!firstApply) {
 				final GLOffscreen temp = mSourceScreen;

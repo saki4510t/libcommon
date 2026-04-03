@@ -31,9 +31,9 @@ import android.util.Log;
 
 import com.serenegiant.app.PendingIntentCompat;
 import com.serenegiant.system.BuildCheck;
-import com.serenegiant.system.ContextUtils;
-import com.serenegiant.utils.HandlerThreadHandler;
-import com.serenegiant.utils.HandlerUtils;
+import com.serenegiant.content.ContextUtils;
+import com.serenegiant.system.HandlerThreadHandler;
+import com.serenegiant.system.HandlerUtils;
 import com.serenegiant.utils.ThreadPool;
 
 import java.lang.ref.WeakReference;

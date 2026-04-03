@@ -1,0 +1,1 @@
+androidx.documentfileパッケージ内のクラスとそれらに関する処理用ヘルパークラス

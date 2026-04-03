@@ -24,8 +24,7 @@ import android.os.StatFs;
 import android.text.TextUtils;
 import android.util.Log;
 
-import com.serenegiant.utils.FileUtils;
-import com.serenegiant.utils.UriHelper;
+import com.serenegiant.content.UriHelper;
 
 import java.io.BufferedReader;
 import java.io.File;

@@ -27,8 +27,8 @@ import android.view.View
 import android.view.ViewGroup
 import com.serenegiant.dialog.RationalDialogV4
 import com.serenegiant.system.BuildCheck
-import com.serenegiant.system.PermissionUtils
-import com.serenegiant.system.PermissionUtils.PermissionCallback
+import com.serenegiant.content.PermissionUtils
+import com.serenegiant.content.PermissionUtils.PermissionCallback
 
 class PermissionFragment : BaseFragment(), RationalDialogV4.DialogResultListener {
 	private var mPermissions: PermissionUtils? = null

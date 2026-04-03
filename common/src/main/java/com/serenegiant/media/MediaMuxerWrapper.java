@@ -28,7 +28,7 @@ import android.util.Log;
 
 import com.serenegiant.mediastore.MediaStoreOutputStream;
 import com.serenegiant.system.BuildCheck;
-import com.serenegiant.utils.UriHelper;
+import com.serenegiant.content.UriHelper;
 
 import java.io.File;
 import java.io.FileDescriptor;

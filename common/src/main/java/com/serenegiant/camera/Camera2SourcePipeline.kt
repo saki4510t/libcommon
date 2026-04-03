@@ -45,8 +45,8 @@ import com.serenegiant.glpipeline.GLPipeline
 import com.serenegiant.glpipeline.ProxyPipeline
 import com.serenegiant.glutils.GLSurfaceReceiver
 import com.serenegiant.system.BuildCheck
-import com.serenegiant.system.ContextUtils
-import com.serenegiant.utils.HandlerThreadHandler
+import com.serenegiant.content.ContextUtils
+import com.serenegiant.system.HandlerThreadHandler
 import com.serenegiant.view.ViewUtils
 import java.lang.ref.WeakReference
 import java.util.concurrent.Executor

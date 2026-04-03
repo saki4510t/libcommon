@@ -24,7 +24,7 @@ import android.util.Log;
 
 import com.serenegiant.gl.GLHistogram;
 import com.serenegiant.gl.GLOffscreen;
-import com.serenegiant.glutils.IMirror;
+import com.serenegiant.graphics.IMirror;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
@@ -80,7 +80,7 @@ public class MediaEffectGLHistogram implements IMediaEffect, IMirror  {
 	}
 
 	@Override
-	public void apply(@NonNull final ISource src) {
+	public void apply(@NonNull final IMediaSource src) {
 		if (!mEnabled) return;
 		final GLOffscreen output = src.getOutputTargetTexture();
 		final int[] srcTexIds = src.getSourceTexId();

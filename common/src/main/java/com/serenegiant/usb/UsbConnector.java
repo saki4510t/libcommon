@@ -28,8 +28,8 @@ import android.hardware.usb.UsbManager;
 import android.util.Log;
 import android.util.SparseArray;
 
-import com.serenegiant.system.ContextUtils;
-import com.serenegiant.utils.BufferHelper;
+import com.serenegiant.content.ContextUtils;
+import com.serenegiant.nio.BufferHelper;
 
 import java.io.Closeable;
 import java.io.IOException;

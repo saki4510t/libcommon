@@ -1,0 +1,1 @@
+Bluetooth/BLE関係のヘルパークラス

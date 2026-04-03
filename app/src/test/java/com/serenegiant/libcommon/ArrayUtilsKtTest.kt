@@ -18,12 +18,12 @@ package com.serenegiant.libcommon
  *  limitations under the License.
 */
 
-import com.serenegiant.utils.ArrayUtilsKt.toByteArray
-import com.serenegiant.utils.ArrayUtilsKt.toDouble
-import com.serenegiant.utils.ArrayUtilsKt.toFloat
-import com.serenegiant.utils.ArrayUtilsKt.toInt
-import com.serenegiant.utils.ArrayUtilsKt.toLong
-import com.serenegiant.utils.ArrayUtilsKt.toShort
+import com.serenegiant.nio.ArrayUtilsKt.toByteArray
+import com.serenegiant.nio.ArrayUtilsKt.toDouble
+import com.serenegiant.nio.ArrayUtilsKt.toFloat
+import com.serenegiant.nio.ArrayUtilsKt.toInt
+import com.serenegiant.nio.ArrayUtilsKt.toLong
+import com.serenegiant.nio.ArrayUtilsKt.toShort
 import org.junit.Assert.assertEquals
 import org.junit.Test
 import java.nio.ByteOrder

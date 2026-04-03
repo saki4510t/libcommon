@@ -35,11 +35,11 @@ import android.view.Surface;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 
-import com.serenegiant.glutils.IMirror;
+import com.serenegiant.graphics.IMirror;
 import com.serenegiant.graphics.BitmapHelper;
 import com.serenegiant.graphics.MatrixUtils;
 import com.serenegiant.system.Stacktrace;
-import com.serenegiant.utils.AssetsHelper;
+import com.serenegiant.content.AssetsHelper;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -55,8 +55,8 @@ import androidx.annotation.Nullable;
 import androidx.annotation.Size;
 import androidx.core.content.res.ResourcesCompat;
 
-import static com.serenegiant.glutils.IMirror.*;
-import static com.serenegiant.utils.BufferHelper.SIZEOF_FLOAT_BYTES;
+import static com.serenegiant.graphics.IMirror.*;
+import static com.serenegiant.nio.BufferHelper.SIZEOF_FLOAT_BYTES;
 
 /**
  * OpenGL|ES関係のヘルパーメソッド

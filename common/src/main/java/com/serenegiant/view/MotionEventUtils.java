@@ -21,7 +21,7 @@ package com.serenegiant.view;
 import android.os.Build;
 import android.view.MotionEvent;
 
-import com.serenegiant.utils.BitsHelper;
+import com.serenegiant.nio.BitsHelper;
 
 import java.util.Locale;
 

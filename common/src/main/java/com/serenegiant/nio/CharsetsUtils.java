@@ -18,8 +18,6 @@ package com.serenegiant.nio;
  *  limitations under the License.
 */
 
-import android.os.Build;
-
 import com.serenegiant.system.BuildCheck;
 
 import java.nio.charset.Charset;

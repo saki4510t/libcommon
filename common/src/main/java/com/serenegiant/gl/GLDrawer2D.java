@@ -23,9 +23,9 @@ import android.opengl.Matrix;
 import android.text.TextUtils;
 import android.util.Log;
 
-import com.serenegiant.glutils.IMirror;
+import com.serenegiant.graphics.IMirror;
 import com.serenegiant.graphics.MatrixUtils;
-import com.serenegiant.utils.BufferHelper;
+import com.serenegiant.nio.BufferHelper;
 
 import java.nio.FloatBuffer;
 import java.util.concurrent.locks.ReentrantLock;

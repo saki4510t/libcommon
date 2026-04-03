@@ -28,7 +28,7 @@ import android.util.Log;
 
 import com.serenegiant.common.R;
 import com.serenegiant.system.BuildCheck;
-import com.serenegiant.system.ContextUtils;
+import com.serenegiant.content.ContextUtils;
 
 import androidx.annotation.DrawableRes;
 import androidx.annotation.NonNull;

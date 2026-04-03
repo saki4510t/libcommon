@@ -28,7 +28,7 @@ import androidx.annotation.Size
 import com.serenegiant.gl.GLConst
 import com.serenegiant.gl.GLDrawer2D
 import com.serenegiant.gl.GLUtils
-import com.serenegiant.glutils.IMirror
+import com.serenegiant.graphics.IMirror
 import com.serenegiant.graphics.MatrixUtils
 import com.serenegiant.math.Fraction
 import com.serenegiant.media.OnFrameAvailableListener

@@ -35,7 +35,7 @@ import com.serenegiant.media.*
 import com.serenegiant.media.IRecorder.RecorderCallback
 import com.serenegiant.mediastore.MediaStoreUtils
 import com.serenegiant.system.BuildCheck
-import com.serenegiant.utils.FileUtils
+import com.serenegiant.system.FileUtils
 import com.serenegiant.widget.EffectCameraGLSurfaceView
 import com.serenegiant.widget.GLPipelineView
 import com.serenegiant.widget.SimpleVideoSourceCameraTextureView

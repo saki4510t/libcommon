@@ -24,9 +24,9 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import android.util.Log;
 
-import com.serenegiant.io.ChannelHelper;
-import com.serenegiant.utils.HandlerThreadHandler;
-import com.serenegiant.utils.HandlerUtils;
+import com.serenegiant.nio.ChannelHelper;
+import com.serenegiant.system.HandlerThreadHandler;
+import com.serenegiant.system.HandlerUtils;
 
 import java.io.IOException;
 import java.lang.ref.WeakReference;

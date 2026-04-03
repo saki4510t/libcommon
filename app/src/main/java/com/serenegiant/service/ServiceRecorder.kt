@@ -30,8 +30,6 @@ import androidx.documentfile.provider.DocumentFile
 import com.serenegiant.media.IAudioSampler
 import com.serenegiant.service.RecordingService.LocalBinder
 import com.serenegiant.service.RecordingService.StateChangeListener
-import com.serenegiant.system.BuildCheck
-import com.serenegiant.utils.ThreadUtils
 import kotlinx.coroutines.CoroutineName
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -40,7 +38,6 @@ import kotlinx.coroutines.cancel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import java.io.IOException
 import java.lang.ref.WeakReference
 import java.nio.ByteBuffer

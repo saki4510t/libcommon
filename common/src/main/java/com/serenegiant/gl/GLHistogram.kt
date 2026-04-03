@@ -30,11 +30,11 @@ import androidx.annotation.Size
 import androidx.annotation.WorkerThread
 import com.serenegiant.gl.GLConst.TexTarget
 import com.serenegiant.gl.GLConst.TexUnit
-import com.serenegiant.glutils.IMirror
-import com.serenegiant.glutils.IMirror.MirrorMode
+import com.serenegiant.graphics.IMirror
+import com.serenegiant.graphics.IMirror.MirrorMode
 import com.serenegiant.graphics.MatrixUtils
 import com.serenegiant.system.Time
-import com.serenegiant.utils.BufferHelper
+import com.serenegiant.nio.BufferHelper
 import java.nio.ByteBuffer
 import kotlin.math.min
 

@@ -37,11 +37,11 @@ import com.serenegiant.gl.GLDrawer2D
 import com.serenegiant.gl.GLManager
 import com.serenegiant.gl.GLUtils
 import com.serenegiant.glpipeline.SurfaceSourcePipeline
-import com.serenegiant.glutils.IMirror
+import com.serenegiant.graphics.IMirror
 import com.serenegiant.graphics.MatrixUtils
 import com.serenegiant.math.Fraction
 import com.serenegiant.media.OnFrameAvailableListener
-import com.serenegiant.utils.HandlerThreadHandler
+import com.serenegiant.system.HandlerThreadHandler
 import com.serenegiant.widget.CameraDelegator.ICameraRenderer
 import javax.microedition.khronos.egl.EGLConfig
 import javax.microedition.khronos.opengles.GL10

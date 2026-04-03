@@ -1,0 +1,1 @@
+SharedPreferencesに関するヘルパークラス

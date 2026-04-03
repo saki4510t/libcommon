@@ -29,7 +29,7 @@ import android.view.View;
 import android.widget.TimePicker;
 
 import com.serenegiant.common.R;
-import com.serenegiant.utils.TypedArrayUtils;
+import com.serenegiant.content.TypedArrayUtils;
 
 import java.util.Calendar;
 import java.util.Date;

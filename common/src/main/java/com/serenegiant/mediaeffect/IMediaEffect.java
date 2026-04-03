@@ -26,7 +26,7 @@ public interface IMediaEffect {
 	 * GLコンテキスト上で実行すること
 	 * @param src
 	 */
-	public void apply(@NonNull final ISource src);
+	public void apply(@NonNull final IMediaSource src);
 	public void release();
 	public IMediaEffect resize(final int width, final int height);
 	public boolean enabled();

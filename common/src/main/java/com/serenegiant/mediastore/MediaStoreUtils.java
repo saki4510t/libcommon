@@ -32,8 +32,8 @@ import android.util.Log;
 
 import com.serenegiant.db.CursorHelper;
 import com.serenegiant.system.BuildCheck;
-import com.serenegiant.utils.FileUtils;
-import com.serenegiant.utils.UriHelper;
+import com.serenegiant.system.FileUtils;
+import com.serenegiant.content.UriHelper;
 
 import java.io.FileNotFoundException;
 

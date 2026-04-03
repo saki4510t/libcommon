@@ -39,8 +39,8 @@ import com.serenegiant.libcommon.list.DummyContent
 import com.serenegiant.libcommon.list.DummyContent.DummyItem
 import com.serenegiant.media.VideoConfig
 import com.serenegiant.system.BuildCheck
-import com.serenegiant.system.PermissionUtils
-import com.serenegiant.system.PermissionUtils.PermissionCallback
+import com.serenegiant.content.PermissionUtils
+import com.serenegiant.content.PermissionUtils.PermissionCallback
 import com.serenegiant.usb.UsbPermission
 import com.serenegiant.widget.GLPipelineView
 

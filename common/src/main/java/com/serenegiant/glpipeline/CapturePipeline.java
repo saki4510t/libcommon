@@ -43,7 +43,7 @@ import androidx.annotation.Nullable;
 import androidx.annotation.Size;
 import androidx.annotation.WorkerThread;
 
-import static com.serenegiant.glutils.IMirror.MIRROR_VERTICAL;
+import static com.serenegiant.graphics.IMirror.MIRROR_VERTICAL;
 
 /**
  * 静止画キャプチャ機能を追加したProxyPipeline実装

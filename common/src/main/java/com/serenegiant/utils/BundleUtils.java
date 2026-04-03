@@ -22,6 +22,8 @@ import android.os.Bundle;
 import android.os.Parcelable;
 import android.util.Log;
 
+import com.serenegiant.nio.ArrayUtils;
+
 import java.io.Serializable;
 import java.util.Arrays;
 import java.util.Set;

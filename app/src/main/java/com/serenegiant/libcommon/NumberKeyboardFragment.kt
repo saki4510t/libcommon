@@ -25,7 +25,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.EditText
-import com.serenegiant.system.KeyboardDelegater
+import com.serenegiant.view.KeyboardDelegater
 import com.serenegiant.view.ViewUtils
 import com.serenegiant.widget.KeyboardView
 

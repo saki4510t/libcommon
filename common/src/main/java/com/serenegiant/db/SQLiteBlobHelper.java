@@ -25,7 +25,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.serenegiant.graphics.BitmapHelper;
-import com.serenegiant.utils.ArrayUtils;
+import com.serenegiant.nio.ArrayUtils;
 
 public class SQLiteBlobHelper {
 //	private static final boolean DEBUG = false;	// 実働時はfalseにすること

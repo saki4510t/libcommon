@@ -24,7 +24,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import com.serenegiant.libcommon.databinding.FragmentSettingsLinkBinding
-import com.serenegiant.system.SettingsUtils
+import com.serenegiant.content.SettingsUtils
 
 /**
  * ユーザーがアプリに権限付与をしなかったために機能を実行できない時に

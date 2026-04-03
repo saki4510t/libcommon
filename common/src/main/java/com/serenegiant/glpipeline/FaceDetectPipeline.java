@@ -30,7 +30,7 @@ import com.serenegiant.gl.GLManager;
 import com.serenegiant.gl.RendererTarget;
 import com.serenegiant.graphics.BitmapHelper;
 import com.serenegiant.math.Fraction;
-import com.serenegiant.utils.HandlerThreadHandler;
+import com.serenegiant.system.HandlerThreadHandler;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;

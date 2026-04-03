@@ -38,7 +38,7 @@ import com.serenegiant.graphics.BitmapHelper
 import com.serenegiant.libcommon.databinding.FragmentCameraSourcePipelineBinding
 import com.serenegiant.libcommon.viewmodel.CameraSourcePipelineViewModel
 import com.serenegiant.system.BuildCheck
-import com.serenegiant.utils.UriHelper
+import com.serenegiant.content.UriHelper
 import com.serenegiant.view.ViewAnimationHelper
 import com.serenegiant.view.ViewAnimationHelper.ViewAnimationListener
 import com.serenegiant.view.ViewUtils

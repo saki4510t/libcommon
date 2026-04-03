@@ -35,8 +35,8 @@ import com.serenegiant.gl.GLConst;
 import com.serenegiant.gl.GLDrawer2D;
 import com.serenegiant.gl.GLUtils;
 import com.serenegiant.system.BuildCheck;
-import com.serenegiant.utils.HandlerThreadHandler;
-import com.serenegiant.utils.HandlerUtils;
+import com.serenegiant.system.HandlerThreadHandler;
+import com.serenegiant.system.HandlerUtils;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;

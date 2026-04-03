@@ -41,9 +41,9 @@ import com.serenegiant.math.Fraction
 import com.serenegiant.media.OnFrameAvailableListener
 import com.serenegiant.mediastore.MediaStoreUtils
 import com.serenegiant.system.BuildCheck
-import com.serenegiant.system.PermissionUtils
-import com.serenegiant.system.SAFUtils
-import com.serenegiant.utils.FileUtils
+import com.serenegiant.content.PermissionUtils
+import com.serenegiant.documentfile.SAFUtils
+import com.serenegiant.system.FileUtils
 import com.serenegiant.view.ViewUtils
 import com.serenegiant.widget.*
 import java.io.IOException

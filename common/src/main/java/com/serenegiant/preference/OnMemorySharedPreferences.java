@@ -22,7 +22,7 @@ import android.content.SharedPreferences;
 import android.text.TextUtils;
 
 import com.serenegiant.collections.ReentrantReadWriteMap;
-import com.serenegiant.utils.UIThreadHelper;
+import com.serenegiant.system.UIThreadHelper;
 
 import java.util.Collections;
 import java.util.HashSet;

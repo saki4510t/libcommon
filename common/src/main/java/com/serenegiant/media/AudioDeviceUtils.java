@@ -27,7 +27,7 @@ import android.text.TextUtils;
 import android.util.Log;
 
 import com.serenegiant.system.BuildCheck;
-import com.serenegiant.system.ContextUtils;
+import com.serenegiant.content.ContextUtils;
 
 import java.util.Arrays;
 

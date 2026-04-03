@@ -47,9 +47,9 @@ import android.text.TextUtils;
 import android.util.Log;
 import android.view.Surface;
 
-import com.serenegiant.io.BitBufferReader;
+import com.serenegiant.nio.BitBufferReader;
 import com.serenegiant.system.BuildCheck;
-import com.serenegiant.utils.BufferHelper;
+import com.serenegiant.nio.BufferHelper;
 
 /**
  * MediaCodec関係のユーティリティ関数を集めたクラス

@@ -1,0 +1,3 @@
+SAFを使ったファイルアクセスを容易にするためのヘルパークラス
+
+* androidx.documentfile.provider.TreeDocumentFileがパッケージプライベートなのでandroidx.documentfile.providerパッケージ内で定義

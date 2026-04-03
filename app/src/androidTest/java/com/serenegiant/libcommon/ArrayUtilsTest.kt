@@ -24,7 +24,7 @@ import com.serenegiant.libcommon.TestUtils.Value
 import com.serenegiant.libcommon.TestUtils.BothValue
 import com.serenegiant.libcommon.TestUtils.ParcelableValue
 import com.serenegiant.libcommon.TestUtils.SerializableValue
-import com.serenegiant.utils.ArrayUtils
+import com.serenegiant.nio.ArrayUtils
 import org.junit.Assert.*
 import org.junit.Test
 import org.junit.runner.RunWith

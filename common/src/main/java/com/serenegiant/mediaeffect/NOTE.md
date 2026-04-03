@@ -1,0 +1,5 @@
+android.media.effectパッケージ内のクラスのヘルパークラスと映像処理に関係するヘルパークラス
+
+* android.media.effect.Effectでの映像処理をラップしてとOpenGL|ESを使った映像処理用と同じインターフェースでアクセスできるようにする。
+* MediaEffectXXXはandroid.media.effect.Effect系のラッパークラス
+* MediaEffectGLXXXはOpenGL|ESを使った映像処理クラス

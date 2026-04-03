@@ -27,6 +27,7 @@ import android.view.Surface;
 
 import com.serenegiant.egl.EGLBase;
 import com.serenegiant.gl.GLContext;
+import com.serenegiant.graphics.IMirror;
 import com.serenegiant.math.Fraction;
 import com.serenegiant.media.OnFrameAvailableListener;
 

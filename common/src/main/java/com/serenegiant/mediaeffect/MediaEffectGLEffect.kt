@@ -23,8 +23,8 @@ import android.util.Log
 import com.serenegiant.gl.GLEffectDrawer2D
 import com.serenegiant.gl.GLEffectDrawer2D.EffectListener
 import com.serenegiant.gl.IEffect
-import com.serenegiant.glutils.IMirror
-import com.serenegiant.glutils.IMirror.MirrorMode
+import com.serenegiant.graphics.IMirror
+import com.serenegiant.graphics.IMirror.MirrorMode
 import java.util.concurrent.locks.ReentrantLock
 import kotlin.concurrent.Volatile
 
@@ -122,7 +122,7 @@ class MediaEffectGLEffect @JvmOverloads constructor(
 	 * please use this method instead of #apply(final int [], int, int, int)
 	 * @param src
 	 */
-	override fun apply(src: ISource) {
+	override fun apply(src: IMediaSource) {
 //		if (DEBUG) Log.v(TAG, "apply:enabled=" + mEnabled + ",src=" + src);
 		if (!mEnabled) return
 		val mirror: Int

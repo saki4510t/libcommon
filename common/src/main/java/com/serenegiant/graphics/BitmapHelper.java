@@ -58,9 +58,8 @@ import android.provider.MediaStore;
 import android.text.TextUtils;
 import android.util.Log;
 
-import com.serenegiant.glutils.IMirror;
-import com.serenegiant.utils.BitsHelper;
-import com.serenegiant.utils.UriHelper;
+import com.serenegiant.nio.BitsHelper;
+import com.serenegiant.content.UriHelper;
 
 public final class BitmapHelper {
 	private static final boolean DEBUG = false;	// 実働時はfalseにすること

@@ -25,9 +25,9 @@ import android.content.Context;
 import android.util.Log;
 
 import com.serenegiant.system.StorageUtils;
-import com.serenegiant.utils.FileUtils;
+import com.serenegiant.system.FileUtils;
 import com.serenegiant.system.StorageInfo;
-import com.serenegiant.utils.UriHelper;
+import com.serenegiant.content.UriHelper;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;

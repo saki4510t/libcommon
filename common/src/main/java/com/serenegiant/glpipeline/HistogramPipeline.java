@@ -26,7 +26,7 @@ import com.serenegiant.gl.GLHistogram;
 import com.serenegiant.gl.GLManager;
 import com.serenegiant.gl.GLOffscreen;
 import com.serenegiant.gl.RendererTarget;
-import com.serenegiant.glutils.IMirror;
+import com.serenegiant.graphics.IMirror;
 import com.serenegiant.math.Fraction;
 
 import androidx.annotation.CallSuper;

@@ -31,7 +31,7 @@ import com.serenegiant.glpipeline.GLPipeline
 import com.serenegiant.glpipeline.ProxyPipeline
 import com.serenegiant.glutils.GLSurfaceReceiver
 import com.serenegiant.glutils.GLSurfaceReceiver.DefaultCallback
-import com.serenegiant.glutils.IMirror
+import com.serenegiant.graphics.IMirror
 import com.serenegiant.glutils.IRendererHolder
 import com.serenegiant.graphics.BitmapHelper
 import com.serenegiant.graphics.MatrixUtils

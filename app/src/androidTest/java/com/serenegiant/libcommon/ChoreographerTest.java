@@ -23,8 +23,8 @@ import android.os.SystemClock;
 import android.util.Log;
 import android.view.Choreographer;
 
-import com.serenegiant.utils.HandlerThreadHandler;
-import com.serenegiant.utils.HandlerUtils;
+import com.serenegiant.system.HandlerThreadHandler;
+import com.serenegiant.system.HandlerUtils;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;

@@ -26,7 +26,7 @@ import com.serenegiant.gl.GLEffectDrawer2D;
 import com.serenegiant.gl.GLManager;
 import com.serenegiant.gl.IEffect;
 import com.serenegiant.glutils.GLSurfaceReceiver;
-import com.serenegiant.glutils.IMirror;
+import com.serenegiant.graphics.IMirror;
 import com.serenegiant.math.Fraction;
 
 import androidx.annotation.NonNull;

@@ -27,7 +27,7 @@ import android.util.AttributeSet;
 import android.util.Log;
 import android.widget.TextView;
 
-import com.serenegiant.utils.TypedArrayUtils;
+import com.serenegiant.content.TypedArrayUtils;
 
 public class MultilineLabelPreferenceV7 extends Preference {
 	private static final boolean DEBUG = false;	// set false on production

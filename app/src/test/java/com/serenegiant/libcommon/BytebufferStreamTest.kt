@@ -18,8 +18,8 @@ package com.serenegiant.libcommon
  *  limitations under the License.
 */
 
-import com.serenegiant.io.ByteBufferOutputStream
-import com.serenegiant.utils.ArrayUtilsKt.toByteArray
+import com.serenegiant.nio.ByteBufferOutputStream
+import com.serenegiant.nio.ArrayUtilsKt.toByteArray
 import org.junit.Assert.*
 import org.junit.Test
 import java.nio.ByteBuffer
@@ -28,7 +28,10 @@ class BytebufferStreamTest {
 
 	@Test
 	fun byteBufferOutputStreamTest() {
-		val outputStream = ByteBufferOutputStream(ByteBuffer.allocate(1000), true)
+		val outputStream = ByteBufferOutputStream(
+			ByteBuffer.allocate(1000),
+			true
+		)
 
 		outputStream.reset()
 		for (i in 0.. 254) {

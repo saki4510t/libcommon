@@ -20,7 +20,7 @@ package com.serenegiant.libcommon;
 
 import android.util.Log;
 
-import com.serenegiant.utils.ArrayUtils;
+import com.serenegiant.nio.ArrayUtils;
 import com.serenegiant.utils.ClassUtils;
 import com.serenegiant.utils.JSONHelper;
 import com.serenegiant.utils.ObjectHelper;

@@ -25,7 +25,7 @@ import androidx.preference.PreferenceViewHolder;
 import android.util.AttributeSet;
 import android.view.View;
 
-import com.serenegiant.utils.TypedArrayUtils;
+import com.serenegiant.content.TypedArrayUtils;
 import com.serenegiant.widget.ColorPickerView;
 
 public class ColorPickerDialogPreferenceV7 extends DialogPreferenceV7 {

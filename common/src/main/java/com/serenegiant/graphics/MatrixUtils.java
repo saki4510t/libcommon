@@ -23,15 +23,13 @@ import android.graphics.Rect;
 import android.graphics.RectF;
 import android.widget.ImageView;
 
-import com.serenegiant.glutils.IMirror;
-
 import java.util.HashMap;
 import java.util.Map;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Size;
 
-import static com.serenegiant.glutils.IMirror.*;
+import static com.serenegiant.graphics.IMirror.*;
 
 public class MatrixUtils {
 	private MatrixUtils() {

@@ -25,7 +25,7 @@ import android.util.Log;
 
 import com.serenegiant.system.StorageInfo;
 import com.serenegiant.system.StorageUtils;
-import com.serenegiant.utils.FileUtils;
+import com.serenegiant.system.FileUtils;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;

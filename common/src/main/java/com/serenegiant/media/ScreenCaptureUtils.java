@@ -26,7 +26,7 @@ import android.media.projection.MediaProjectionManager;
 import android.os.Build;
 import android.util.Log;
 
-import com.serenegiant.system.ContextUtils;
+import com.serenegiant.content.ContextUtils;
 
 import java.lang.ref.WeakReference;
 

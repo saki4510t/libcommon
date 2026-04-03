@@ -6,7 +6,7 @@ import androidx.annotation.RequiresApi
 import android.os.Build
 import com.serenegiant.dialog.ConfirmDialogV4.ConfirmDialogListener
 import com.serenegiant.widget.StringsRecyclerViewAdapter
-import com.serenegiant.system.SAFPermission
+import com.serenegiant.documentfile.SAFPermission
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.os.Bundle
@@ -21,7 +21,7 @@ import android.widget.Toast
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.serenegiant.libcommon.databinding.FragmentSafutilsBinding
 import com.serenegiant.libcommon.viewmodel.SAFUtilsViewModel
-import com.serenegiant.system.SAFUtils
+import com.serenegiant.documentfile.SAFUtils
 import java.lang.NumberFormatException
 import java.util.ArrayList
 
@@ -54,7 +54,10 @@ class SAFUtilsFragment: BaseFragment(), ConfirmDialogListener {
 	override fun onAttach(context: Context) {
 		super.onAttach(context)
 		// XXX Fragmentの場合SAFPermissionを#onAttachまたは#onCreateで初期化しないといけない
-		mSAFPermission = SAFPermission(this, SAFPermission.DEFAULT_CALLBACK)
+		mSAFPermission = SAFPermission(
+			this,
+			SAFPermission.DEFAULT_CALLBACK
+		)
 	}
 
 	override fun onCreateView(

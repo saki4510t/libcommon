@@ -30,7 +30,7 @@ import android.view.animation.Animation;
 import android.widget.TextView;
 
 import com.serenegiant.common.R;
-import com.serenegiant.system.ContextHolder;
+import com.serenegiant.content.ContextHolder;
 import com.serenegiant.view.animation.ResizeAnimation;
 
 import java.util.Locale;
