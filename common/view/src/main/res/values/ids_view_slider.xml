@@ -20,4 +20,8 @@
 */
 -->
 <resources>
+	<!-- MessagePanelUtilsと重複するのでコメントに -->
+<!--	<item type="id" name="auto_hide_duration" />-->
+<!--	<item type="id" name="visibility" />-->
+<!--	<item type="id" name="intent" />-->
 </resources>

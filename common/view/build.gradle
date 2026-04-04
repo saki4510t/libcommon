@@ -1,63 +1,35 @@
 plugins {
 	id 'com.android.library'
 	id 'org.jetbrains.kotlin.android'
-	id 'org.jetbrains.kotlin.kapt'
 	id 'org.jetbrains.dokka'
 	id 'maven-publish'
 }
 
-/*
- * libcommon
- * utility/helper classes for myself
- *
- * Copyright (c) 2014-2026 saki t_saki@serenegiant.com
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- *  You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- *  Unless required by applicable law or agreed to in writing, software
- *  distributed under the License is distributed on an "AS IS" BASIS,
- *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *  See the License for the specific language governing permissions and
- *  limitations under the License.
-*/
-
 android {
-	namespace 'com.serenegiant.common'
-    compileSdk versionCompiler
+	namespace 'com.serenegiant.view'
+	compileSdk versionCompiler
 
-   	compileOptions {
-   		sourceCompatibility javaSourceCompatibility
-   		targetCompatibility javaTargetCompatibility
-   	}
+	compileOptions {
+		sourceCompatibility javaSourceCompatibility
+		targetCompatibility javaTargetCompatibility
+	}
 
-    defaultConfig {
-        minSdkVersion versionMin
-        targetSdkVersion versionTarget
-		// AGP 4.1.0以降でライブラリプロジェクトのBuildConfigにVERSION_CODEとVERSION_NAMEが
-		// 含まれなくなってしまったのでワークアラウンドを追加
-		buildConfigField 'int', 'VERSION_CODE', "${rootProject.versionCodeNum}"
-		buildConfigField 'String', 'VERSION_NAME', "\"${rootProject.versionNameString}\""
+	defaultConfig {
+		minSdkVersion versionMin
+		targetSdkVersion versionTarget
 
-		vectorDrawables.useSupportLibrary = true
-    }
+		testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+		consumerProguardFiles "consumer-rules.pro"
+	}
 
-    buildTypes {
-        release {
-            minifyEnabled false
-            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
-        }
-		debug {
-			multiDexEnabled true
+	buildTypes {
+		release {
+			minifyEnabled false
+			proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
 		}
 	}
 
 	buildFeatures {
-	    buildConfig = true
-		dataBinding = true	// appでデータバインディングを使っているとこれを削除できない…
 	}
 
 	kotlinOptions.jvmTarget = "17"
@@ -67,13 +39,10 @@ dependencies {
 	// androidx
 	implementation "androidx.legacy:legacy-support-v4:$androidXLegacyV4"
 	implementation "androidx.appcompat:appcompat:$androidXAppCompat"
-	//noinspection KtxExtensionAvailable
-	implementation "androidx.preference:preference:$androidXPreference"
 	implementation "androidx.recyclerview:recyclerview:$androidXRecyclerview"
 	implementation "androidx.exifinterface:exifinterface:$androidXExif"
 	implementation "com.google.android.material:material:$androidXMaterial"
 	implementation "androidx.lifecycle:lifecycle-process:$androidXLifecycle"
-	implementation "androidx.databinding:databinding-common:$androidXDataBinding"
 	// ktx
 	implementation "androidx.core:core-ktx:$androidXCoreKtx"
 	implementation "androidx.preference:preference-ktx:$androidXPreference"
@@ -87,15 +56,9 @@ dependencies {
 
 	api project(':common:core')
 	api project(':common:gl')
-	api project(':common:media')
-	api project(':common:net')
-	api project(':common:usb')
-	api project(':common:view')
 }
 
 def repo = new File(rootDir, "repository")
-
-//apply plugin: 'maven-publish'
 
 afterEvaluate {
 	publishing {
@@ -107,7 +70,7 @@ afterEvaluate {
 		publications {
 			release(MavenPublication) {
 				groupId = 'com.serenegiant'
-				artifactId = 'common'
+				artifactId = 'common-view'
 				version = versionNameString
 				from components.release
 				pom {

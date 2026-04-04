@@ -20,4 +20,5 @@
 */
 -->
 <resources>
+	<dimen name="scale_type_padding">16dp</dimen>
 </resources>

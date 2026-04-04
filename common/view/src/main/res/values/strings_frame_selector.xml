@@ -20,4 +20,7 @@
 */
 -->
 <resources>
+	<string name="scale_type_none">none</string>
+	<string name="scale_type_inch">inch scale</string>
+	<string name="scale_type_mm">mm scale</string>
 </resources>
