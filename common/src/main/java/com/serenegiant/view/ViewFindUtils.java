@@ -23,8 +23,6 @@ import android.view.ViewParent;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.serenegiant.common.R;
-
 import androidx.annotation.IdRes;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -32,35 +30,6 @@ import androidx.annotation.Nullable;
 public class ViewFindUtils {
 	private ViewFindUtils() {
 		// インスタンス化を防止するためデフォルトコンストラクタをprivateに
-	}
-
-	@IdRes
-	private static final int[] ICON_IDS = {
-		R.id.thumbnail,
-		android.R.id.icon,
-		R.id.icon,
-		R.id.image,
-	};
-
-	@IdRes
-	private static final int[] TITLE_IDS = {
-		R.id.title,
-		R.id.content,
-		android.R.id.title,
-		android.R.id.text1,
-		android.R.id.text2,
-	};
-
-	/**
-	 * サムネイル・アイコン表示用にImageViewを探す
-	 * id = R.id.thumbnail, android.R.id.icon, R.id.icon, R.id.image
-	 * @param view
-	 * @return
-	 */
-	@Deprecated
-	@Nullable
-	public static ImageView findIconView(@NonNull final View view) {
-		return findView(view, ICON_IDS, ImageView.class);
 	}
 
 	/**
@@ -75,18 +44,6 @@ public class ViewFindUtils {
 		@NonNull @IdRes final int[] ids) {
 
 		return findView(view, ids, ImageView.class);
-	}
-
-	/**
-	 * タイトル表示用にTextViewを探す
-	 * id = android.R.id.title, R.id.title
-	 * @param view
-	 * @return
-	 */
-	@Deprecated
-	@Nullable
-	public static TextView findTitleView(@NonNull final View view) {
-		return findView(view, TITLE_IDS, TextView.class);
 	}
 
 	/**
