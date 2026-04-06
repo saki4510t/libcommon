@@ -49,7 +49,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
-        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
         android:text="You can change scale mode with touching screen."
         android:textColor="#ffff0000" />
 
@@ -57,9 +57,20 @@
         android:id="@+id/scalemode_textview"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
         android:layout_below="@+id/textView1"
         android:text="scale mode"
         android:textColor="#ffff0000" />
+
+	<TextView
+		android:id="@+id/effect_name_textview"
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
+		android:layout_above="@+id/record_button"
+		android:layout_centerHorizontal="true"
+		android:layout_marginBottom="16dp"
+		android:text="Effect name"
+		android:textSize="18sp"
+		android:textColor="#ffff0000" />
 
 </RelativeLayout>

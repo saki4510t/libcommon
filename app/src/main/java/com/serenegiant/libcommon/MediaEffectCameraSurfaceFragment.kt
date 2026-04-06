@@ -27,9 +27,9 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.TextView
 import com.serenegiant.gl.GLEffect
 import com.serenegiant.gl.ShaderConst
-import com.serenegiant.glpipeline.MediaEffectPipeline
 import com.serenegiant.graphics.BitmapHelper
 import com.serenegiant.mediaeffect.EffectsBuilder
 import com.serenegiant.mediaeffect.IMediaEffect
@@ -88,7 +88,15 @@ import com.serenegiant.widget.MediaEffectCameraSurfaceView
 
 class MediaEffectCameraSurfaceFragment : BaseFragment() {
 
+	private interface MyEffectsBuilder : EffectsBuilder {
+		fun name(): String {
+			return "No name"
+		}
+	}
+
 	private lateinit var mCameraView: MediaEffectCameraSurfaceView
+	private lateinit var mEffectNameTv: TextView
+
 	override fun onAttach(context: Context) {
 		super.onAttach(context)
 		requireActivity().title = TAG
@@ -103,13 +111,16 @@ class MediaEffectCameraSurfaceFragment : BaseFragment() {
 			R.layout.fragment_camera_media_effect,
 			container, false)
 		mCameraView = rootView.findViewById(R.id.cameraView)
+		mEffectNameTv = rootView.findViewById(R.id.effect_name_textview)
 		return rootView
 	}
 
 	override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
 		super.onViewCreated(view, savedInstanceState)
 		if (DEBUG) Log.v(TAG, "onViewCreated:")
-		mCameraView.changeEffect(mEffectsBuilders[mEffectIx])
+		val builder = mEffectsBuilders[mEffectIx]
+		mEffectNameTv.text = builder.name()
+		mCameraView.changeEffect(builder)
 		mCameraView.setOnLongClickListener { v ->
 			onLongClickListener(v)
 		}
@@ -131,7 +142,9 @@ class MediaEffectCameraSurfaceFragment : BaseFragment() {
 		when (view.id) {
 			R.id.cameraView -> {
 				mEffectIx = (mEffectIx + 1) % mEffectsBuilders.size
-				mCameraView.changeEffect(mEffectsBuilders[mEffectIx])
+				val builder = mEffectsBuilders[mEffectIx]
+				mEffectNameTv.text = builder.name()
+				mCameraView.changeEffect(builder)
 			}
 		}
 		return false
@@ -139,34 +152,41 @@ class MediaEffectCameraSurfaceFragment : BaseFragment() {
 
 	private var mEffectIx = 0
 	private val mEffectsBuilders = listOf(
-		object : EffectsBuilder{
+		object : MyEffectsBuilder{
+			override fun name(): String { return "Non" }
 		},
-		object : EffectsBuilder{
+		object : MyEffectsBuilder {
+			override fun name(): String { return "MediaEffectAutoFix" }
 			override fun buildEffects(effectContext: EffectContext): MutableList<IMediaEffect> {
 				return mutableListOf(MediaEffectAutoFix(effectContext, 0.5f))
 			}
 		},
-		object : EffectsBuilder{
+		object : MyEffectsBuilder {
+			override fun name(): String { return "EFFECT_ADAPTIVE_BIN" }
 			override fun buildEffects(effectContext: EffectContext): MutableList<IMediaEffect> {
 				return mutableListOf(MediaEffectGLEffect(GLEffect.EFFECT_ADAPTIVE_BIN))
 			}
 		},
-		object : EffectsBuilder{
+		object : MyEffectsBuilder {
+			override fun name(): String { return "EFFECT_KERNEL_SOBEL_HV" }
 			override fun buildEffects(effectContext: EffectContext): MutableList<IMediaEffect> {
 				return mutableListOf(MediaEffectGLEffect(GLEffect.EFFECT_KERNEL_SOBEL_HV))
 			}
 		},
-		object : EffectsBuilder{
+		object : MyEffectsBuilder {
+			override fun name(): String { return "EFFECT_BIN" }
 			override fun buildEffects(effectContext: EffectContext): MutableList<IMediaEffect> {
 				return mutableListOf(MediaEffectGLEffect(GLEffect.EFFECT_BIN))
 			}
 		},
-		object : EffectsBuilder{
+		object : MyEffectsBuilder {
+			override fun name(): String { return "EFFECT_KERNEL_CANNY_ENHANCE" }
 			override fun buildEffects(effectContext: EffectContext): MutableList<IMediaEffect> {
 				return mutableListOf(MediaEffectGLEffect(GLEffect.EFFECT_KERNEL_CANNY_ENHANCE))
 			}
 		},
-		object : EffectsBuilder{
+		object : MyEffectsBuilder {
+			override fun name(): String { return "AutoFix+Crop" }
 			override fun buildEffects(effectContext: EffectContext): MutableList<IMediaEffect> {
 				return mutableListOf(
 					MediaEffectAutoFix(effectContext, 0.5f),
@@ -178,14 +198,15 @@ class MediaEffectCameraSurfaceFragment : BaseFragment() {
 		},
 		// FIXME これはうまく動かない、urlから動画取得開始後しばらくしてから
 		//       内部的にクラッシュする(android.media.effect.FilterGraphEffect.apply(FilterGraphEffect)
-//		object : EffectsBuilder{
+//		object : MyEffectsBuilder {
 //			override fun buildEffects(effectContext: EffectContext): MutableList<IMediaEffect> {
 //				return mutableListOf(MediaEffectBackDropper(effectContext,
 //					"https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4"
 //				))
 //			}
 //		},
-		object : EffectsBuilder{
+		object : MyEffectsBuilder {
+			override fun name(): String { return "MediaEffectBitmapOverlay" }
 			override fun buildEffects(effectContext: EffectContext): MutableList<IMediaEffect> {
 				return mutableListOf(MediaEffectBitmapOverlay(effectContext,
 					BitmapHelper.genMaskImage(0,
@@ -194,17 +215,20 @@ class MediaEffectCameraSurfaceFragment : BaseFragment() {
 				))
 			}
 		},
-		object : EffectsBuilder{
+		object : MyEffectsBuilder {
+			override fun name(): String { return "MediaEffectBlackWhite" }
 			override fun buildEffects(effectContext: EffectContext): MutableList<IMediaEffect> {
 				return mutableListOf(MediaEffectBlackWhite(effectContext))
 			}
 		},
-		object : EffectsBuilder{
+		object : MyEffectsBuilder {
+			override fun name(): String { return "MediaEffectContrast(1.2)" }
 			override fun buildEffects(effectContext: EffectContext): MutableList<IMediaEffect> {
 				return mutableListOf(MediaEffectContrast(effectContext, 1.2f))
 			}
 		},
-		object : EffectsBuilder{
+		object : MyEffectsBuilder {
+			override fun name(): String { return "MediaEffectCrop" }
 			override fun buildEffects(effectContext: EffectContext): MutableList<IMediaEffect> {
 				return mutableListOf(MediaEffectCrop(effectContext,
 					CameraDelegator.DEFAULT_PREVIEW_WIDTH / 4, CameraDelegator.DEFAULT_PREVIEW_HEIGHT / 4,
@@ -212,240 +236,284 @@ class MediaEffectCameraSurfaceFragment : BaseFragment() {
 				))
 			}
 		},
-		object : EffectsBuilder{
+		object : MyEffectsBuilder {
+			override fun name(): String { return "MediaEffectCrossProcess" }
 			override fun buildEffects(effectContext: EffectContext): MutableList<IMediaEffect> {
 				return mutableListOf(MediaEffectCrossProcess(effectContext))
 			}
 		},
-		object : EffectsBuilder{
+		object : MyEffectsBuilder {
+			override fun name(): String { return "MediaEffectDocumentary" }
 			override fun buildEffects(effectContext: EffectContext): MutableList<IMediaEffect> {
 				return mutableListOf(MediaEffectDocumentary(effectContext))
 			}
 		},
-		object : EffectsBuilder{
+		object : MyEffectsBuilder {
+			override fun name(): String { return "MediaEffectDuoTone(0xffff0000,0xff00ff00)" }
 			override fun buildEffects(effectContext: EffectContext): MutableList<IMediaEffect> {
 				return mutableListOf(MediaEffectDuoTone(effectContext,
 					0xffff0000.toInt(), 0xff00ff00.toInt()
 				))
 			}
 		},
-		object : EffectsBuilder{
+		object : MyEffectsBuilder {
+			override fun name(): String { return "MediaEffectFillLight" }
 			override fun buildEffects(effectContext: EffectContext): MutableList<IMediaEffect> {
 				// FillLight tile size: 640とlogCatへ出力される
 				return mutableListOf(MediaEffectFillLight(effectContext, 0.5f))
 			}
 		},
-		object : EffectsBuilder{
+		object : MyEffectsBuilder {
+			override fun name(): String { return "MediaEffectFishEye" }
 			override fun buildEffects(effectContext: EffectContext): MutableList<IMediaEffect> {
 				return mutableListOf(MediaEffectFishEye(effectContext, 0.5f))
 			}
 		},
-		object : EffectsBuilder{
+		object : MyEffectsBuilder {
+			override fun name(): String { return "MediaEffectFlipHorizontal" }
 			override fun buildEffects(effectContext: EffectContext): MutableList<IMediaEffect> {
 				return mutableListOf(MediaEffectFlipHorizontal(effectContext))
 			}
 		},
-		object : EffectsBuilder{
+		object : MyEffectsBuilder {
+			override fun name(): String { return "MediaEffectFlipVertical" }
 			override fun buildEffects(effectContext: EffectContext): MutableList<IMediaEffect> {
 				return mutableListOf(MediaEffectFlipVertical(effectContext))
 			}
 		},
-		object : EffectsBuilder{
+		object : MyEffectsBuilder {
+			override fun name(): String { return "MediaEffectFlip(true,true)" }
 			override fun buildEffects(effectContext: EffectContext): MutableList<IMediaEffect> {
 				return mutableListOf(MediaEffectFlip(effectContext, true, true))
 			}
 		},
-		object : EffectsBuilder{
+		object : MyEffectsBuilder {
+			override fun name(): String { return "MediaEffectGrain(0.5)" }
 			override fun buildEffects(effectContext: EffectContext): MutableList<IMediaEffect> {
 				return mutableListOf(MediaEffectGrain(effectContext, 0.5f))
 			}
 		},
-		object : EffectsBuilder{
+		object : MyEffectsBuilder {
+			override fun name(): String { return "MediaEffectGrayScale" }
 			override fun buildEffects(effectContext: EffectContext): MutableList<IMediaEffect> {
 				return mutableListOf(MediaEffectGrayScale(effectContext))
 			}
 		},
-		object : EffectsBuilder{
+		object : MyEffectsBuilder {
+			override fun name(): String { return "MediaEffectLomoish" }
 			override fun buildEffects(effectContext: EffectContext): MutableList<IMediaEffect> {
 				return mutableListOf(MediaEffectLomoish(effectContext))
 			}
 		},
-		object : EffectsBuilder{
+		object : MyEffectsBuilder {
+			override fun name(): String { return "MediaEffectNegative" }
 			override fun buildEffects(effectContext: EffectContext): MutableList<IMediaEffect> {
 				return mutableListOf(MediaEffectNegative(effectContext))
 			}
 		},
-		object : EffectsBuilder{
+		object : MyEffectsBuilder {
+			override fun name(): String { return "MediaEffectNull" }
 			override fun buildEffects(effectContext: EffectContext): MutableList<IMediaEffect> {
 				return mutableListOf(MediaEffectNull(effectContext))
 			}
 		},
-		object : EffectsBuilder{
+		object : MyEffectsBuilder {
+			override fun name(): String { return "MediaEffectRedEye" }
 			override fun buildEffects(effectContext: EffectContext): MutableList<IMediaEffect> {
 				return mutableListOf(MediaEffectRedEye(effectContext,
 					floatArrayOf(0.33f, 0.33f, 0.66f, 0.33f)	// これは適当
 				))
 			}
 		},
-		object : EffectsBuilder{
+		object : MyEffectsBuilder {
+			override fun name(): String { return "MediaEffectRotate(90)" }
 			override fun buildEffects(effectContext: EffectContext): MutableList<IMediaEffect> {
 				return mutableListOf(MediaEffectRotate(effectContext, 90))
 			}
 		},
-		object : EffectsBuilder{
+		object : MyEffectsBuilder {
+			override fun name(): String { return "MediaEffectSaturate(0.5)" }
 			override fun buildEffects(effectContext: EffectContext): MutableList<IMediaEffect> {
 				return mutableListOf(MediaEffectSaturate(effectContext, 0.5f))
 			}
 		},
-		object : EffectsBuilder{
+		object : MyEffectsBuilder {
+			override fun name(): String { return "MediaEffectSepia" }
 			override fun buildEffects(effectContext: EffectContext): MutableList<IMediaEffect> {
 				return mutableListOf(MediaEffectSepia(effectContext))
 			}
 		},
-		object : EffectsBuilder{
+		object : MyEffectsBuilder {
+			override fun name(): String { return "MediaEffectSharpen(0.5)" }
 			override fun buildEffects(effectContext: EffectContext): MutableList<IMediaEffect> {
 				return mutableListOf(MediaEffectSharpen(effectContext, 0.5f))
 			}
 		},
-		object : EffectsBuilder{
+		object : MyEffectsBuilder {
+			override fun name(): String { return "MediaEffectStraighten(0.5)" }
 			override fun buildEffects(effectContext: EffectContext): MutableList<IMediaEffect> {
 				return mutableListOf(MediaEffectStraighten(effectContext, 0.5f))
 			}
 		},
-		object : EffectsBuilder{
+		object : MyEffectsBuilder {
+			override fun name(): String { return "MediaEffectTemperature(0.75)" }
 			override fun buildEffects(effectContext: EffectContext): MutableList<IMediaEffect> {
 				return mutableListOf(MediaEffectTemperature(effectContext, 0.75f))
 			}
 		},
-		object : EffectsBuilder{
+		object : MyEffectsBuilder {
+			override fun name(): String { return "MediaEffectTint(0xff00ffff)" }
 			override fun buildEffects(effectContext: EffectContext): MutableList<IMediaEffect> {
 				return mutableListOf(MediaEffectTint(effectContext, 0xff00ffff.toInt()))
 			}
 		},
-		object : EffectsBuilder{
+		object : MyEffectsBuilder {
+			override fun name(): String { return "MediaEffectVignette(0.5)" }
 			override fun buildEffects(effectContext: EffectContext): MutableList<IMediaEffect> {
 				return mutableListOf(MediaEffectVignette(effectContext, 0.5f))
 			}
 		},
 		// OpenGL|ESでの映像フィルタ処理
-		object : EffectsBuilder{
+		object : MyEffectsBuilder {
+			override fun name(): String { return "MediaEffectGLAlphaBlend(0.5)" }
 			override fun buildEffects(effectContext: EffectContext): MutableList<IMediaEffect> {
 				return mutableListOf(MediaEffectGLAlphaBlend(0.5f))
 			}
 		},
-		object : EffectsBuilder{
+		object : MyEffectsBuilder {
+			override fun name(): String { return "MediaEffectGLBrightness(0.5)" }
 			override fun buildEffects(effectContext: EffectContext): MutableList<IMediaEffect> {
 				return mutableListOf(MediaEffectGLBrightness(0.5f))
 			}
 		},
-		object : EffectsBuilder{
+		object : MyEffectsBuilder {
+			override fun name(): String { return "MediaEffectGLCanny(0.5)" }
 			override fun buildEffects(effectContext: EffectContext): MutableList<IMediaEffect> {
 				return mutableListOf(MediaEffectGLCanny(0.5f))
 			}
 		},
-		object : EffectsBuilder{
+		object : MyEffectsBuilder {
+			override fun name(): String { return "COLOR_MATRIX_BLACK_COLOR" }
 			override fun buildEffects(effectContext: EffectContext): MutableList<IMediaEffect> {
 				return mutableListOf(MediaEffectGLColorMatrix(ShaderConst.COLOR_MATRIX_BLACK_COLOR, 0))
 			}
 		},
-		object : EffectsBuilder{
+		object : MyEffectsBuilder {
+			override fun name(): String { return "COLOR_MATRIX_GRAYSCALE" }
 			override fun buildEffects(effectContext: EffectContext): MutableList<IMediaEffect> {
 				return mutableListOf(MediaEffectGLColorMatrix(ShaderConst.COLOR_MATRIX_GRAYSCALE, 0))
 			}
 		},
-		object : EffectsBuilder{
+		object : MyEffectsBuilder {
+			override fun name(): String { return "COLOR_MATRIX_CONTRAST(0)" }
 			override fun buildEffects(effectContext: EffectContext): MutableList<IMediaEffect> {
 				return mutableListOf(MediaEffectGLColorMatrix(ShaderConst.COLOR_MATRIX_CONTRAST, 0))
 			}
 		},
-		object : EffectsBuilder{
+		object : MyEffectsBuilder {
+			override fun name(): String { return "COLOR_MATRIX_CONTRAST(16)" }
 			override fun buildEffects(effectContext: EffectContext): MutableList<IMediaEffect> {
 				return mutableListOf(MediaEffectGLColorMatrix(ShaderConst.COLOR_MATRIX_CONTRAST, 16))
 			}
 		},
-		object : EffectsBuilder{
+		object : MyEffectsBuilder {
+			override fun name(): String { return "COLOR_MATRIX_SEPIA" }
 			override fun buildEffects(effectContext: EffectContext): MutableList<IMediaEffect> {
 				return mutableListOf(MediaEffectGLColorMatrix(ShaderConst.COLOR_MATRIX_SEPIA, 0))
 			}
 		},
-		object : EffectsBuilder{
+		object : MyEffectsBuilder {
+			override fun name(): String { return "MediaEffectGLColorCorrection(gamma=2.0)" }
 			override fun buildEffects(effectContext: EffectContext): MutableList<IMediaEffect> {
 				return mutableListOf(MediaEffectGLColorCorrection().apply {
 					setGamma(2.0f)
 				})
 			}
 		},
-		object : EffectsBuilder{
+		object : MyEffectsBuilder {
+			override fun name(): String { return "MediaEffectGLColorCorrection(gamma=0.6)" }
 			override fun buildEffects(effectContext: EffectContext): MutableList<IMediaEffect> {
 				return mutableListOf(MediaEffectGLColorCorrection().apply {
 					setGamma(0.6f)
 				})
 			}
 		},
-		object : EffectsBuilder{
+		object : MyEffectsBuilder {
+			override fun name(): String { return "MediaEffectGLColorCorrection(contrast=-0.5)" }
 			override fun buildEffects(effectContext: EffectContext): MutableList<IMediaEffect> {
 				return mutableListOf(MediaEffectGLColorCorrection().apply {
 					setContrast(-0.5f)
 				})
 			}
 		},
-		object : EffectsBuilder{
+		object : MyEffectsBuilder {
+			override fun name(): String { return "MediaEffectGLColorCorrection(contrast=0.5)" }
 			override fun buildEffects(effectContext: EffectContext): MutableList<IMediaEffect> {
 				return mutableListOf(MediaEffectGLColorCorrection().apply {
 					setContrast(0.5f)
 				})
 			}
 		},
-		object : EffectsBuilder{
+		object : MyEffectsBuilder {
+			override fun name(): String { return "MediaEffectGLColorCorrection(sigmoid=10.0,0.5)" }
 			override fun buildEffects(effectContext: EffectContext): MutableList<IMediaEffect> {
 				return mutableListOf(MediaEffectGLColorCorrection().apply {
 					setSigmoid(10.0f, 0.5f)
 				})
 			}
 		},
-		object : EffectsBuilder{
+		object : MyEffectsBuilder {
+			override fun name(): String { return "MediaEffectGLColorCorrection(sigmoid=5.0,0.8)" }
 			override fun buildEffects(effectContext: EffectContext): MutableList<IMediaEffect> {
 				return mutableListOf(MediaEffectGLColorCorrection().apply {
 					setSigmoid(5.0f, 0.8f)
 				})
 			}
 		},
-		object : EffectsBuilder{
+		object : MyEffectsBuilder {
+			override fun name(): String { return "MediaEffectGLCrossProcess" }
 			override fun buildEffects(effectContext: EffectContext): MutableList<IMediaEffect> {
 				return mutableListOf(MediaEffectGLCrossProcess())
 			}
 		},
-		object : EffectsBuilder{
+		object : MyEffectsBuilder {
+			override fun name(): String { return "MediaEffectGLDilation(2)" }
 			override fun buildEffects(effectContext: EffectContext): MutableList<IMediaEffect> {
 				return mutableListOf(MediaEffectGLDilation(2))
 			}
 		},
-		object : EffectsBuilder{
+		object : MyEffectsBuilder {
+			override fun name(): String { return "MediaEffectGLDocumentary(2)" }
 			override fun buildEffects(effectContext: EffectContext): MutableList<IMediaEffect> {
 				return mutableListOf(MediaEffectGLDocumentary())
 			}
 		},
-		object : EffectsBuilder{
+		object : MyEffectsBuilder {
+			override fun name(): String { return "MediaEffectGLEmboss(0.5)" }
 			override fun buildEffects(effectContext: EffectContext): MutableList<IMediaEffect> {
 				return mutableListOf(MediaEffectGLEmboss(0.5f))
 			}
 		},
-		object : EffectsBuilder{
+		object : MyEffectsBuilder {
+			override fun name(): String { return "MediaEffectGLErosion(2)" }
 			override fun buildEffects(effectContext: EffectContext): MutableList<IMediaEffect> {
 				return mutableListOf(MediaEffectGLErosion(2))
 			}
 		},
-		object : EffectsBuilder{
+		object : MyEffectsBuilder {
+			override fun name(): String { return "MediaEffectGLExposure(2.0)" }
 			override fun buildEffects(effectContext: EffectContext): MutableList<IMediaEffect> {
 				return mutableListOf(MediaEffectGLExposure(2.0f))
 			}
 		},
-		object : EffectsBuilder{
+		object : MyEffectsBuilder {
+			override fun name(): String { return "MediaEffectGLExtraction" }
 			override fun buildEffects(effectContext: EffectContext): MutableList<IMediaEffect> {
 				return mutableListOf(MediaEffectGLExtraction())	// この設定だとなにもしない
 			}
 		},
-		object : EffectsBuilder{
+		object : MyEffectsBuilder {
+			override fun name(): String { return "MediaEffectGLHistogram(false)" }
 			override fun buildEffects(effectContext: EffectContext): MutableList<IMediaEffect> {
 				return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
 					mutableListOf(MediaEffectGLHistogram(false))
@@ -454,7 +522,8 @@ class MediaEffectCameraSurfaceFragment : BaseFragment() {
 				}
 			}
 		},
-		object : EffectsBuilder{
+		object : MyEffectsBuilder {
+			override fun name(): String { return "MediaEffectGLHistogram(false,true)" }
 			override fun buildEffects(effectContext: EffectContext): MutableList<IMediaEffect> {
 				return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
 					mutableListOf(MediaEffectGLHistogram(false, true))
@@ -463,48 +532,57 @@ class MediaEffectCameraSurfaceFragment : BaseFragment() {
 				}
 			}
 		},
-		object : EffectsBuilder{
+		object : MyEffectsBuilder {
+			override fun name(): String { return "MediaEffectGLMaskedAlphaBlend(no mask)" }
 			override fun buildEffects(effectContext: EffectContext): MutableList<IMediaEffect> {
 				return mutableListOf(MediaEffectGLMaskedAlphaBlend())	// マスク用テクスチャを指定していないので変化無し
 			}
 		},
-		object : EffectsBuilder{
+		object : MyEffectsBuilder {
+			override fun name(): String { return "MediaEffectGLMedian3x3" }
 			override fun buildEffects(effectContext: EffectContext): MutableList<IMediaEffect> {
 				return mutableListOf(MediaEffectGLMedian3x3())
 			}
 		},
-		object : EffectsBuilder{
+		object : MyEffectsBuilder {
+			override fun name(): String { return "MediaEffectGLNegative" }
 			override fun buildEffects(effectContext: EffectContext): MutableList<IMediaEffect> {
 				return mutableListOf(MediaEffectGLNegative())
 			}
 		},
-		object : EffectsBuilder{
+		object : MyEffectsBuilder {
+			override fun name(): String { return "MediaEffectGLNull" }
 			override fun buildEffects(effectContext: EffectContext): MutableList<IMediaEffect> {
 				return mutableListOf(MediaEffectGLNull())
 			}
 		},
-		object : EffectsBuilder{
+		object : MyEffectsBuilder {
+			override fun name(): String { return "MediaEffectGLPosterize(10.0)" }
 			override fun buildEffects(effectContext: EffectContext): MutableList<IMediaEffect> {
 				return mutableListOf(MediaEffectGLPosterize(10.0f))
 			}
 		},
-		object : EffectsBuilder{
+		object : MyEffectsBuilder {
+			override fun name(): String { return "MediaEffectGLSaturate(0.5)" }
 			override fun buildEffects(effectContext: EffectContext): MutableList<IMediaEffect> {
 				return mutableListOf(MediaEffectGLSaturate(0.5f))
 			}
 		},
-		object : EffectsBuilder{
+		object : MyEffectsBuilder {
+			override fun name(): String { return "MediaEffectGLSphere" }
 			override fun buildEffects(effectContext: EffectContext): MutableList<IMediaEffect> {
 				return mutableListOf(MediaEffectGLSphere(
 					CameraDelegator.DEFAULT_PREVIEW_WIDTH / CameraDelegator.DEFAULT_PREVIEW_HEIGHT.toFloat()))
 			}
 		},
-		object : EffectsBuilder{
+		object : MyEffectsBuilder {
+			override fun name(): String { return "MediaEffectGLTexProjection" }
 			override fun buildEffects(effectContext: EffectContext): MutableList<IMediaEffect> {
 				return mutableListOf(MediaEffectGLTexProjection())
 			}
 		},
-		object : EffectsBuilder {
+		object : MyEffectsBuilder {
+			override fun name(): String { return "MediaEffectGLVignette" }
 			override fun buildEffects(effectContext: EffectContext): MutableList<IMediaEffect> {
 				return mutableListOf(MediaEffectGLVignette())
 			}
