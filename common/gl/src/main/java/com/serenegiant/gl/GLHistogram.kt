@@ -547,21 +547,39 @@ class GLHistogram @WorkerThread constructor(
 	@Size(value = HISTOGRAM_SIZE.toLong())
 	@WorkerThread
 	fun getHistogram(): IntArray {
-		val result = IntArray(HISTOGRAM_SIZE)
+		return readHistogram(null)
+	}
+
+	/**
+	 * ヒストグラムデータを指定したIntバッファへ読み込む
+	 * EGL|GLコンテキストの存在するスレッド上で実行すること
+	 * @param buffer nullまたはHISTOGRAM_SIZEより小さい場合は内部で新しく生成する
+	 * @return
+	 */
+	@Size(value = HISTOGRAM_SIZE.toLong())
+	@WorkerThread
+	fun readHistogram(buffer: IntArray?): IntArray {
+		val buf = if ((buffer == null) || (buffer.size < HISTOGRAM_SIZE)) {
+			IntArray(HISTOGRAM_SIZE)
+		} else {
+			buffer
+		}
 		if (mHistogramRGBId != GLConst.GL_NO_BUFFER) {
 			GLES31.glBindBuffer(GLES31.GL_SHADER_STORAGE_BUFFER, mHistogramRGBId)
-			val buffer = GLES31.glMapBufferRange(
+			val mapped = GLES31.glMapBufferRange(
 				GLES31.GL_SHADER_STORAGE_BUFFER,
 				0, HISTOGRAM_BYTES,	// lengthはバイト数なので注意
 				GLES31.GL_MAP_READ_BIT)
-			if (buffer is ByteBuffer) {
-				buffer.asIntBuffer().get(result)
+			if (mapped is ByteBuffer) {
+				mapped.asIntBuffer().get(buf)
 			}
 			GLES31.glUnmapBuffer(GLES31.GL_SHADER_STORAGE_BUFFER)
 			GLES31.glBindBuffer(GLES31.GL_SHADER_STORAGE_BUFFER, 0)
+		} else {
+			throw IllegalStateException("No histogram buffer")
 		}
 
-		return result
+		return buf
 	}
 
 	/**
