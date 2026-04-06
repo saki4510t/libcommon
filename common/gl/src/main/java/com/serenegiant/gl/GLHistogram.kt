@@ -307,7 +307,7 @@ class GLHistogram @WorkerThread constructor(
 	)
 
 	/**
-	 * ヒストグラム受け取り用のテクスチャをゼロクリアするために使うIntBuffer
+	 * ヒストグラム受け取り用のテクスチャをゼロクリアまたはLUTをセットするために使うIntBuffer
 	 */
 	private val mClearBuffer = BufferHelper.createBuffer(IntArray(HISTOGRAM_SIZE))
 
@@ -583,6 +583,15 @@ class GLHistogram @WorkerThread constructor(
 	}
 
 	/**
+	 * ヒストグラム平均化補正時にヒストグラムデータを読み込むためのIntArray
+	 */
+	private val mReadBuffer = IntArray(HISTOGRAM_SIZE)
+	/**
+	 * LUT計算時のワーク
+	 */
+	private val mDist = FloatArray(256)
+
+	/**
 	 * ヒストグラム平坦化用のLUTを計算
 	 * 累積分布関数でLUTを計算する
 	 * EGL|GLコンテキストの存在するスレッド上で実行すること
@@ -590,22 +599,21 @@ class GLHistogram @WorkerThread constructor(
 	@OptIn(ExperimentalUnsignedTypes::class)
 	@WorkerThread
 	fun equalize() {
-		val work = getHistogram().asUIntArray()	// XXX #asUIntArrayはOptInが必要
+		val work = readHistogram(mReadBuffer).asUIntArray()	// XXX #asUIntArrayはOptInが必要
 		var total = 0.0f	// ヒストグラムの全ピクセル数
-		val dist = FloatArray(256)
 		for (ix in 0..255) {
 			val rgb = work[ix] + work[ix + 256] + work[ix + 512]	// R[ix] + G[ix] + B[ix]
 			total += rgb.toFloat()
-			dist[ix] = rgb.toFloat()
+			mDist[ix] = rgb.toFloat()
 		}
 		mClearBuffer.limit(mClearBuffer.capacity())
-		mClearBuffer.position(1280)
+		mClearBuffer.position(LUT_INDEX)
 		var sum = 0.0f
 		for (ix in 0..255) {
-			sum += dist[ix] / total	// 正規化ヒストグラムの累積頻度を計算
+			sum += mDist[ix] / total	// 正規化ヒストグラムの累積頻度を計算
 			mClearBuffer.put((sum * 255.0f).toInt())	// 0..255に変換してセット
 		}
-		mClearBuffer.position(1280)
+		mClearBuffer.position(LUT_INDEX)
 		setLUT()
 	}
 
@@ -615,11 +623,11 @@ class GLHistogram @WorkerThread constructor(
 	@WorkerThread
 	fun resetEqualize() {
 		mClearBuffer.limit(mClearBuffer.capacity())
-		mClearBuffer.position(1280)
+		mClearBuffer.position(LUT_INDEX)
 		for (ix in 0..255) {
 			mClearBuffer.put(ix)
 		}
-		mClearBuffer.position(1280)
+		mClearBuffer.position(LUT_INDEX)
 		setLUT()
 	}
 
@@ -653,7 +661,7 @@ class GLHistogram @WorkerThread constructor(
 		GLUtils.checkGlError("initHistogramBuffer:glBindBuffer")
 		// デフォルトのLUTをセット
 		mClearBuffer.clear()
-		mClearBuffer.position(1280)
+		mClearBuffer.position(LUT_INDEX)
 		for (ix in 0..255) {
 			mClearBuffer.put(ix)
 		}
@@ -706,13 +714,13 @@ class GLHistogram @WorkerThread constructor(
 		// #glReadPixels, #glBufferData, #glBufferSubDataなどのGLESのバッファ関係の関数では
 		// Bufferのlimit/positionの操作は無視されてる気がする
 		mClearBuffer.limit(mClearBuffer.capacity())
-		mClearBuffer.position(1280)
+		mClearBuffer.position(LUT_INDEX)
 		// シェーダーストレージバッファオブジェクトのLUT領域を更新
 		GLES31.glBindBuffer(GLES31.GL_SHADER_STORAGE_BUFFER, mHistogramRGBId)
 		if (DEBUG) GLUtils.checkGlError("setLUT:glBindBuffer($mHistogramRGBId)")
 		GLES31.glBufferSubData(
 			GLES31.GL_SHADER_STORAGE_BUFFER,
-			1280 * BufferHelper.SIZEOF_INT_BYTES, 256 * BufferHelper.SIZEOF_INT_BYTES,  // sizeはバイト数なので注意
+			LUT_INDEX * BufferHelper.SIZEOF_INT_BYTES, 256 * BufferHelper.SIZEOF_INT_BYTES,  // sizeはバイト数なので注意
 			mClearBuffer
 		)
 		if (DEBUG) GLUtils.checkGlError("setLUT:glBufferData")
@@ -722,7 +730,7 @@ class GLHistogram @WorkerThread constructor(
 
 	companion object {
 		private const val DEBUG = false // set false on production
-		private val TAG: String = GLHistogram::class.java.simpleName
+		private val TAG = GLHistogram::class.java.simpleName
 
 		const val HISTOGRAM_NON = 0
 		/**
@@ -748,7 +756,7 @@ class GLHistogram @WorkerThread constructor(
 		/**
 		 * RGBのヒストグラムを描画
 		 */
-		const val HISTOGRAM_RGB: Int = HISTOGRAM_R or HISTOGRAM_G or HISTOGRAM_B
+		const val HISTOGRAM_RGB = HISTOGRAM_R or HISTOGRAM_G or HISTOGRAM_B
 
 		/**
 		 * ヒストグラムの種類
@@ -777,6 +785,10 @@ class GLHistogram @WorkerThread constructor(
 		private const val USB_COMPUTE_SHADER = true
 
 		/**
+		 * ヒストグラム平均化補正時のLUTの先頭インデックス
+		 */
+		private const val LUT_INDEX = 1280
+		/**
 		 * ヒストグラムのデータ長
 		 * インデックス0-255:		R
 		 * インデックス256-511:	G
@@ -799,7 +811,7 @@ class GLHistogram @WorkerThread constructor(
 		 * RGBヒストグラムカウント用のモデルビュー変換行列とテクスチャ変換行列適用する頂点シェーダー
 		 * for ES3
 		 */
-		private const val VERTEX_SHADER_STEPPED_ES31: String =
+		private const val VERTEX_SHADER_STEPPED_ES31 =
 			"""
 			#version 310 es
 			uniform mat4 uMVPMatrix;
