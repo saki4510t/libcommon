@@ -36,6 +36,8 @@ import com.serenegiant.graphics.MatrixUtils
 import com.serenegiant.system.Time
 import com.serenegiant.nio.BufferHelper
 import java.nio.ByteBuffer
+import java.util.concurrent.locks.ReentrantLock
+import kotlin.concurrent.withLock
 import kotlin.math.min
 
 /**
@@ -291,6 +293,11 @@ class GLHistogram @WorkerThread constructor(
 	 */
 	private val muStepFactorLoc: Int
 
+	/**
+	 * 排他制御用
+	 */
+	private val mLock = ReentrantLock()
+
 	@Size(value = 4)
 	private val mROI = FloatArray(4)
 
@@ -321,7 +328,7 @@ class GLHistogram @WorkerThread constructor(
 
 	/**
 	 * コンストラクタ
-	 * ヒストグラムの歳代更新頻度は2fps
+	 * ヒストグラムの最大更新頻度は2fps
 	 * ヒストグラム平坦化による補正描画は行わない
 	 * EGL|GLコンテキストの存在するスレッド上で実行すること
 	 * @param isOES
@@ -459,7 +466,7 @@ class GLHistogram @WorkerThread constructor(
 		GLES31.glUseProgram(mRendererDrawer.hProgram)
 		// ヒストグラムテクスチャをバインド
 		GLES31.glActiveTexture(GLES31.GL_TEXTURE3)
-		synchronized(mHistogramRegion) {
+		mLock.withLock {
 			GLES31.glUniform4fv(muEmbedRegionLoc, 1, mHistogramRegion, 0)
 		}
 		GLES31.glUniform1i(muHistogramTypeLoc, histogramType)
@@ -486,7 +493,7 @@ class GLHistogram @WorkerThread constructor(
 	}
 
 	override fun setMirror(mirror: Int) {
-		synchronized(this) {
+		mLock.withLock {
 			if (mMirror != mirror) {
 				mMirror = mirror
 //				MatrixUtils.setMirror(mHistogramDrawer.mMvpMatrix, mirror);
@@ -514,7 +521,7 @@ class GLHistogram @WorkerThread constructor(
 		minU: Float, minV: Float,
 		maxU: Float, maxV: Float
 	) {
-		synchronized(mHistogramRegion) {
+		mLock.withLock {
 			mHistogramRegion[0] = minU
 			mHistogramRegion[1] = minV
 			mHistogramRegion[2] = maxU
@@ -528,7 +535,7 @@ class GLHistogram @WorkerThread constructor(
 	@AnyThread
 	fun setStepFactor(
 		@FloatRange(from = 1.0) sx: Float, @FloatRange(from = 1.0) sy: Float) {
-		synchronized(mStepFactor) {
+		mLock.withLock {
 			mStepFactor[0] = if (sx >= 1.0) sx else 4.0f
 			mStepFactor[1] = if (sy >= 1.0) sy else 3.0f
 		}
