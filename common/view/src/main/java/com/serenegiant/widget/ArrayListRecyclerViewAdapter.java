@@ -26,7 +26,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Checkable;
 
-import com.serenegiant.common.R;
+import com.serenegiant.view.R;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -264,7 +264,7 @@ public abstract class ArrayListRecyclerViewAdapter<T>
 					}, 100);
 				}
 				if (mCustomRecycleViewListener != null) {
-					final Object pos = v.getTag(R.id.position);
+					final Object pos = v.getTag(R.id.array_list_adapter_position);
 					if (pos instanceof Integer) {
 						try {
 							final int position = (Integer)pos;
@@ -297,7 +297,7 @@ public abstract class ArrayListRecyclerViewAdapter<T>
 			if (mRecycleView != null) {
 				try {
 					if (mCustomRecycleViewListener != null) {
-						final Object pos = v.getTag(R.id.position);
+						final Object pos = v.getTag(R.id.array_list_adapter_position);
 						if (pos instanceof Integer) {
 							final int position = (Integer)pos;
 							final T item = getItem(position);
@@ -334,7 +334,7 @@ public abstract class ArrayListRecyclerViewAdapter<T>
 				mSelectedPosition = -1;
 			} else if (hasFocus && (mRecycleView != null)) {
 				try {
-					final Object pos = v.getTag(R.id.position);
+					final Object pos = v.getTag(R.id.array_list_adapter_position);
 					if (pos instanceof Integer) {
 						final int position = mSelectedPosition = (Integer)pos;
 						if (mCustomRecycleViewListener != null) {
@@ -405,7 +405,7 @@ public abstract class ArrayListRecyclerViewAdapter<T>
         	if (mView instanceof Dividable) {
         		((Dividable)mView).hasDivider(hasDivider);
 			} else {
-        		mView.setTag(R.id.has_divider, hasDivider);
+        		mView.setTag(R.id.array_list_adapter_has_divider, hasDivider);
 			}
         }
 
@@ -413,7 +413,7 @@ public abstract class ArrayListRecyclerViewAdapter<T>
 			if (mView instanceof Dividable) {
 				return ((Dividable)mView).hasDivider();
 			} else {
-				final Boolean b = (Boolean)mView.getTag(R.id.has_divider);
+				final Boolean b = (Boolean)mView.getTag(R.id.array_list_adapter_has_divider);
 				return ((b != null) && b);
 			}
         }
