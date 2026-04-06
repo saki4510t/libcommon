@@ -19,6 +19,8 @@ package com.serenegiant.bluetooth;
 */
 
 import android.annotation.SuppressLint;
+
+import androidx.annotation.IdRes;
 import androidx.annotation.LayoutRes;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -43,6 +45,14 @@ public class BluetoothDeviceInfoRecyclerAdapter
 
 	private static final boolean DEBUG = false;	// set false on production
 	private static final String TAG = BluetoothDeviceInfoRecyclerAdapter.class.getSimpleName();
+
+	@IdRes
+	private static final int[] ICON_IDS = {
+		R.id.thumbnail,
+		android.R.id.icon,
+		R.id.icon,
+		R.id.image,
+	};
 
 	public interface OnItemClickListener {
 		public void onClick(final int position, final BluetoothDeviceInfo item);
@@ -189,7 +199,7 @@ public class BluetoothDeviceInfoRecyclerAdapter
 			mView = view;
 			nameTv = view.findViewById(R.id.name);
 			addressTv = view.findViewById(R.id.address);
-			icon = ViewFindUtils.findIconView(view);
+			icon = ViewFindUtils.findIconView(view, ICON_IDS);
 		}
 		
 	}

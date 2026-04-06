@@ -19,6 +19,8 @@ package com.serenegiant.bluetooth;
 */
 
 import android.content.Context;
+
+import androidx.annotation.IdRes;
 import androidx.annotation.LayoutRes;
 import androidx.annotation.NonNull;
 import android.util.Log;
@@ -41,6 +43,14 @@ import java.util.List;
 public class BluetoothDeviceInfoAdapter extends ArrayAdapter<BluetoothDeviceInfo> {
 //	private static final boolean DEBUG = false;	// 実働時はfalseにすること
 	private static final String TAG = BluetoothDeviceInfoAdapter.class.getSimpleName();
+
+	@IdRes
+	private static final int[] ICON_IDS = {
+		R.id.thumbnail,
+		android.R.id.icon,
+		R.id.icon,
+		R.id.image,
+	};
 
 	private final LayoutInflater mInflater;
 	/** 項目表示用レイアウトリソースID */
@@ -74,7 +84,7 @@ public class BluetoothDeviceInfoAdapter extends ArrayAdapter<BluetoothDeviceInfo
 			final ViewHolder holder = new ViewHolder();
 			holder.nameTv = rootView.findViewById(R.id.name);
 			holder.addressTv = rootView.findViewById(R.id.address);
-			holder.icon = ViewFindUtils.findIconView(rootView);
+			holder.icon = ViewFindUtils.findIconView(rootView, ICON_IDS);
 			rootView.setTag(holder);
 		}
 		final ViewHolder holder = (ViewHolder)rootView.getTag();

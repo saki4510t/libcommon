@@ -46,6 +46,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.regex.Pattern;
 
+import androidx.annotation.IdRes;
 import androidx.annotation.LayoutRes;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -64,6 +65,14 @@ public class DocumentTreeRecyclerAdapter
 	private static final String TAG = DocumentTreeRecyclerAdapter.class.getSimpleName();
 
 	private static final long DELAY_MILLIS = 100L;
+	@IdRes
+	private static final int[] TITLE_IDS = {
+		R.id.title,
+		R.id.content,
+		android.R.id.title,
+		android.R.id.text1,
+		android.R.id.text2,
+	};
 
 	/**
 	 * リストの項目をクリック・ロングクリックしたときのコールバックリスナー
@@ -562,7 +571,7 @@ public class DocumentTreeRecyclerAdapter
 
 		public ViewHolder(final View view) {
 			super(view);
-			mTitleTv = ViewFindUtils.findTitleView(view);
+			mTitleTv = ViewFindUtils.findTitleView(view, TITLE_IDS);
 			if (mTitleTv == null) {
 				throw new IllegalArgumentException("TextView not found");
 			}

@@ -20,10 +20,12 @@ package com.serenegiant.widget;
 
 import android.widget.TextView;
 
+import com.serenegiant.common.R;
 import com.serenegiant.view.ViewFindUtils;
 
 import java.util.List;
 
+import androidx.annotation.IdRes;
 import androidx.annotation.LayoutRes;
 import androidx.annotation.NonNull;
 
@@ -33,6 +35,15 @@ import androidx.annotation.NonNull;
 public class StringsRecyclerViewAdapter extends ArrayListRecyclerViewAdapter<String> {
 	private static final boolean DEBUG = false;	// FIXME set false when production
 	private static final String TAG = StringsRecyclerViewAdapter.class.getSimpleName();
+
+	@IdRes
+	private static final int[] TITLE_IDS = {
+		R.id.title,
+		R.id.content,
+		android.R.id.title,
+		android.R.id.text1,
+		android.R.id.text2,
+	};
 
 	/**
 	 * コンストラクタ
@@ -62,7 +73,7 @@ public class StringsRecyclerViewAdapter extends ArrayListRecyclerViewAdapter<Str
 		final int position) {
 
 		holder.mItem = getItem(position);
-		final TextView tv = ViewFindUtils.findTitleView(holder.mView);
+		final TextView tv = ViewFindUtils.findTitleView(holder.mView, TITLE_IDS);
 		if (tv != null) {
 			tv.setText(holder.mItem);
 		} else {

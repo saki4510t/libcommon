@@ -28,6 +28,7 @@ import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
 
+import androidx.annotation.IdRes;
 import androidx.annotation.LayoutRes;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -58,6 +59,22 @@ public class MediaStoreAdapter extends CursorAdapter {
 
 	private static final boolean DEBUG = false;	// 実働時はfalseにすること
 	private static final String TAG = MediaStoreAdapter.class.getSimpleName();
+
+	@IdRes
+	private static final int[] ICON_IDS = {
+		R.id.thumbnail,
+		android.R.id.icon,
+		R.id.icon,
+		R.id.image,
+	};
+	@IdRes
+	private static final int[] TITLE_IDS = {
+		R.id.title,
+		R.id.content,
+		android.R.id.title,
+		android.R.id.text1,
+		android.R.id.text2,
+	};
 
 	private int mThumbnailWidth = 200, mThumbnailHeight = 200;
 
@@ -165,8 +182,8 @@ public class MediaStoreAdapter extends CursorAdapter {
 		holder = (ViewHolder)view.getTag(R.id.mediastorephotoadapter);
 		if (holder == null) {
 			holder = new ViewHolder();
-			holder.mImageView = ViewFindUtils.findIconView(view);
-			holder.mTitleView = ViewFindUtils.findTitleView(view);
+			holder.mImageView = ViewFindUtils.findIconView(view, ICON_IDS);
+			holder.mTitleView = ViewFindUtils.findTitleView(view, TITLE_IDS);
 			view.setTag(R.id.mediastorephotoadapter, holder);
 		}
 		return holder;

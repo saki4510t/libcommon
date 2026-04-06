@@ -29,6 +29,7 @@ import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
 import android.os.Handler;
 
+import androidx.annotation.IdRes;
 import androidx.annotation.LayoutRes;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -61,6 +62,22 @@ import static com.serenegiant.mediastore.MediaStoreUtils.*;
 public class MediaStoreImageAdapter extends PagerAdapter {
 	private static final boolean DEBUG = false;	// 実働時はfalseにすること
 	private static final String TAG = MediaStoreImageAdapter.class.getSimpleName();
+
+	@IdRes
+	private static final int[] ICON_IDS = {
+		R.id.thumbnail,
+		android.R.id.icon,
+		R.id.icon,
+		R.id.image,
+	};
+	@IdRes
+	private static final int[] TITLE_IDS = {
+		R.id.title,
+		R.id.content,
+		android.R.id.title,
+		android.R.id.text1,
+		android.R.id.text2,
+	};
 
 	@NonNull
 	private final Context mContext;
@@ -151,8 +168,8 @@ public class MediaStoreImageAdapter extends PagerAdapter {
 			if (holder == null) {
 				holder = new ViewHolder();
 			}
-			holder.mImageView = ViewFindUtils.findIconView(view);
-			holder.mTitleView = ViewFindUtils.findTitleView(view);
+			holder.mImageView = ViewFindUtils.findIconView(view, ICON_IDS);
+			holder.mTitleView = ViewFindUtils.findTitleView(view, TITLE_IDS);
 			info.loadFromCursor(getCursor(position));
 			// ローカルキャッシュ
 			Drawable drawable = holder.mImageView.getDrawable();

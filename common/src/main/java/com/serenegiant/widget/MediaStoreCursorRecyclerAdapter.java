@@ -48,6 +48,7 @@ import com.serenegiant.view.ViewFindUtils;
 
 import java.io.IOException;
 
+import androidx.annotation.IdRes;
 import androidx.annotation.LayoutRes;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -67,6 +68,22 @@ public class MediaStoreCursorRecyclerAdapter
 
 	private static final boolean DEBUG = false;	// 実働時はfalseにすること
 	private static final String TAG = MediaStoreCursorRecyclerAdapter.class.getSimpleName();
+
+	@IdRes
+	private static final int[] ICON_IDS = {
+		R.id.thumbnail,
+		android.R.id.icon,
+		R.id.icon,
+		R.id.image,
+	};
+	@IdRes
+	private static final int[] TITLE_IDS = {
+		R.id.title,
+		R.id.content,
+		android.R.id.title,
+		android.R.id.text1,
+		android.R.id.text2,
+	};
 
 	@NonNull
 	private final Object mSync = new Object();
@@ -610,8 +627,8 @@ public class MediaStoreCursorRecyclerAdapter
 		public ViewHolder(@NonNull final View v) {
 			super(v);
 			v.setTag(R.id.info, info);
-			mImageView = ViewFindUtils.findIconView(v);
-			mTitleView = ViewFindUtils.findTitleView(v);
+			mImageView = ViewFindUtils.findIconView(v, ICON_IDS);
+			mTitleView = ViewFindUtils.findTitleView(v, TITLE_IDS);
 		}
 
 	}

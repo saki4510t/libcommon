@@ -20,6 +20,8 @@ package com.serenegiant.widget;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+
+import androidx.annotation.IdRes;
 import androidx.annotation.LayoutRes;
 import androidx.annotation.NonNull;
 
@@ -31,6 +33,7 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
+import com.serenegiant.common.R;
 import com.serenegiant.view.ViewFindUtils;
 
 import java.util.ArrayList;
@@ -40,6 +43,15 @@ import java.util.List;
 public class ValueSelectorAdapter extends ArrayAdapter<ValueSelectorAdapter.ValueEntry> {
 	private static final boolean DEBUG = false;	// 実働時はfalseにすること
 	private static final String TAG = ValueSelectorAdapter.class.getSimpleName();
+
+	@IdRes
+	private static final int[] TITLE_IDS = {
+		R.id.title,
+		R.id.content,
+		android.R.id.title,
+		android.R.id.text1,
+		android.R.id.text2,
+	};
 
 	public interface ValueSelectorAdapterListener {
 		public void onTouch(final View view, final MotionEvent event, final int position);
@@ -92,7 +104,7 @@ public class ValueSelectorAdapter extends ArrayAdapter<ValueSelectorAdapter.Valu
 			final TextView label;
 			rootView = mInflater.inflate(mLayoutId, parent, false);
 			final ViewHolder holder = new ViewHolder();
-			holder.titleTv = ViewFindUtils.findTitleView(rootView);
+			holder.titleTv = ViewFindUtils.findTitleView(rootView, TITLE_IDS);
 			rootView.setOnTouchListener(mOnTouchListener);
 			rootView.setTag(holder);
 		}

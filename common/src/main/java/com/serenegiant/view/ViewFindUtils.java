@@ -36,15 +36,15 @@ public class ViewFindUtils {
 
 	@IdRes
 	private static final int[] ICON_IDS = {
-		com.serenegiant.common.R.id.thumbnail,
+		R.id.thumbnail,
 		android.R.id.icon,
-		com.serenegiant.common.R.id.icon,
-		com.serenegiant.common.R.id.image,
+		R.id.icon,
+		R.id.image,
 	};
 
 	@IdRes
 	private static final int[] TITLE_IDS = {
-		com.serenegiant.common.R.id.title,
+		R.id.title,
 		R.id.content,
 		android.R.id.title,
 		android.R.id.text1,
@@ -57,6 +57,7 @@ public class ViewFindUtils {
 	 * @param view
 	 * @return
 	 */
+	@Deprecated
 	@Nullable
 	public static ImageView findIconView(@NonNull final View view) {
 		return findView(view, ICON_IDS, ImageView.class);
@@ -82,6 +83,7 @@ public class ViewFindUtils {
 	 * @param view
 	 * @return
 	 */
+	@Deprecated
 	@Nullable
 	public static TextView findTitleView(@NonNull final View view) {
 		return findView(view, TITLE_IDS, TextView.class);
