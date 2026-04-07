@@ -34,7 +34,6 @@ import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
 import com.serenegiant.common.R;
-import com.serenegiant.view.ViewFindUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -43,15 +42,6 @@ import java.util.List;
 public class ValueSelectorAdapter extends ArrayAdapter<ValueSelectorAdapter.ValueEntry> {
 	private static final boolean DEBUG = false;	// 実働時はfalseにすること
 	private static final String TAG = ValueSelectorAdapter.class.getSimpleName();
-
-	@IdRes
-	private static final int[] TITLE_IDS = {
-		R.id.title,
-		R.id.content,
-		android.R.id.title,
-		android.R.id.text1,
-		android.R.id.text2,
-	};
 
 	public interface ValueSelectorAdapterListener {
 		public void onTouch(final View view, final MotionEvent event, final int position);
@@ -79,8 +69,11 @@ public class ValueSelectorAdapter extends ArrayAdapter<ValueSelectorAdapter.Valu
 		return result;
 	}
 
+	@NonNull
 	private final LayoutInflater mInflater;
+	@LayoutRes
 	private final int mLayoutId;
+	@IdRes
 	private final int mTitleId;
 	private final ValueSelectorAdapterListener mListener;
 
@@ -104,11 +97,12 @@ public class ValueSelectorAdapter extends ArrayAdapter<ValueSelectorAdapter.Valu
 			final TextView label;
 			rootView = mInflater.inflate(mLayoutId, parent, false);
 			final ViewHolder holder = new ViewHolder();
-			holder.titleTv = ViewFindUtils.findTitleView(rootView, TITLE_IDS);
+			holder.titleTv = (rootView instanceof TextView)
+				? (TextView)rootView : rootView.findViewById(mTitleId);
 			rootView.setOnTouchListener(mOnTouchListener);
-			rootView.setTag(holder);
+			rootView.setTag(R.id.value_selector_adapter_view_holder, holder);
 		}
-		final ViewHolder holder = (ViewHolder)rootView.getTag();
+		final ViewHolder holder = (ViewHolder)rootView.getTag(R.id.value_selector_adapter_view_holder);
 		// 指定行のデータを取得
 		final ValueEntry item = getItem(position);
 		if ((item != null) && (holder.titleTv != null)) {
@@ -142,7 +136,7 @@ public class ValueSelectorAdapter extends ArrayAdapter<ValueSelectorAdapter.Valu
 		@Override
 		public boolean onTouch(final View v, final MotionEvent event) {
 			if (mListener != null) {
-				final ViewHolder holder = (ViewHolder)v.getTag();
+				final ViewHolder holder = (ViewHolder)v.getTag(R.id.value_selector_adapter_view_holder);
 				final int position = holder != null ? holder.position : -1;
 				try {
 					mListener.onTouch(v, event, position);
