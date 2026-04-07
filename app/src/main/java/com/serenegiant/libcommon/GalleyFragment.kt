@@ -71,6 +71,7 @@ class GalleyFragment : BaseFragment() {
 		mMediaStoreAdapter = MediaStoreAdapter(
 			requireContext(),
 			R.layout.grid_item_media,
+			R.id.title, R.id.thumbnail,
 			false
 		)
 		gridView.adapter = mMediaStoreAdapter

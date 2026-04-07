@@ -77,10 +77,12 @@ class GalleyFragment2 : BaseFragment() {
 		recyclerView.setHasFixedSize(true)
 		recyclerView.layoutManager = GridLayoutManager(requireContext(), 4)
 //		recyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
-		mMediaStoreAdapter =
-			MediaStoreCursorRecyclerAdapter(
-				requireContext(), R.layout.grid_item_media, false
-			)
+		mMediaStoreAdapter = MediaStoreCursorRecyclerAdapter(
+			requireContext(),
+			R.layout.grid_item_media,
+			R.id.title, R.id.thumbnail,
+			false
+		)
 		mMediaStoreAdapter!!.setListener(mListener)
 		recyclerView.adapter = mMediaStoreAdapter
 	}

@@ -44,7 +44,6 @@ import com.serenegiant.mediastore.ThumbnailCache;
 import com.serenegiant.mediastore.ThumbnailLoader;
 import com.serenegiant.mediastore.ThumbnailLoaderDrawable;
 import com.serenegiant.utils.ThreadPool;
-import com.serenegiant.view.ViewFindUtils;
 
 import java.io.IOException;
 
@@ -69,29 +68,18 @@ public class MediaStoreCursorRecyclerAdapter
 	private static final boolean DEBUG = false;	// 実働時はfalseにすること
 	private static final String TAG = MediaStoreCursorRecyclerAdapter.class.getSimpleName();
 
-	@IdRes
-	private static final int[] ICON_IDS = {
-		R.id.thumbnail,
-		android.R.id.icon,
-		R.id.icon,
-		R.id.image,
-	};
-	@IdRes
-	private static final int[] TITLE_IDS = {
-		R.id.title,
-		R.id.content,
-		android.R.id.title,
-		android.R.id.text1,
-		android.R.id.text2,
-	};
-
 	@NonNull
 	private final Object mSync = new Object();
 	@NonNull
 	private final Context mContext;
 	@NonNull
 	private final LayoutInflater mInflater;
-	private final int mLayoutId;
+	@LayoutRes
+	private final int mLayoutResId;
+	@IdRes
+	private final int mTitleResId;
+	@IdRes
+	private final int mIconResId;
 	@NonNull
 	private final MyAsyncQueryHandler mQueryHandler;
 	@NonNull
@@ -119,32 +107,26 @@ public class MediaStoreCursorRecyclerAdapter
 
 	/**
 	 * コンストラクタ
-	 * すぐにデータ取得要求する
 	 * @param context
-	 * @param itemLayout
-	 */
-	public MediaStoreCursorRecyclerAdapter(
-		@NonNull final Context context,
-		@LayoutRes final int itemLayout) {
-
-		this(context, itemLayout, true);
-	}
-
-	/**
-	 * コンストラクタ
-	 * @param context
-	 * @param itemLayout
+	 * @param layoutResId 項目表示用レイアウトリソースID
+	 * @param titleResId タイトル用テキストビューのID
+	 * @param iconResId アイコン用イメージビューのID
 	 * @param refreshNow true: すぐにデータ取得要求する, false: refreshを呼ぶまでデータ取得しない
 	 */
 	public MediaStoreCursorRecyclerAdapter(
 		@NonNull final Context context,
-		@LayoutRes final int itemLayout, final boolean refreshNow) {
+		@LayoutRes final int layoutResId,
+		@IdRes final int titleResId,
+		@IdRes final int iconResId,
+		final boolean refreshNow) {
 
 		super();
 		if (DEBUG) Log.v(TAG, "コンストラクタ:");
 		mContext = context;
 		mInflater = LayoutInflater.from(context);
-		mLayoutId = itemLayout;
+		mLayoutResId = layoutResId;
+		mTitleResId = titleResId;
+		mIconResId = iconResId;
 		mQueryHandler = new MyAsyncQueryHandler(context.getContentResolver(), this);
 		mThumbnailCache = new ThumbnailCache(context);
 		mNeedValidate = true;
@@ -180,10 +162,10 @@ public class MediaStoreCursorRecyclerAdapter
 	@NonNull
 	@Override
 	public ViewHolder onCreateViewHolder(@NonNull final ViewGroup parent, final int viewType) {
-		final View view = mInflater.inflate(mLayoutId, parent, false);
+		final View view = mInflater.inflate(mLayoutResId, parent, false);
 		view.setOnClickListener(mOnClickListener);
 		view.setOnLongClickListener(mOnLongClickListener);
-		return new ViewHolder(view);
+		return new ViewHolder(this, view);
 	}
 
 	@Override
@@ -485,7 +467,7 @@ public class MediaStoreCursorRecyclerAdapter
 					}, 100);
 				}
 				if (mListener != null) {
-					final MediaInfo info = (MediaInfo) v.getTag(R.id.info);
+					final MediaInfo info = (MediaInfo) v.getTag(R.id.mediastore_adapter_info);
 					if (DEBUG) Log.v(TAG, "onClick:info=" + info);
 					if (info != null) {
 						try {
@@ -513,7 +495,7 @@ public class MediaStoreCursorRecyclerAdapter
 			if (((mRecycleView != null) && mRecycleView.isEnabled())
 				&& (mListener != null)) {
 
-				final MediaInfo info = (MediaInfo) v.getTag(R.id.info);
+				final MediaInfo info = (MediaInfo) v.getTag(R.id.mediastore_adapter_info);
 				if (info != null) {
 					try {
 						return mListener.onItemLongClick(
@@ -624,11 +606,11 @@ public class MediaStoreCursorRecyclerAdapter
 		@NonNull
 		private final MediaInfo info = new MediaInfo();
 
-		public ViewHolder(@NonNull final View v) {
+		public ViewHolder(@NonNull final MediaStoreCursorRecyclerAdapter parent, @NonNull final View v) {
 			super(v);
-			v.setTag(R.id.info, info);
-			mImageView = ViewFindUtils.findIconView(v, ICON_IDS);
-			mTitleView = ViewFindUtils.findTitleView(v, TITLE_IDS);
+			v.setTag(R.id.mediastore_adapter_info, info);
+			mImageView = v.findViewById(parent.mIconResId);
+			mTitleView = v.findViewById(parent.mTitleResId);
 		}
 
 	}

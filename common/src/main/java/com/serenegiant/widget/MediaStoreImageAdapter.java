@@ -47,7 +47,6 @@ import com.serenegiant.mediastore.ImageLoader;
 import com.serenegiant.mediastore.LoaderDrawable;
 import com.serenegiant.mediastore.MediaInfo;
 import com.serenegiant.utils.ThreadPool;
-import com.serenegiant.view.ViewFindUtils;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -63,27 +62,16 @@ public class MediaStoreImageAdapter extends PagerAdapter {
 	private static final boolean DEBUG = false;	// 実働時はfalseにすること
 	private static final String TAG = MediaStoreImageAdapter.class.getSimpleName();
 
-	@IdRes
-	private static final int[] ICON_IDS = {
-		R.id.thumbnail,
-		android.R.id.icon,
-		R.id.icon,
-		R.id.image,
-	};
-	@IdRes
-	private static final int[] TITLE_IDS = {
-		R.id.title,
-		R.id.content,
-		android.R.id.title,
-		android.R.id.text1,
-		android.R.id.text2,
-	};
-
 	@NonNull
 	private final Context mContext;
 	@NonNull
 	private final LayoutInflater mInflater;
-	private final int mLayoutId;
+	@LayoutRes
+	private final int mLayoutResId;
+	@IdRes
+	private final int mTitleResId;
+	@IdRes
+	private final int mIconResId;
 	@NonNull
 	private final ContentResolver mCr;
 	@NonNull
@@ -108,28 +96,23 @@ public class MediaStoreImageAdapter extends PagerAdapter {
 
 	/**
 	 * コンストラクタ
-	 * すぐにデータ取得要求する
 	 * @param context
-	 * @param id_layout
-	 */
-	public MediaStoreImageAdapter(@NonNull final Context context,
-		@LayoutRes final int id_layout) {
-
-		this(context, id_layout, true);
-	}
-
-	/**
-	 * コンストラクタ
-	 * @param context
-	 * @param id_layout
+	 * @param layoutResId 項目表示用レイアウトリソースID
+	 * @param titleResId タイトル用テキストビューのID
+	 * @param iconResId アイコン用イメージビューのID
 	 * @param refreshNow true: すぐにデータ取得要求する, false: refreshを呼ぶまでデータ取得しない
 	 */
 	public MediaStoreImageAdapter(@NonNull final Context context,
-		@LayoutRes final int id_layout, final boolean refreshNow) {
+		@LayoutRes final int layoutResId,
+		@IdRes final int titleResId,
+		@IdRes final int iconResId,
+		final boolean refreshNow) {
 
 		mContext = context;
 		mInflater = LayoutInflater.from(context);
-		mLayoutId = id_layout;
+		mLayoutResId = layoutResId;
+		mTitleResId = titleResId;
+		mIconResId = iconResId;
 		mCr = context.getContentResolver();
 		mQueryHandler = new MyAsyncQueryHandler(mCr, this);
 		mNeedValidate = true;
@@ -160,16 +143,17 @@ public class MediaStoreImageAdapter extends PagerAdapter {
 		final int position) {
 
 		if (DEBUG) Log.v(TAG, "instantiateItem:position=" + position);
-		final View view = mInflater.inflate(mLayoutId, container, false);
+		final View view = mInflater.inflate(mLayoutResId, container, false);
 		ViewHolder holder;
 		if (view != null) {
 			container.addView(view);
-			holder = (ViewHolder)view.getTag();
+			holder = (ViewHolder)view.getTag(R.id.mediastore_adapter_view_holder);
 			if (holder == null) {
 				holder = new ViewHolder();
+				view.setTag(R.id.mediastore_adapter_view_holder, holder);
 			}
-			holder.mImageView = ViewFindUtils.findIconView(view, ICON_IDS);
-			holder.mTitleView = ViewFindUtils.findTitleView(view, TITLE_IDS);
+			holder.mImageView = view.findViewById(mIconResId);
+			holder.mTitleView = view.findViewById(mTitleResId);
 			info.loadFromCursor(getCursor(position));
 			// ローカルキャッシュ
 			Drawable drawable = holder.mImageView.getDrawable();

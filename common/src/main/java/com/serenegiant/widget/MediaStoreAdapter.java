@@ -47,7 +47,6 @@ import com.serenegiant.mediastore.ThumbnailCache;
 import com.serenegiant.mediastore.ThumbnailLoader;
 import com.serenegiant.mediastore.ThumbnailLoaderDrawable;
 import com.serenegiant.utils.ThreadPool;
-import com.serenegiant.view.ViewFindUtils;
 
 import static com.serenegiant.mediastore.MediaStoreUtils.*;
 
@@ -60,29 +59,18 @@ public class MediaStoreAdapter extends CursorAdapter {
 	private static final boolean DEBUG = false;	// 実働時はfalseにすること
 	private static final String TAG = MediaStoreAdapter.class.getSimpleName();
 
-	@IdRes
-	private static final int[] ICON_IDS = {
-		R.id.thumbnail,
-		android.R.id.icon,
-		R.id.icon,
-		R.id.image,
-	};
-	@IdRes
-	private static final int[] TITLE_IDS = {
-		R.id.title,
-		R.id.content,
-		android.R.id.title,
-		android.R.id.text1,
-		android.R.id.text2,
-	};
-
 	private int mThumbnailWidth = 200, mThumbnailHeight = 200;
 
 	@NonNull
 	private final Context mContext;
 	@NonNull
 	private final LayoutInflater mInflater;
-	private final int mLayoutId;
+	@LayoutRes
+	private final int mLayoutResId;
+	@IdRes
+	private final int mTitleResId;
+	@IdRes
+	private final int mIconResId;
 	@NonNull
 	private final MyAsyncQueryHandler mQueryHandler;
 	@NonNull
@@ -98,31 +86,27 @@ public class MediaStoreAdapter extends CursorAdapter {
 
 	/**
 	 * コンストラクタ
-	 * すぐにデータ取得要求する
 	 * @param context
-	 * @param id_layout
-	 */
-	public MediaStoreAdapter(@NonNull final Context context,
-		@LayoutRes final int id_layout) {
-
-		this(context, id_layout, true);
-	}
-
-	/**
-	 * コンストラクタ
-	 * @param context
-	 * @param id_layout
+	 * @param layoutResId 項目表示用レイアウトリソースID
+	 * @param titleResId タイトル用テキストビューのID
+	 * @param iconResId アイコン用イメージビューのID
 	 * @param refreshNow true: すぐにデータ取得要求する, false: refreshを呼ぶまでデータ取得しない
 	 */
-	public MediaStoreAdapter(@NonNull final Context context,
-		@LayoutRes final int id_layout, final boolean refreshNow) {
+	public MediaStoreAdapter(
+		@NonNull final Context context,
+		 @LayoutRes final int layoutResId,
+		 @IdRes final int titleResId,
+		 @IdRes final int iconResId,
+		final boolean refreshNow) {
 
 		super(context, null, CursorAdapter.FLAG_REGISTER_CONTENT_OBSERVER);
 		mContext = context;
 	    mInflater = LayoutInflater.from(context);
 	    mQueryHandler = new MyAsyncQueryHandler(context.getContentResolver(), this);
 		// getMemoryClass return the available memory amounts for app as mega bytes(API >= 5)
-		mLayoutId = id_layout;
+		mLayoutResId = layoutResId;
+		mTitleResId = titleResId;
+		mIconResId = iconResId;
 		mThumbnailCache = new ThumbnailCache(context);
 		mNeedValidate = true;
 		if (refreshNow) {
@@ -144,7 +128,7 @@ public class MediaStoreAdapter extends CursorAdapter {
 		final Cursor cursor, final ViewGroup parent) {
 
 		// this method is called within UI thread and should return as soon as possible
-		final View view = mInflater.inflate(mLayoutId, parent, false);
+		final View view = mInflater.inflate(mLayoutResId, parent, false);
 		getViewHolder(view);
 		return view;
 	}
@@ -179,12 +163,12 @@ public class MediaStoreAdapter extends CursorAdapter {
 		ViewHolder holder;
 		// you can use View#getTag()/setTag() instead of using View#getTag(int)/setTag(int)
 		// but we assume that using getTag(int)/setTag(int) and keeping getTag()/setTag() left for user is better.
-		holder = (ViewHolder)view.getTag(R.id.mediastorephotoadapter);
+		holder = (ViewHolder)view.getTag(R.id.mediastore_adapter_view_holder);
 		if (holder == null) {
 			holder = new ViewHolder();
-			holder.mImageView = ViewFindUtils.findIconView(view, ICON_IDS);
-			holder.mTitleView = ViewFindUtils.findTitleView(view, TITLE_IDS);
-			view.setTag(R.id.mediastorephotoadapter, holder);
+			holder.mImageView = view.findViewById(mIconResId);
+			holder.mTitleView = view.findViewById(mTitleResId);
+			view.setTag(R.id.mediastore_adapter_view_holder, holder);
 		}
 		return holder;
 	}
