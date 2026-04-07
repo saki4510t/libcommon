@@ -31,8 +31,6 @@ import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.serenegiant.common.R;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;

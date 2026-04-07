@@ -31,8 +31,6 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.serenegiant.common.R;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;

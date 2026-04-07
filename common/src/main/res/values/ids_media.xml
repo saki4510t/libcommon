@@ -25,4 +25,5 @@
 	<item type="id" name="title" />
 	<item type="id" name="content" />
 	<item type="id" name="info" />
+	<item type="id" name="icon" />
 </resources>

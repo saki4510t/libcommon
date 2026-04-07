@@ -86,6 +86,7 @@ dependencies {
 	implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:$kotlinCoroutinesVersion"
 
 	api project(':common:core')
+	api project(':common:bluetooth')
 	api project(':common:gl')
 	api project(':common:media')
 	api project(':common:net')
