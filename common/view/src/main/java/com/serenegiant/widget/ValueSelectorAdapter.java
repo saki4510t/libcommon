@@ -33,7 +33,7 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
-import com.serenegiant.common.R;
+import com.serenegiant.view.R;
 
 import java.util.ArrayList;
 import java.util.List;
