@@ -26,7 +26,7 @@ import android.util.AttributeSet;
 import android.util.Log;
 import android.view.View;
 
-import com.serenegiant.common.R;
+import com.serenegiant.view.R;
 import com.serenegiant.view.ViewFindUtils;
 
 import androidx.annotation.IdRes;
@@ -133,7 +133,7 @@ public class RecyclerViewWithEmptyView extends RecyclerView {
 		if (mEmptyView == null) {
 			// #setEmptyViewでempty viewが割り当てられていないときのみ
 			// empty viewを探す
-			final int[] ids = new int[] {mEmptyViewId, R.id.empty, android.R.id.empty};
+			final int[] ids = new int[] { mEmptyViewId, android.R.id.empty };
 			final View emptyView = ViewFindUtils.findViewInParent(this, ids, View.class);
 			if (DEBUG) Log.v(TAG, "onAttachedToWindow:" + emptyView);
 			setEmptyView(emptyView);
