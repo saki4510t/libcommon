@@ -32,8 +32,9 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.serenegiant.common.R;
-import com.serenegiant.view.ViewFindUtils;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -41,37 +42,63 @@ import java.util.List;
  * Bluetooth機器を一覧表示するためのadapter
  */
 public class BluetoothDeviceInfoAdapter extends ArrayAdapter<BluetoothDeviceInfo> {
-//	private static final boolean DEBUG = false;	// 実働時はfalseにすること
+	private static final boolean DEBUG = false;	// set false on production
 	private static final String TAG = BluetoothDeviceInfoAdapter.class.getSimpleName();
-
-	@IdRes
-	private static final int[] ICON_IDS = {
-		R.id.thumbnail,
-		android.R.id.icon,
-		R.id.icon,
-		R.id.image,
-	};
 
 	private final LayoutInflater mInflater;
 	/** 項目表示用レイアウトリソースID */
-	private final int mLayoutId;
+	@LayoutRes
+	private final int mItemLayoutResId;
+	@IdRes
+	private final int mNameTvId;
+	@IdRes
+	private final int mAddressTvId;
+	@IdRes
+	private final int mIconIvId;
 
-	public BluetoothDeviceInfoAdapter(@NonNull final Context context, @LayoutRes final int resource) {
-		super(context, resource);
-		mInflater = LayoutInflater.from(context);
-		mLayoutId = resource;
+	public BluetoothDeviceInfoAdapter(
+		@NonNull final Context context, @LayoutRes final int itemLayoutResId) {
+		this(context, itemLayoutResId, new ArrayList<>());
 	}
 
-	public BluetoothDeviceInfoAdapter(@NonNull final Context context, @LayoutRes final int resource, final List<BluetoothDeviceInfo> objects) {
-		super(context, resource, objects);
-		mInflater = LayoutInflater.from(context);
-		mLayoutId = resource;
+	public BluetoothDeviceInfoAdapter(
+		@NonNull final Context context,
+		@LayoutRes final int itemLayoutResId,
+		@NonNull final BluetoothDeviceInfo[] objects) {
+		this(context, itemLayoutResId, Arrays.asList(objects));
 	}
 
-	public BluetoothDeviceInfoAdapter(@NonNull final Context context, @LayoutRes final int resource, final BluetoothDeviceInfo[] objects) {
-		super(context, resource, objects);
+	public BluetoothDeviceInfoAdapter(
+		@NonNull final Context context,
+		@LayoutRes final int itemLayoutResId,
+		@NonNull final List<BluetoothDeviceInfo> objects) {
+
+		this(context, itemLayoutResId, R.id.name, R.id.address, R.id.icon, objects);
+	}
+
+	/**
+	 * コンストラクタ
+	 * @param context
+	 * @param itemLayoutResId 項目表示用レイアウトリソースID
+	 * @param nameTextViewId Bluetooth機器名表示用テキストビューID
+	 * @param addressTextViewId Bluetoothアドレス表示用テキストビューID
+	 * @param iconImageViewId アイコン表示用イメージビューID
+	 * @param objects
+	 */
+	public BluetoothDeviceInfoAdapter(
+		@NonNull final Context context,
+		@LayoutRes final int itemLayoutResId,
+		@IdRes final int nameTextViewId,
+		@IdRes final int addressTextViewId,
+		@IdRes final int iconImageViewId,
+		@NonNull final List<BluetoothDeviceInfo> objects) {
+
+		super(context, itemLayoutResId, objects);
 		mInflater = LayoutInflater.from(context);
-		mLayoutId = resource;
+		mItemLayoutResId = itemLayoutResId;
+		mNameTvId = nameTextViewId;
+		mAddressTvId = addressTextViewId;
+		mIconIvId = iconImageViewId;
 	}
 
 	@NonNull
@@ -80,11 +107,11 @@ public class BluetoothDeviceInfoAdapter extends ArrayAdapter<BluetoothDeviceInfo
 		View rootView = convertView;
 		if (rootView == null) {
 			final TextView label;
-			rootView = mInflater.inflate(mLayoutId, parent, false);
+			rootView = mInflater.inflate(mItemLayoutResId, parent, false);
 			final ViewHolder holder = new ViewHolder();
-			holder.nameTv = rootView.findViewById(R.id.name);
-			holder.addressTv = rootView.findViewById(R.id.address);
-			holder.icon = ViewFindUtils.findIconView(rootView, ICON_IDS);
+			holder.nameTv = rootView.findViewById(mNameTvId);
+			holder.addressTv = rootView.findViewById(mAddressTvId);
+			holder.icon = rootView.findViewById(mIconIvId);
 			rootView.setTag(holder);
 		}
 		final ViewHolder holder = (ViewHolder)rootView.getTag();

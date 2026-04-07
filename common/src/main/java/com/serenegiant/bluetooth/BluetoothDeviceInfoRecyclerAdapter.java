@@ -32,7 +32,6 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.serenegiant.common.R;
-import com.serenegiant.view.ViewFindUtils;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -46,36 +45,66 @@ public class BluetoothDeviceInfoRecyclerAdapter
 	private static final boolean DEBUG = false;	// set false on production
 	private static final String TAG = BluetoothDeviceInfoRecyclerAdapter.class.getSimpleName();
 
-	@IdRes
-	private static final int[] ICON_IDS = {
-		R.id.thumbnail,
-		android.R.id.icon,
-		R.id.icon,
-		R.id.image,
-	};
-
 	public interface OnItemClickListener {
 		public void onClick(final int position, final BluetoothDeviceInfo item);
 	}
 	
 	/** 項目表示用レイアウトリソースID */
-	private final int mLayoutId;
+	@LayoutRes
+	private final int mItemLayoutResId;
+	@IdRes
+	private final int mNameTvId;
+	@IdRes
+	private final int mAddressTvId;
+	@IdRes
+	private final int mIconIvId;
 	@NonNull
 	private final List<BluetoothDeviceInfo> mValues;
 	@Nullable
 	private final OnItemClickListener mListener;
 
-	public BluetoothDeviceInfoRecyclerAdapter(@LayoutRes final int resource,
+	/**
+	 * コンストラクタ
+	 *
+	 * @param itemLayoutResId
+	 * @param listener
+	 */
+	public BluetoothDeviceInfoRecyclerAdapter
+		(@LayoutRes final int itemLayoutResId,
 		@Nullable final OnItemClickListener listener) {
 		
-		this(resource, null, listener);
+		this(itemLayoutResId, null, listener);
 	}
 	
-	public BluetoothDeviceInfoRecyclerAdapter(@LayoutRes final int resource,
+	public BluetoothDeviceInfoRecyclerAdapter(
+		@LayoutRes final int itemLayoutResId,
 		@Nullable final List<BluetoothDeviceInfo> list,
 		@Nullable final OnItemClickListener listener) {
-		
-		mLayoutId = resource;
+
+		this(itemLayoutResId, R.id.name, R.id.address, R.id.icon, list, listener);
+	}
+
+	/**
+	 * コンストラクタ
+	 * @param itemLayoutResId 項目表示用レイアウトリソースID
+	 * @param nameTextViewId Bluetooth機器名表示用テキストビューID
+	 * @param addressTextViewId Bluetoothアドレス表示用テキストビューID
+	 * @param iconImageViewId アイコン表示用イメージビューID
+	 * @param list
+	 * @param listener
+	 */
+	public BluetoothDeviceInfoRecyclerAdapter(
+		@LayoutRes final int itemLayoutResId,
+		@IdRes final int nameTextViewId,
+		@IdRes final int addressTextViewId,
+		@IdRes final int iconImageViewId,
+		@Nullable final List<BluetoothDeviceInfo> list,
+		@Nullable final OnItemClickListener listener) {
+
+		mItemLayoutResId = itemLayoutResId;
+		mNameTvId = nameTextViewId;
+		mAddressTvId = addressTextViewId;
+		mIconIvId = iconImageViewId;
 		mValues = list != null ? list : new ArrayList<>();
 		mListener = listener;
 	}
@@ -84,8 +113,8 @@ public class BluetoothDeviceInfoRecyclerAdapter
 	@Override
 	public ViewHolder onCreateViewHolder(@NonNull final ViewGroup parent, final int viewType) {
 		final View view = LayoutInflater.from(parent.getContext())
-			.inflate(mLayoutId, parent, false);
-		return new ViewHolder(view);
+			.inflate(mItemLayoutResId, parent, false);
+		return new ViewHolder(this, view);
 	}
 	
 	@SuppressLint("RecyclerView")
@@ -104,7 +133,7 @@ public class BluetoothDeviceInfoRecyclerAdapter
 //			holder.icon.setImageResource(item.isPaired() ? R.mipmap.ic_paired : R.mipmap.ic_not_paired);
 //		}
 		
-		holder.mView.setOnClickListener(new View.OnClickListener() {
+		holder.itemView.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
 				if (mListener != null) {
@@ -187,19 +216,20 @@ public class BluetoothDeviceInfoRecyclerAdapter
 	}
 
 	public static class ViewHolder extends RecyclerView.ViewHolder {
-		public final View mView;
 		public final ImageView icon;
 		public final TextView nameTv;
 		public final TextView addressTv;
 		public BluetoothDeviceInfo mItem;
 		public int position;
 		
-		public ViewHolder(View view) {
+		public ViewHolder(
+			@NonNull final BluetoothDeviceInfoRecyclerAdapter parent,
+			@NonNull final View view) {
+
 			super(view);
-			mView = view;
-			nameTv = view.findViewById(R.id.name);
-			addressTv = view.findViewById(R.id.address);
-			icon = ViewFindUtils.findIconView(view, ICON_IDS);
+			nameTv = view.findViewById(parent.mNameTvId);
+			addressTv = view.findViewById(parent.mAddressTvId);
+			icon = view.findViewById(parent.mIconIvId);
 		}
 		
 	}
