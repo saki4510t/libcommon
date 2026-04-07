@@ -40,7 +40,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.serenegiant.common.R;
+import com.serenegiant.media.R;
 import com.serenegiant.graphics.BitmapHelper;
 import com.serenegiant.mediastore.MediaInfo;
 import com.serenegiant.mediastore.ThumbnailCache;
