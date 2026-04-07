@@ -36,7 +36,6 @@ import com.serenegiant.common.R;
 import com.serenegiant.documentfile.SAFUtils;
 import com.serenegiant.system.HandlerThreadHandler;
 import com.serenegiant.system.HandlerUtils;
-import com.serenegiant.view.ViewFindUtils;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -65,15 +64,6 @@ public class DocumentTreeRecyclerAdapter
 	private static final String TAG = DocumentTreeRecyclerAdapter.class.getSimpleName();
 
 	private static final long DELAY_MILLIS = 100L;
-	@IdRes
-	private static final int[] TITLE_IDS = {
-		R.id.title,
-		R.id.content,
-		android.R.id.title,
-		android.R.id.text1,
-		android.R.id.text2,
-	};
-
 	/**
 	 * リストの項目をクリック・ロングクリックしたときのコールバックリスナー
 	 */
@@ -87,9 +77,18 @@ public class DocumentTreeRecyclerAdapter
 //--------------------------------------------------------------------------------
 @NonNull
 	private final Object mSync = new Object();
+	/**
+	 * リスト項目用レイアウトリソースID
+	 */
 	@NonNull
 	private final Context mContext;
-	private final int mLayoutRes;
+	@LayoutRes
+	private final int mLayoutResId;
+	/**
+	 * 内容表示用テキストビューのリソースID
+	 */
+	@IdRes
+	private final int mContentResId;
 	@NonNull
 	private final DocumentFile mRoot;
 	@NonNull
@@ -131,12 +130,14 @@ public class DocumentTreeRecyclerAdapter
 	/**
 	 * コンストラクタ
 	 * @param context
-	 * @param layoutResId
+	 * @param layoutResId リスト項目用レイアウトリソースID
+	 * @param contentResId タイトル表示用テキストビューのID
 	 * @param root ディレクトリを示すDocumentFile
 	 */
 	public DocumentTreeRecyclerAdapter(
 		@NonNull final Context context,
 		@LayoutRes final int layoutResId,
+		@IdRes final int contentResId,
 		@NonNull final DocumentFile root) {
 
 		super();
@@ -144,7 +145,8 @@ public class DocumentTreeRecyclerAdapter
 			throw new IllegalArgumentException("root should be a directory!");
 		}
 		mContext = context;
-		mLayoutRes = layoutResId;
+		mLayoutResId = layoutResId;
+		mContentResId = contentResId;
 		mRoot = root;
 		mAsyncHandler = HandlerThreadHandler.createHandler(TAG);
 		internalChangeDir(root);
@@ -177,7 +179,7 @@ public class DocumentTreeRecyclerAdapter
 		if (mLayoutInflater == null) {
 			mLayoutInflater = LayoutInflater.from(mContext);
 		}
-		final View view = mLayoutInflater.inflate(mLayoutRes, parent, false);
+		final View view = mLayoutInflater.inflate(mLayoutResId, parent, false);
 		view.setOnClickListener(mOnClickListener);
 		view.setOnLongClickListener(mOnLongClickListener);
 		return onCreateViewHolder(view);
@@ -271,7 +273,7 @@ public class DocumentTreeRecyclerAdapter
 	 * @return
 	 */
 	protected ViewHolder onCreateViewHolder(final View itemView) {
-		return new ViewHolder(itemView);
+		return new ViewHolder(itemView, mContentResId);
 	}
 
 	@NonNull
@@ -380,7 +382,7 @@ public class DocumentTreeRecyclerAdapter
 					}, 100);
 				}
 				if (mListener != null) {
-					final Object pos = v.getTag(R.id.position);
+					final Object pos = v.getTag(R.id.document_tree_position);
 					if (DEBUG) Log.v(TAG, "onClick:pos=" + pos);
 					if (pos instanceof Integer) {
 						try {
@@ -408,7 +410,7 @@ public class DocumentTreeRecyclerAdapter
 			if (((mRecycleView != null) && mRecycleView.isEnabled())
 				&& (mListener != null)) {
 
-				final Object pos = v.getTag(R.id.position);
+				final Object pos = v.getTag(R.id.document_tree_position);
 				if (pos instanceof Integer) {
 					try {
 						return mListener.onItemLongClick(
@@ -429,7 +431,7 @@ public class DocumentTreeRecyclerAdapter
 	/**
 	 * ファイル情報を保持するためのDocumentFileのラッパークラス
 	 */
-	protected static class FileInfo implements Comparable<FileInfo>  {
+	public static class FileInfo implements Comparable<FileInfo>  {
 		private final Locale mLocale = Locale.getDefault();
 		@NonNull
 		private final DocumentFile mFile;			// ファイルオブジェクト
@@ -569,9 +571,9 @@ public class DocumentTreeRecyclerAdapter
 		/*package*/ TextView mTitleTv;
 		private FileInfo mItem;
 
-		public ViewHolder(final View view) {
+		public ViewHolder(@NonNull final View view, @IdRes final int contentResId) {
 			super(view);
-			mTitleTv = ViewFindUtils.findTitleView(view, TITLE_IDS);
+			mTitleTv = view.findViewById(contentResId);
 			if (mTitleTv == null) {
 				throw new IllegalArgumentException("TextView not found");
 			}
@@ -583,7 +585,7 @@ public class DocumentTreeRecyclerAdapter
 			final FileInfo item) {
 
 			mItem = item;
-			itemView.setTag(R.id.position, position);
+			itemView.setTag(R.id.document_tree_position, position);
 			if (mTitleTv != null) {
 				if (item.isDirectory() && !item.isUpNavigation()) {
 					// ディレクトリの場合は、名前の後ろに「/」を付ける
@@ -608,7 +610,7 @@ public class DocumentTreeRecyclerAdapter
 			if (itemView instanceof Dividable) {
 				((Dividable) itemView).hasDivider(hasDivider);
 			} else {
-				itemView.setTag(R.id.has_divider, hasDivider);
+				itemView.setTag(R.id.document_tree_has_divider, hasDivider);
 			}
 		}
 
@@ -617,7 +619,7 @@ public class DocumentTreeRecyclerAdapter
 			if (itemView instanceof Dividable) {
 				return ((Dividable) itemView).hasDivider();
 			} else {
-				final Boolean b = (Boolean) itemView.getTag(R.id.has_divider);
+				final Boolean b = (Boolean) itemView.getTag(R.id.document_tree_has_divider);
 				return ((b != null) && b);
 			}
 		}

@@ -80,7 +80,7 @@ class SAFFilerFragment
 	private fun initView() {
 		mAdapter = DocumentTreeRecyclerAdapter(
 			requireContext(),
-			R.layout.list_item_title,
+			R.layout.list_item_title, R.id.content,
 			SAFRootTreeDocumentFile.fromContext(requireContext())
 		)
 		mAdapter!!.setListener(
