@@ -20,9 +20,6 @@ package com.serenegiant.widget;
 
 import android.widget.TextView;
 
-import com.serenegiant.common.R;
-import com.serenegiant.view.ViewFindUtils;
-
 import java.util.List;
 
 import androidx.annotation.IdRes;
@@ -37,24 +34,21 @@ public class StringsRecyclerViewAdapter extends ArrayListRecyclerViewAdapter<Str
 	private static final String TAG = StringsRecyclerViewAdapter.class.getSimpleName();
 
 	@IdRes
-	private static final int[] TITLE_IDS = {
-		R.id.title,
-		R.id.content,
-		android.R.id.title,
-		android.R.id.text1,
-		android.R.id.text2,
-	};
+	private final int mTitleResId;
 
 	/**
 	 * コンストラクタ
 	 * @param itemViewLayoutId
+	 * @param titleResId
 	 * @param items
 	 */
 	public StringsRecyclerViewAdapter(
 		@LayoutRes final int itemViewLayoutId,
+		@IdRes final int titleResId,
 		@NonNull final List<String> items) {
 
 		super(itemViewLayoutId, items, new DiffCallback<String>());
+		mTitleResId = titleResId;
 	}
 
 	@Override
@@ -73,7 +67,8 @@ public class StringsRecyclerViewAdapter extends ArrayListRecyclerViewAdapter<Str
 		final int position) {
 
 		holder.mItem = getItem(position);
-		final TextView tv = ViewFindUtils.findTitleView(holder.mView, TITLE_IDS);
+		final TextView tv = (holder.mView instanceof TextView)
+			? (TextView) holder.mView : holder.mView.findViewById(mTitleResId);
 		if (tv != null) {
 			tv.setText(holder.mItem);
 		} else {

@@ -114,7 +114,8 @@ class SAFUtilsFragment: BaseFragment(), ConfirmDialogListener {
 	 */
 	private fun initView() {
 		mAdapter = StringsRecyclerViewAdapter(
-			R.layout.list_item_title, ArrayList()
+			R.layout.list_item_title, R.id.content,
+			ArrayList()
 		)
 		mAdapter!!.setOnItemClickListener(
 			object : ArrayListRecyclerViewListener<String?> {
