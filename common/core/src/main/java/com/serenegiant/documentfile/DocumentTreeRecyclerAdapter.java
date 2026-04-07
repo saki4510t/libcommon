@@ -1,4 +1,4 @@
-package com.serenegiant.widget;
+package com.serenegiant.documentfile;
 /*
  * libcommon
  * utility/helper classes for myself
@@ -32,10 +32,10 @@ import android.view.ViewGroup;
 import android.widget.Checkable;
 import android.widget.TextView;
 
-import com.serenegiant.common.R;
-import com.serenegiant.documentfile.SAFUtils;
+import com.serenegiant.core.R;
 import com.serenegiant.system.HandlerThreadHandler;
 import com.serenegiant.system.HandlerUtils;
+import com.serenegiant.widget.Dividable;
 
 import java.io.IOException;
 import java.util.ArrayList;
