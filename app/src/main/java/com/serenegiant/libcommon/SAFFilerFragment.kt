@@ -44,7 +44,7 @@ class SAFFilerFragment
  */
 	: BaseFragment() {
 	private var mBinding: FragmentSafFilerBinding? = null
-	private var mAdapter: DocumentTreeRecyclerAdapter? = null
+	private var mAdapter: com.serenegiant.documentfile.DocumentTreeRecyclerAdapter? = null
 	override fun onCreateView(
 		inflater: LayoutInflater,
 		container: ViewGroup?,
@@ -78,10 +78,10 @@ class SAFFilerFragment
 	 * 表示を初期化
 	 */
 	private fun initView() {
-		mAdapter = DocumentTreeRecyclerAdapter(
+		mAdapter = com.serenegiant.documentfile.DocumentTreeRecyclerAdapter(
 			requireContext(),
 			R.layout.list_item_title, R.id.content,
-			SAFRootTreeDocumentFile.fromContext(requireContext())
+			androidx.documentfile.provider.SAFRootTreeDocumentFile.fromContext(requireContext())
 		)
 		mAdapter!!.setListener(
 			object : DocumentTreeRecyclerAdapterListener {

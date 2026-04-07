@@ -330,7 +330,7 @@ abstract class AbstractCameraFragment : BaseFragment() {
 		return if ((activity == null) || activity.isFinishing) {
 			false
 		} else (!BuildCheck.isAPI21()
-			|| SAFUtils.hasPermission(activity, REQUEST_ACCESS_SD)	// API>=19
+			|| com.serenegiant.documentfile.SAFUtils.hasPermission(activity, REQUEST_ACCESS_SD)	// API>=19
 			|| (BuildCheck.isAPI28() || PermissionUtils.hasWriteExternalStorage(activity)))
 			&& PermissionUtils.hasAudio(activity)
 			&& PermissionUtils.hasCamera(activity)

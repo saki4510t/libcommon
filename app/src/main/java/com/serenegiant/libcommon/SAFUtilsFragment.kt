@@ -50,13 +50,13 @@ class SAFUtilsFragment: BaseFragment(), ConfirmDialogListener {
 
 	private lateinit var mBinding: FragmentSafutilsBinding
 	private var mAdapter: StringsRecyclerViewAdapter? = null
-	private var mSAFPermission: SAFPermission? = null
+	private var mSAFPermission: com.serenegiant.documentfile.SAFPermission? = null
 	override fun onAttach(context: Context) {
 		super.onAttach(context)
 		// XXX Fragmentの場合SAFPermissionを#onAttachまたは#onCreateで初期化しないといけない
-		mSAFPermission = SAFPermission(
+		mSAFPermission = com.serenegiant.documentfile.SAFPermission(
 			this,
-			SAFPermission.DEFAULT_CALLBACK
+			com.serenegiant.documentfile.SAFPermission.DEFAULT_CALLBACK
 		)
 	}
 
@@ -141,7 +141,7 @@ class SAFUtilsFragment: BaseFragment(), ConfirmDialogListener {
 										"release permission,requestCode=$requestCode",
 										Toast.LENGTH_SHORT
 									).show()
-									SAFUtils.releasePersistableUriPermission(
+									com.serenegiant.documentfile.SAFUtils.releasePersistableUriPermission(
 										requireContext(),
 										requestCode
 									)
@@ -182,7 +182,7 @@ class SAFUtilsFragment: BaseFragment(), ConfirmDialogListener {
 				val requestCode = this.requestCode
 				if (requestCode != 0 && requestCode and 0xffff == requestCode) {
 					if (DEBUG) Log.v(TAG, "onClick:request SAF permission,requestCode=$requestCode")
-					if (!SAFUtils.hasPermission(requireContext(), requestCode)) {
+					if (!com.serenegiant.documentfile.SAFUtils.hasPermission(requireContext(), requestCode)) {
 						requestPermission(requestCode)
 					} else {
 						ConfirmDialogV4.showDialog(
@@ -208,7 +208,7 @@ class SAFUtilsFragment: BaseFragment(), ConfirmDialogListener {
 	 * @param requestCode
 	 */
 	private fun requestPermission(requestCode: Int) {
-		SAFUtils.releasePersistableUriPermission(requireContext(), requestCode)
+		com.serenegiant.documentfile.SAFUtils.releasePersistableUriPermission(requireContext(), requestCode)
 		mSAFPermission!!.requestPermission(requestCode)
 	}
 
@@ -217,7 +217,7 @@ class SAFUtilsFragment: BaseFragment(), ConfirmDialogListener {
 	 */
 	private fun updateSAFPermissions() {
 		if (DEBUG) Log.v(TAG, "updateSAFPermissions:")
-		val map = SAFUtils.getStorageUriAll(requireContext())
+		val map = com.serenegiant.documentfile.SAFUtils.getStorageUriAll(requireContext())
 		val list: MutableList<String> = ArrayList()
 		for ((key, value) in map) {
 			list.add("$key@$value")

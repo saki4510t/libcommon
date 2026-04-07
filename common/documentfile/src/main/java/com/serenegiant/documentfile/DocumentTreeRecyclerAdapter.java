@@ -32,7 +32,6 @@ import android.view.ViewGroup;
 import android.widget.Checkable;
 import android.widget.TextView;
 
-import com.serenegiant.core.R;
 import com.serenegiant.system.HandlerThreadHandler;
 import com.serenegiant.system.HandlerUtils;
 import com.serenegiant.widget.Dividable;
