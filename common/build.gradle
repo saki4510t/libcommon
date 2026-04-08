@@ -69,6 +69,7 @@ dependencies {
 	implementation "androidx.core:core-ktx:$androidXCoreKtx"
 
 	api project(':common:core')
+	api project(':common:accessibility')
 	api project(':common:bluetooth')
 	api project(':common:camera')
 	api project(':common:dialog')

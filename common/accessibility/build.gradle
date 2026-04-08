@@ -1,0 +1,83 @@
+plugins {
+	id 'com.android.library'
+	id 'org.jetbrains.kotlin.android'
+	id 'org.jetbrains.dokka'
+	id 'maven-publish'
+}
+
+android {
+	namespace 'com.serenegiant.accessibility'
+	compileSdk versionCompiler
+
+	compileOptions {
+		sourceCompatibility javaSourceCompatibility
+		targetCompatibility javaTargetCompatibility
+	}
+
+	defaultConfig {
+		minSdkVersion versionMin
+		targetSdkVersion versionTarget
+
+		testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+		consumerProguardFiles "consumer-rules.pro"
+	}
+
+	buildTypes {
+		release {
+			minifyEnabled false
+			proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+		}
+	}
+
+	buildFeatures {
+	}
+
+	kotlinOptions.jvmTarget = "17"
+}
+
+dependencies {
+	// androidx
+	implementation "androidx.appcompat:appcompat:$androidXAppCompat"
+	// ktx
+	implementation "androidx.core:core-ktx:$androidXCoreKtx"
+	implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:$kotlinCoroutinesVersion"
+
+	api project(':common:core')
+}
+
+def repo = new File(rootDir, "repository")
+
+afterEvaluate {
+	publishing {
+		repositories {
+			maven {
+				url = "file://${repo.absolutePath}"
+			}
+		}
+		publications {
+			release(MavenPublication) {
+				groupId = 'com.serenegiant'
+				artifactId = 'common-accessibility'
+				version = versionNameString
+				from components.release
+				pom {
+					inceptionYear = '2014'
+					licenses {
+						license {
+							name = 'The Apache Software License, Version 2.0'
+							url = 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+							distribution = 'repo'
+						}
+					}
+					developers {
+						developer {
+							id = 'saki4510t'
+							name = 't_saki'
+							email = 't_saki@serenegiant.com'
+						}
+					}
+				}
+			}
+		}
+	}
+}
