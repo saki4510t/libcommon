@@ -75,7 +75,11 @@ fun SharedPreferences?.getPref(
 	val result = IntArray(n)
 	if (this != null) {
 		for (i in 0 until n) {
-			result[i] = PrefHelper.get(this, key + i, defaultValues[i])
+			result[i] = PrefHelper.get(
+				this,
+				key + i,
+				defaultValues[i]
+			)
 		}
 	}
 	return result

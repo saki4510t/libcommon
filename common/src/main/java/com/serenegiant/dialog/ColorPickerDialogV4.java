@@ -217,7 +217,7 @@ public class ColorPickerDialogV4 extends DialogFragmentEx {
 		final Activity activity = requireActivity();
 		final FrameLayout rootView
 			= (FrameLayout)LayoutInflater.from(activity)
-				.inflate(R.layout.color_picker, null);
+				.inflate(R.layout.color_picker_dialog, null);
 		final FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(
 			FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT);
 		final ColorPickerView view = new ColorPickerView(activity);

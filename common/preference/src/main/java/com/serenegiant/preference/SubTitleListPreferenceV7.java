@@ -28,7 +28,6 @@ import android.view.ViewGroup;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import com.serenegiant.common.R;
 import com.serenegiant.content.TypedArrayUtils;
 import com.serenegiant.view.ViewUtils;
 

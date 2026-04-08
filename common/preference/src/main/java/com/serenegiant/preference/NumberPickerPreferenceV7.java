@@ -23,7 +23,6 @@ import android.content.res.TypedArray;
 import android.util.AttributeSet;
 import android.util.Log;
 
-import com.serenegiant.common.R;
 import com.serenegiant.content.TypedArrayUtils;
 
 import java.util.Locale;
