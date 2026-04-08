@@ -87,6 +87,7 @@ dependencies {
 
 	api project(':common:core')
 	api project(':common:bluetooth')
+	api project(':common:camera')
 	api project(':common:documentfile')
 	api project(':common:gl')
 	api project(':common:media')
