@@ -470,8 +470,9 @@ public class SwipeRefreshLayout extends ViewGroup
 		try {
 			setEnabled(a.getBoolean(0, true));
 		} finally {
+			// ASでTypedArrayを使った後に#recycleを呼べ、TypedArrayはAutoClosableだから#closeを呼べと
+			// 言われるけど#recycleと#closeは片方しか呼べない(両方呼ぶとクラッシュする)
 			a.recycle();
-			a.close();
 		}
 	}
 
