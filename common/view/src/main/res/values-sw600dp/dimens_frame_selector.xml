@@ -20,6 +20,7 @@
 */
 -->
 <resources>
+	<dimen name="scale_type_padding">16dp</dimen>
 	<dimen name="scale_type_margin_top">24dp</dimen>
 	<dimen name="text_sz_scale_type">28sp</dimen>
 </resources>
