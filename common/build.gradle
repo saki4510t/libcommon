@@ -80,6 +80,7 @@ dependencies {
 	api project(':common:mediaeffect')
 	api project(':common:net')
 	api project(':common:preference')
+	api project(':common:telephony')
 	api project(':common:usb')
 	api project(':common:view')
 }
