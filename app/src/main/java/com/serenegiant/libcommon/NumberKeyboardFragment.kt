@@ -25,7 +25,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.EditText
-import com.serenegiant.view.KeyboardDelegater
+import com.serenegiant.keyboard.KeyboardDelegater
 import com.serenegiant.view.ViewUtils
 import com.serenegiant.widget.KeyboardView
 
@@ -72,7 +72,7 @@ class NumberKeyboardFragment : BaseFragment() {
 		mInputEditText = rootView.findViewById(R.id.edittext)
 		mKeyboardView = rootView.findViewById(R.id.number_keyboardview)
 		mDelegater = object : KeyboardDelegater(
-			mInputEditText!!, mKeyboardView!!, com.serenegiant.common.R.xml.keyboard_number) {
+			mInputEditText!!, mKeyboardView!!, com.serenegiant.keyboard.R.xml.keyboard_number) {
 
 			override fun onCancelClick() {
 				if (DEBUG) Log.v(TAG, "onCancelClick:")

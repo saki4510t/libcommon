@@ -63,8 +63,8 @@ import android.view.accessibility.AccessibilityManager;
 import android.widget.PopupWindow;
 import android.widget.TextView;
 
-import com.serenegiant.common.R;
 import com.serenegiant.content.ContextUtils;
+import com.serenegiant.keyboard.R;
 
 import java.util.Arrays;
 import java.util.HashMap;

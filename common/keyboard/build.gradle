@@ -1,0 +1,95 @@
+plugins {
+	id 'com.android.library'
+	id 'org.jetbrains.kotlin.android'
+	id 'org.jetbrains.dokka'
+	id 'maven-publish'
+}
+
+android {
+	namespace 'com.serenegiant.keyboard'
+	compileSdk versionCompiler
+
+	compileOptions {
+		sourceCompatibility javaSourceCompatibility
+		targetCompatibility javaTargetCompatibility
+	}
+
+	defaultConfig {
+		minSdkVersion versionMin
+		targetSdkVersion versionTarget
+
+		testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+		consumerProguardFiles "consumer-rules.pro"
+	}
+
+	buildTypes {
+		release {
+			minifyEnabled false
+			proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+		}
+	}
+
+	buildFeatures {
+	}
+
+	kotlinOptions.jvmTarget = "17"
+}
+
+dependencies {
+	// androidx
+	implementation "androidx.legacy:legacy-support-v4:$androidXLegacyV4"
+	implementation "androidx.appcompat:appcompat:$androidXAppCompat"
+	implementation "androidx.recyclerview:recyclerview:$androidXRecyclerview"
+	implementation "androidx.exifinterface:exifinterface:$androidXExif"
+	implementation "com.google.android.material:material:$androidXMaterial"
+	implementation "androidx.lifecycle:lifecycle-process:$androidXLifecycle"
+	// ktx
+	implementation "androidx.core:core-ktx:$androidXCoreKtx"
+	implementation "androidx.preference:preference-ktx:$androidXPreference"
+	implementation "androidx.fragment:fragment-ktx:$androidXFragmentKtx"
+	implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:$androidXLifecycleKtx"
+	implementation "androidx.lifecycle:lifecycle-viewmodel-savedstate:$androidXLifecycleKtx"
+	implementation "androidx.lifecycle:lifecycle-livedata-ktx:$androidXLifecycleKtx"
+	implementation "androidx.lifecycle:lifecycle-service:$androidXLifecycleKtx"
+	implementation "androidx.lifecycle:lifecycle-common-java8:$androidXLifecycleKtx"
+	implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:$kotlinCoroutinesVersion"
+
+	api project(':common:core')
+}
+
+def repo = new File(rootDir, "repository")
+
+afterEvaluate {
+	publishing {
+		repositories {
+			maven {
+				url = "file://${repo.absolutePath}"
+			}
+		}
+		publications {
+			release(MavenPublication) {
+				groupId = 'com.serenegiant'
+				artifactId = 'common-keyboard'
+				version = versionNameString
+				from components.release
+				pom {
+					inceptionYear = '2014'
+					licenses {
+						license {
+							name = 'The Apache Software License, Version 2.0'
+							url = 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+							distribution = 'repo'
+						}
+					}
+					developers {
+						developer {
+							id = 'saki4510t'
+							name = 't_saki'
+							email = 't_saki@serenegiant.com'
+						}
+					}
+				}
+			}
+		}
+	}
+}

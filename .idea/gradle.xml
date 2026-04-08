@@ -19,6 +19,7 @@
             <option value="$PROJECT_DIR$/common/dialog" />
             <option value="$PROJECT_DIR$/common/documentfile" />
             <option value="$PROJECT_DIR$/common/gl" />
+            <option value="$PROJECT_DIR$/common/keyboard" />
             <option value="$PROJECT_DIR$/common/media" />
             <option value="$PROJECT_DIR$/common/net" />
             <option value="$PROJECT_DIR$/common/preference" />

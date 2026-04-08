@@ -1,4 +1,4 @@
-package com.serenegiant.view;
+package com.serenegiant.keyboard;
 /*
  * libcommon
  * utility/helper classes for myself

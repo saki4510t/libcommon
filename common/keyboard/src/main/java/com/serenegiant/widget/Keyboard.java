@@ -45,7 +45,7 @@ import android.util.Log;
 import android.util.TypedValue;
 import android.util.Xml;
 
-import com.serenegiant.common.R;
+import com.serenegiant.keyboard.R;
 
 import org.xmlpull.v1.XmlPullParserException;
 
@@ -235,25 +235,30 @@ public class Keyboard {
 		public Row(Resources res, @NonNull final  Keyboard parent, XmlResourceParser parser) {
 			if (DEBUG) Log.v(TAG, "コンストラクタ:");
 			this.parent = parent;
-			TypedArray a = res.obtainAttributes(Xml.asAttributeSet(parser),
-				R.styleable.Keyboard);
-			defaultWidth = getDimensionOrFraction(a,
-				R.styleable.Keyboard_keyWidth,
-				parent.mDisplayWidth, parent.mDefaultWidth);
-			defaultHeight = getDimensionOrFraction(a,
-				R.styleable.Keyboard_keyHeight,
-				parent.mDisplayHeight, parent.mDefaultHeight);
-			defaultHorizontalGap = getDimensionOrFraction(a,
-				R.styleable.Keyboard_horizontalGap,
-				parent.mDisplayWidth, parent.mDefaultHorizontalGap);
-			verticalGap = getDimensionOrFraction(a,
-				R.styleable.Keyboard_verticalGap,
-				parent.mDisplayHeight, parent.mDefaultVerticalGap);
-			a.recycle();
-			a = res.obtainAttributes(Xml.asAttributeSet(parser), R.styleable.Keyboard_Row);
-			rowEdgeFlags = a.getInt(R.styleable.Keyboard_Row_rowEdgeFlags, 0);
-			mode = a.getResourceId(R.styleable.Keyboard_Row_keyboardMode, 0);
-			a.recycle();
+			final TypedArray a = res.obtainAttributes(Xml.asAttributeSet(parser), R.styleable.Keyboard);
+			try {
+				defaultWidth = getDimensionOrFraction(a,
+					R.styleable.Keyboard_keyWidth,
+					parent.mDisplayWidth, parent.mDefaultWidth);
+				defaultHeight = getDimensionOrFraction(a,
+					R.styleable.Keyboard_keyHeight,
+					parent.mDisplayHeight, parent.mDefaultHeight);
+				defaultHorizontalGap = getDimensionOrFraction(a,
+					R.styleable.Keyboard_horizontalGap,
+					parent.mDisplayWidth, parent.mDefaultHorizontalGap);
+				verticalGap = getDimensionOrFraction(a,
+					R.styleable.Keyboard_verticalGap,
+					parent.mDisplayHeight, parent.mDefaultVerticalGap);
+			} finally {
+				a.recycle();
+			}
+			final TypedArray b = res.obtainAttributes(Xml.asAttributeSet(parser), R.styleable.Keyboard_Row);
+			try {
+				rowEdgeFlags = b.getInt(R.styleable.Keyboard_Row_rowEdgeFlags, 0);
+				mode = b.getResourceId(R.styleable.Keyboard_Row_keyboardMode, 0);
+			} finally {
+				b.recycle();
+			}
 		}
 
 		@NonNull
