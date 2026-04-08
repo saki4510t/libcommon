@@ -1,4 +1,4 @@
-package com.serenegiant.widget;
+package com.serenegiant.databinding;
 /*
  * libcommon
  * utility/helper classes for myself
@@ -17,6 +17,13 @@ package com.serenegiant.widget;
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
+
+import com.serenegiant.widget.CheckableButton;
+import com.serenegiant.widget.CheckableEx;
+import com.serenegiant.widget.CheckableImageButton;
+import com.serenegiant.widget.CheckableImageView;
+import com.serenegiant.widget.CheckableLinearLayout;
+import com.serenegiant.widget.CheckableRelativeLayout;
 
 import androidx.annotation.NonNull;
 import androidx.databinding.BindingAdapter;

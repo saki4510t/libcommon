@@ -17,6 +17,7 @@
             <option value="$PROJECT_DIR$/common/bluetooth" />
             <option value="$PROJECT_DIR$/common/camera" />
             <option value="$PROJECT_DIR$/common/core" />
+            <option value="$PROJECT_DIR$/common/databinding" />
             <option value="$PROJECT_DIR$/common/dialog" />
             <option value="$PROJECT_DIR$/common/documentfile" />
             <option value="$PROJECT_DIR$/common/gl" />

@@ -1,7 +1,6 @@
 plugins {
 	id 'com.android.library'
 	id 'org.jetbrains.kotlin.android'
-	id 'org.jetbrains.kotlin.kapt'
 	id 'org.jetbrains.dokka'
 	id 'maven-publish'
 }
@@ -56,7 +55,6 @@ android {
 
 	buildFeatures {
 	    buildConfig = true
-		dataBinding = true	// appでデータバインディングを使っているとこれを削除できない…
 	}
 
 	kotlinOptions.jvmTarget = "17"
@@ -72,6 +70,7 @@ dependencies {
 	api project(':common:accessibility')
 	api project(':common:bluetooth')
 	api project(':common:camera')
+	api project(':common:databinding')
 	api project(':common:dialog')
 	api project(':common:documentfile')
 	api project(':common:gl')
