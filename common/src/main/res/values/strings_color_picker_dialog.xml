@@ -22,11 +22,4 @@
     <string name="color_swatch_description_selected">Color <xliff:g id="color_index" example="14">%1$d</xliff:g> selected</string>
     <string name="color_picker_select">Select</string>
     <string name="color_picker_cancel">Cancel</string>
-	<!-- ディメンジョン -->
-	<dimen name="color_swatch_large">64dip</dimen>
-	<dimen name="color_swatch_small">48dip</dimen>
-	<dimen name="color_swatch_margins_large">8dip</dimen>
-	<dimen name="color_swatch_margins_small">4dip</dimen>
-	<dimen name="color_picker_margin_horizontal">16dp</dimen>
-	<dimen name="color_picker_margin_vertical">16dp</dimen>
 </resources>
