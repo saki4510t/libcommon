@@ -47,7 +47,6 @@ import com.serenegiant.system.BuildCheck;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 
-
 /**
  * Notification生成/表示用のヘルパークラス
  * NotificationCompat#Builderを継承してNotificationChannel関係の設定メソッドと

@@ -26,7 +26,6 @@ import android.graphics.drawable.Drawable;
 import android.text.TextUtils;
 import android.util.Log;
 
-import com.serenegiant.common.R;
 import com.serenegiant.system.BuildCheck;
 
 import java.util.List;

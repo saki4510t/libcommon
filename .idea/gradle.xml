@@ -24,6 +24,7 @@
             <option value="$PROJECT_DIR$/common/media" />
             <option value="$PROJECT_DIR$/common/mediaeffect" />
             <option value="$PROJECT_DIR$/common/net" />
+            <option value="$PROJECT_DIR$/common/notification" />
             <option value="$PROJECT_DIR$/common/preference" />
             <option value="$PROJECT_DIR$/common/telephony" />
             <option value="$PROJECT_DIR$/common/usb" />

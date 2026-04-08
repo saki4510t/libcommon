@@ -26,7 +26,6 @@ import android.app.Service;
 import android.text.TextUtils;
 import android.util.Log;
 
-import com.serenegiant.common.R;
 import com.serenegiant.system.BuildCheck;
 import com.serenegiant.content.ContextUtils;
 
