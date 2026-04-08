@@ -72,7 +72,6 @@ dependencies {
 //	androidTestImplementation "androidx.test.espresso:espresso-idling-resource:$androidTestEspresso"
 	androidTestImplementation "androidx.multidex:multidex-instrumentation:2.0.0"
 
-	implementation "androidx.legacy:legacy-support-v4:$androidXLegacyV4"
 	implementation "androidx.appcompat:appcompat:$androidXAppCompat"
 	implementation "androidx.recyclerview:recyclerview:$androidXRecyclerview"
 	implementation "androidx.constraintlayout:constraintlayout:$androidXConstraint"

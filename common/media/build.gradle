@@ -43,21 +43,11 @@ android {
 
 dependencies {
 	// androidx
-	implementation "androidx.legacy:legacy-support-v4:$androidXLegacyV4"
 	implementation "androidx.appcompat:appcompat:$androidXAppCompat"
 	implementation "androidx.recyclerview:recyclerview:$androidXRecyclerview"
-	implementation "androidx.exifinterface:exifinterface:$androidXExif"
 	implementation "com.google.android.material:material:$androidXMaterial"
-	implementation "androidx.lifecycle:lifecycle-process:$androidXLifecycle"
 	// ktx
 	implementation "androidx.core:core-ktx:$androidXCoreKtx"
-	implementation "androidx.preference:preference-ktx:$androidXPreference"
-	implementation "androidx.fragment:fragment-ktx:$androidXFragmentKtx"
-	implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:$androidXLifecycleKtx"
-	implementation "androidx.lifecycle:lifecycle-viewmodel-savedstate:$androidXLifecycleKtx"
-	implementation "androidx.lifecycle:lifecycle-livedata-ktx:$androidXLifecycleKtx"
-	implementation "androidx.lifecycle:lifecycle-service:$androidXLifecycleKtx"
-	implementation "androidx.lifecycle:lifecycle-common-java8:$androidXLifecycleKtx"
 	implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:$kotlinCoroutinesVersion"
 
 	api project(':common:core')
