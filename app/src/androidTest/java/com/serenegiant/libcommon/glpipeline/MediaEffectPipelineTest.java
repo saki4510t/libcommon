@@ -35,7 +35,6 @@ import com.serenegiant.graphics.BitmapHelper;
 import com.serenegiant.mediaeffect.EffectsBuilder;
 import com.serenegiant.mediaeffect.IMediaEffect;
 import com.serenegiant.mediaeffect.MediaEffectAutoFix;
-import com.serenegiant.mediaeffect.MediaEffectBackDropper;
 import com.serenegiant.mediaeffect.MediaEffectBitmapOverlay;
 import com.serenegiant.mediaeffect.MediaEffectBlackWhite;
 import com.serenegiant.mediaeffect.MediaEffectContrast;

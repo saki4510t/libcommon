@@ -1,1 +1,0 @@
-View/ViewGroup操作用のヘルパークラス

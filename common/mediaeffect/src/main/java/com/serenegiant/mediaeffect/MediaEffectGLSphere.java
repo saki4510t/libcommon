@@ -19,7 +19,6 @@ package com.serenegiant.mediaeffect;
 */
 
 import static com.serenegiant.gl.ShaderConst.FRAGMENT_SHADER_SPHERE_ES2;
-import static com.serenegiant.gl.ShaderConst.VERTEX_SHADER_ES2;
 
 /** 球状フィルター */
 public class MediaEffectGLSphere extends MediaEffectGLBase {

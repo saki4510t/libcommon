@@ -22,7 +22,6 @@ import androidx.annotation.Nullable;
 import androidx.annotation.Size;
 
 import static com.serenegiant.gl.ShaderConst.FRAGMENT_SHADER_COLOR_MATRIX_ES2;
-import static com.serenegiant.gl.ShaderConst.VERTEX_SHADER_ES2;
 
 /** GL|ESで色変換行列を適用するMediaEffectGLBase実装 */
 public class MediaEffectGLColorMatrix extends MediaEffectGLBase {

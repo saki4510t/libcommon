@@ -53,7 +53,7 @@ class MediaEffectCameraSurfaceView @JvmOverloads constructor(
 	private var mCamera: Camera? = null
 
 	private var mEffectsBuilder: EffectsBuilder
-		= object : EffectsBuilder{}
+		= object : EffectsBuilder {}
 
 	/**
 	 * コンストラクタ
