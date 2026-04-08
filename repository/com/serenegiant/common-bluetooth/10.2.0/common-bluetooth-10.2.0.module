@@ -1,0 +1,145 @@
+{
+  "formatVersion": "1.1",
+  "component": {
+    "group": "com.serenegiant",
+    "module": "common-bluetooth",
+    "version": "10.2.0",
+    "attributes": {
+      "org.gradle.status": "release"
+    }
+  },
+  "createdBy": {
+    "gradle": {
+      "version": "8.2"
+    }
+  },
+  "variants": [
+    {
+      "name": "releaseApiElements-published",
+      "attributes": {
+        "org.gradle.category": "library",
+        "org.gradle.usage": "java-api",
+        "org.jetbrains.kotlin.platform.type": "androidJvm"
+      },
+      "dependencies": [
+        {
+          "group": "com.serenegiant",
+          "module": "common-core",
+          "version": {
+            "requires": "10.2.0"
+          }
+        },
+        {
+          "group": "org.jetbrains.kotlin",
+          "module": "kotlin-stdlib",
+          "version": {
+            "requires": "1.9.24"
+          }
+        }
+      ],
+      "files": [
+        {
+          "name": "common-bluetooth-10.2.0.aar",
+          "url": "common-bluetooth-10.2.0.aar",
+          "size": 27672,
+          "sha512": "604ccb8d0845fea7e733a5f48a7cacbe50fbaf007bd26d5ff89decd5d65b9d84288205d026ecff5312bd266e878beafca1c5098e72ee105e4a736a35755775b7",
+          "sha256": "7256bb7d18a586bb15c5be830631128b5c5ced0c1c2f6adaf9c59eee51fa2314",
+          "sha1": "0fe47245970e0b25e8d3ae7508152d8c978c45d4",
+          "md5": "8b564d1e85227c94fb86510c9600a44a"
+        }
+      ]
+    },
+    {
+      "name": "releaseRuntimeElements-published",
+      "attributes": {
+        "org.gradle.category": "library",
+        "org.gradle.usage": "java-runtime",
+        "org.jetbrains.kotlin.platform.type": "androidJvm"
+      },
+      "dependencies": [
+        {
+          "group": "androidx.appcompat",
+          "module": "appcompat",
+          "version": {
+            "requires": "1.6.1"
+          }
+        },
+        {
+          "group": "androidx.recyclerview",
+          "module": "recyclerview",
+          "version": {
+            "requires": "1.3.2"
+          }
+        },
+        {
+          "group": "com.google.android.material",
+          "module": "material",
+          "version": {
+            "requires": "1.12.0"
+          }
+        },
+        {
+          "group": "androidx.core",
+          "module": "core-ktx",
+          "version": {
+            "requires": "1.13.1"
+          }
+        },
+        {
+          "group": "org.jetbrains.kotlinx",
+          "module": "kotlinx-coroutines-android",
+          "version": {
+            "requires": "1.8.1"
+          }
+        },
+        {
+          "group": "com.serenegiant",
+          "module": "common-core",
+          "version": {
+            "requires": "10.2.0"
+          }
+        },
+        {
+          "group": "org.jetbrains.kotlin",
+          "module": "kotlin-stdlib",
+          "version": {
+            "requires": "1.9.24"
+          }
+        }
+      ],
+      "files": [
+        {
+          "name": "common-bluetooth-10.2.0.aar",
+          "url": "common-bluetooth-10.2.0.aar",
+          "size": 27672,
+          "sha512": "604ccb8d0845fea7e733a5f48a7cacbe50fbaf007bd26d5ff89decd5d65b9d84288205d026ecff5312bd266e878beafca1c5098e72ee105e4a736a35755775b7",
+          "sha256": "7256bb7d18a586bb15c5be830631128b5c5ced0c1c2f6adaf9c59eee51fa2314",
+          "sha1": "0fe47245970e0b25e8d3ae7508152d8c978c45d4",
+          "md5": "8b564d1e85227c94fb86510c9600a44a"
+        }
+      ]
+    },
+    {
+      "name": "releaseSourcesElements-published",
+      "attributes": {
+        "org.gradle.category": "documentation",
+        "org.gradle.dependency.bundling": "external",
+        "org.gradle.docstype": "sources",
+        "org.gradle.libraryelements": "jar",
+        "org.gradle.usage": "java-runtime",
+        "org.jetbrains.kotlin.platform.type": "androidJvm"
+      },
+      "files": [
+        {
+          "name": "common-bluetooth-10.2.0-sources.jar",
+          "url": "common-bluetooth-10.2.0-sources.jar",
+          "size": 31425,
+          "sha512": "304d7bf2fc9e02f0931706838493b75c9a6140a7eed6f65257b90e3e9a6008169c448c2bd442e2381b491ef5c83923fd410d091223a93cd2a4c028ec2f785497",
+          "sha256": "2a3b74b5886be7cb03d3c6056fe4e67f64158786f9415b7a1cafb34f8c925dc1",
+          "sha1": "f37a18d6a81d3e38a46bb5c162fc6e591a32cb0f",
+          "md5": "e34dbab556a572e8b872663d10e4c373"
+        }
+      ]
+    }
+  ]
+}

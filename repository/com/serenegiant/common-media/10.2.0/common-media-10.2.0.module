@@ -1,0 +1,173 @@
+{
+  "formatVersion": "1.1",
+  "component": {
+    "group": "com.serenegiant",
+    "module": "common-media",
+    "version": "10.2.0",
+    "attributes": {
+      "org.gradle.status": "release"
+    }
+  },
+  "createdBy": {
+    "gradle": {
+      "version": "8.2"
+    }
+  },
+  "variants": [
+    {
+      "name": "releaseApiElements-published",
+      "attributes": {
+        "org.gradle.category": "library",
+        "org.gradle.usage": "java-api",
+        "org.jetbrains.kotlin.platform.type": "androidJvm"
+      },
+      "dependencies": [
+        {
+          "group": "com.serenegiant",
+          "module": "common-core",
+          "version": {
+            "requires": "10.2.0"
+          }
+        },
+        {
+          "group": "com.serenegiant",
+          "module": "common-documentfile",
+          "version": {
+            "requires": "10.2.0"
+          }
+        },
+        {
+          "group": "com.serenegiant",
+          "module": "common-gl",
+          "version": {
+            "requires": "10.2.0"
+          }
+        },
+        {
+          "group": "org.jetbrains.kotlin",
+          "module": "kotlin-stdlib",
+          "version": {
+            "requires": "1.9.24"
+          }
+        }
+      ],
+      "files": [
+        {
+          "name": "common-media-10.2.0.aar",
+          "url": "common-media-10.2.0.aar",
+          "size": 273883,
+          "sha512": "6918ac39b225ec4fd622f537e8537974ba0cf2d0e00b1ec496631de02b203023112dea2c8b334cb8bc80b93339667f4925e35c50c548b4708536bc3f613c6712",
+          "sha256": "b602a0357489e9c6dbe02df1679e22298b788595be6e819ccfd4cc2e86ed5ba3",
+          "sha1": "c65964edc26efed71183575a96b03f003b207c4f",
+          "md5": "12b9862a72a0d710c7160125f79410f9"
+        }
+      ]
+    },
+    {
+      "name": "releaseRuntimeElements-published",
+      "attributes": {
+        "org.gradle.category": "library",
+        "org.gradle.usage": "java-runtime",
+        "org.jetbrains.kotlin.platform.type": "androidJvm"
+      },
+      "dependencies": [
+        {
+          "group": "androidx.appcompat",
+          "module": "appcompat",
+          "version": {
+            "requires": "1.6.1"
+          }
+        },
+        {
+          "group": "androidx.recyclerview",
+          "module": "recyclerview",
+          "version": {
+            "requires": "1.3.2"
+          }
+        },
+        {
+          "group": "com.google.android.material",
+          "module": "material",
+          "version": {
+            "requires": "1.12.0"
+          }
+        },
+        {
+          "group": "androidx.core",
+          "module": "core-ktx",
+          "version": {
+            "requires": "1.13.1"
+          }
+        },
+        {
+          "group": "org.jetbrains.kotlinx",
+          "module": "kotlinx-coroutines-android",
+          "version": {
+            "requires": "1.8.1"
+          }
+        },
+        {
+          "group": "com.serenegiant",
+          "module": "common-core",
+          "version": {
+            "requires": "10.2.0"
+          }
+        },
+        {
+          "group": "com.serenegiant",
+          "module": "common-documentfile",
+          "version": {
+            "requires": "10.2.0"
+          }
+        },
+        {
+          "group": "com.serenegiant",
+          "module": "common-gl",
+          "version": {
+            "requires": "10.2.0"
+          }
+        },
+        {
+          "group": "org.jetbrains.kotlin",
+          "module": "kotlin-stdlib",
+          "version": {
+            "requires": "1.9.24"
+          }
+        }
+      ],
+      "files": [
+        {
+          "name": "common-media-10.2.0.aar",
+          "url": "common-media-10.2.0.aar",
+          "size": 273883,
+          "sha512": "6918ac39b225ec4fd622f537e8537974ba0cf2d0e00b1ec496631de02b203023112dea2c8b334cb8bc80b93339667f4925e35c50c548b4708536bc3f613c6712",
+          "sha256": "b602a0357489e9c6dbe02df1679e22298b788595be6e819ccfd4cc2e86ed5ba3",
+          "sha1": "c65964edc26efed71183575a96b03f003b207c4f",
+          "md5": "12b9862a72a0d710c7160125f79410f9"
+        }
+      ]
+    },
+    {
+      "name": "releaseSourcesElements-published",
+      "attributes": {
+        "org.gradle.category": "documentation",
+        "org.gradle.dependency.bundling": "external",
+        "org.gradle.docstype": "sources",
+        "org.gradle.libraryelements": "jar",
+        "org.gradle.usage": "java-runtime",
+        "org.jetbrains.kotlin.platform.type": "androidJvm"
+      },
+      "files": [
+        {
+          "name": "common-media-10.2.0-sources.jar",
+          "url": "common-media-10.2.0-sources.jar",
+          "size": 402285,
+          "sha512": "649813266dcf2f169ed75cee2140f1b5ec9b0e16948827e15aa83f42f73d00344de03f7f691de3712628d145483d99319da38665c3631a8d0e7c12c8b4d435c2",
+          "sha256": "c363703d74c3d9c823c85cd3a16826dec4822d60da1873ba603ead0c0c5fc914",
+          "sha1": "4766a39f857f9f236814693304309c9b4e25c683",
+          "md5": "d3457ea81a0940a8eab96932cff7ecdc"
+        }
+      ]
+    }
+  ]
+}

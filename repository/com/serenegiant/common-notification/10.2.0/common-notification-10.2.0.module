@@ -1,0 +1,131 @@
+{
+  "formatVersion": "1.1",
+  "component": {
+    "group": "com.serenegiant",
+    "module": "common-notification",
+    "version": "10.2.0",
+    "attributes": {
+      "org.gradle.status": "release"
+    }
+  },
+  "createdBy": {
+    "gradle": {
+      "version": "8.2"
+    }
+  },
+  "variants": [
+    {
+      "name": "releaseApiElements-published",
+      "attributes": {
+        "org.gradle.category": "library",
+        "org.gradle.usage": "java-api",
+        "org.jetbrains.kotlin.platform.type": "androidJvm"
+      },
+      "dependencies": [
+        {
+          "group": "com.serenegiant",
+          "module": "common-core",
+          "version": {
+            "requires": "10.2.0"
+          }
+        },
+        {
+          "group": "org.jetbrains.kotlin",
+          "module": "kotlin-stdlib",
+          "version": {
+            "requires": "1.9.24"
+          }
+        }
+      ],
+      "files": [
+        {
+          "name": "common-notification-10.2.0.aar",
+          "url": "common-notification-10.2.0.aar",
+          "size": 34703,
+          "sha512": "ef9cbf8b87878af8800e47cc4cf0e9beb58bf339b93f887a6efb90a26814db1eadc6329b80e3d724821ddca6619a5e1c64af4fd96b1382441e084c9dce122aba",
+          "sha256": "3d09c048c1151f67d1459bd1037c6007ef6fccebfa270143136ab5ad0012fec0",
+          "sha1": "82942a62d189a51998aad7b7210a715d85932c3a",
+          "md5": "80038c1f791db66bdc00814bc2ebecb4"
+        }
+      ]
+    },
+    {
+      "name": "releaseRuntimeElements-published",
+      "attributes": {
+        "org.gradle.category": "library",
+        "org.gradle.usage": "java-runtime",
+        "org.jetbrains.kotlin.platform.type": "androidJvm"
+      },
+      "dependencies": [
+        {
+          "group": "androidx.appcompat",
+          "module": "appcompat",
+          "version": {
+            "requires": "1.6.1"
+          }
+        },
+        {
+          "group": "androidx.core",
+          "module": "core-ktx",
+          "version": {
+            "requires": "1.13.1"
+          }
+        },
+        {
+          "group": "org.jetbrains.kotlinx",
+          "module": "kotlinx-coroutines-android",
+          "version": {
+            "requires": "1.8.1"
+          }
+        },
+        {
+          "group": "com.serenegiant",
+          "module": "common-core",
+          "version": {
+            "requires": "10.2.0"
+          }
+        },
+        {
+          "group": "org.jetbrains.kotlin",
+          "module": "kotlin-stdlib",
+          "version": {
+            "requires": "1.9.24"
+          }
+        }
+      ],
+      "files": [
+        {
+          "name": "common-notification-10.2.0.aar",
+          "url": "common-notification-10.2.0.aar",
+          "size": 34703,
+          "sha512": "ef9cbf8b87878af8800e47cc4cf0e9beb58bf339b93f887a6efb90a26814db1eadc6329b80e3d724821ddca6619a5e1c64af4fd96b1382441e084c9dce122aba",
+          "sha256": "3d09c048c1151f67d1459bd1037c6007ef6fccebfa270143136ab5ad0012fec0",
+          "sha1": "82942a62d189a51998aad7b7210a715d85932c3a",
+          "md5": "80038c1f791db66bdc00814bc2ebecb4"
+        }
+      ]
+    },
+    {
+      "name": "releaseSourcesElements-published",
+      "attributes": {
+        "org.gradle.category": "documentation",
+        "org.gradle.dependency.bundling": "external",
+        "org.gradle.docstype": "sources",
+        "org.gradle.libraryelements": "jar",
+        "org.gradle.usage": "java-runtime",
+        "org.jetbrains.kotlin.platform.type": "androidJvm"
+      },
+      "files": [
+        {
+          "name": "common-notification-10.2.0-sources.jar",
+          "url": "common-notification-10.2.0-sources.jar",
+          "size": 33921,
+          "sha512": "b1f1a732c9e96016cfea0a1236dc0a75e4d1bd46c02a8c3994a5386a1e9c7419876f4de71b39557c939a4070fe60c5c782a1b6347de7a25aa4715d3d77457076",
+          "sha256": "82042d163bad271b32ccf3c1a276b413a8f2a8587c2abf973dba82c84ca2e39c",
+          "sha1": "2cc801bfddcfce8edfdfc6addd55ffc984f801db",
+          "md5": "f1a9531655f205848a769ac4c5d291d3"
+        }
+      ]
+    }
+  ]
+}
