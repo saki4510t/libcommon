@@ -28,7 +28,6 @@ import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 
-import com.serenegiant.common.R;
 import com.serenegiant.system.BuildCheck;
 
 import java.util.HashMap;

@@ -33,7 +33,6 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.widget.FrameLayout;
 
-import com.serenegiant.common.R;
 import com.serenegiant.widget.ColorPickerView;
 import com.serenegiant.widget.ColorPickerView.ColorPickerListener;
 
