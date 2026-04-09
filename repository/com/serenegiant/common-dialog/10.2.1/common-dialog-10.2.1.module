@@ -1,0 +1,159 @@
+{
+  "formatVersion": "1.1",
+  "component": {
+    "group": "com.serenegiant",
+    "module": "common-dialog",
+    "version": "10.2.1",
+    "attributes": {
+      "org.gradle.status": "release"
+    }
+  },
+  "createdBy": {
+    "gradle": {
+      "version": "8.2"
+    }
+  },
+  "variants": [
+    {
+      "name": "releaseApiElements-published",
+      "attributes": {
+        "org.gradle.category": "library",
+        "org.gradle.usage": "java-api",
+        "org.jetbrains.kotlin.platform.type": "androidJvm"
+      },
+      "dependencies": [
+        {
+          "group": "com.serenegiant",
+          "module": "common-core",
+          "version": {
+            "requires": "10.2.1"
+          }
+        },
+        {
+          "group": "com.serenegiant",
+          "module": "common-view",
+          "version": {
+            "requires": "10.2.1"
+          }
+        },
+        {
+          "group": "org.jetbrains.kotlin",
+          "module": "kotlin-stdlib",
+          "version": {
+            "requires": "1.9.24"
+          }
+        }
+      ],
+      "files": [
+        {
+          "name": "common-dialog-10.2.1.aar",
+          "url": "common-dialog-10.2.1.aar",
+          "size": 25445,
+          "sha512": "3a9bdc1c8340788b1c6ef2fc8ebf59bbb9673a110d40031f0fc2928d890d91719878848688612d958d5989f27e6336fc6ed80622b2ff50d7694dd365b78ef58a",
+          "sha256": "587b8aa714d4f5ab053772a797fa4524ac30051ee6c3c6fc9bbb68e932708279",
+          "sha1": "340a32d10fbef0efdf83bb691a93279e289c7aa4",
+          "md5": "5f4020804613380207f6cd3f85fbcbbf"
+        }
+      ]
+    },
+    {
+      "name": "releaseRuntimeElements-published",
+      "attributes": {
+        "org.gradle.category": "library",
+        "org.gradle.usage": "java-runtime",
+        "org.jetbrains.kotlin.platform.type": "androidJvm"
+      },
+      "dependencies": [
+        {
+          "group": "androidx.appcompat",
+          "module": "appcompat",
+          "version": {
+            "requires": "1.6.1"
+          }
+        },
+        {
+          "group": "com.google.android.material",
+          "module": "material",
+          "version": {
+            "requires": "1.12.0"
+          }
+        },
+        {
+          "group": "androidx.core",
+          "module": "core-ktx",
+          "version": {
+            "requires": "1.13.1"
+          }
+        },
+        {
+          "group": "androidx.fragment",
+          "module": "fragment-ktx",
+          "version": {
+            "requires": "1.7.1"
+          }
+        },
+        {
+          "group": "org.jetbrains.kotlinx",
+          "module": "kotlinx-coroutines-android",
+          "version": {
+            "requires": "1.8.1"
+          }
+        },
+        {
+          "group": "com.serenegiant",
+          "module": "common-core",
+          "version": {
+            "requires": "10.2.1"
+          }
+        },
+        {
+          "group": "com.serenegiant",
+          "module": "common-view",
+          "version": {
+            "requires": "10.2.1"
+          }
+        },
+        {
+          "group": "org.jetbrains.kotlin",
+          "module": "kotlin-stdlib",
+          "version": {
+            "requires": "1.9.24"
+          }
+        }
+      ],
+      "files": [
+        {
+          "name": "common-dialog-10.2.1.aar",
+          "url": "common-dialog-10.2.1.aar",
+          "size": 25445,
+          "sha512": "3a9bdc1c8340788b1c6ef2fc8ebf59bbb9673a110d40031f0fc2928d890d91719878848688612d958d5989f27e6336fc6ed80622b2ff50d7694dd365b78ef58a",
+          "sha256": "587b8aa714d4f5ab053772a797fa4524ac30051ee6c3c6fc9bbb68e932708279",
+          "sha1": "340a32d10fbef0efdf83bb691a93279e289c7aa4",
+          "md5": "5f4020804613380207f6cd3f85fbcbbf"
+        }
+      ]
+    },
+    {
+      "name": "releaseSourcesElements-published",
+      "attributes": {
+        "org.gradle.category": "documentation",
+        "org.gradle.dependency.bundling": "external",
+        "org.gradle.docstype": "sources",
+        "org.gradle.libraryelements": "jar",
+        "org.gradle.usage": "java-runtime",
+        "org.jetbrains.kotlin.platform.type": "androidJvm"
+      },
+      "files": [
+        {
+          "name": "common-dialog-10.2.1-sources.jar",
+          "url": "common-dialog-10.2.1-sources.jar",
+          "size": 28055,
+          "sha512": "f2e17989cd16d9b6ef0ef246e017d0f867c3700fc5d6a84c41ea91c124d2f8a1ddd6c7c43d40d75ffc3b619c4c0989fbbd1a44cef381ca5b3eb8d94317371705",
+          "sha256": "b44c71a689e2274d40f6f0ab77859924019abe7c24233c3a82b36ff5bbc1f1e5",
+          "sha1": "ae21fb551955ca029f0e3a0dd69dc504d80bd1c6",
+          "md5": "a293025772657c114291d3efc48a30db"
+        }
+      ]
+    }
+  ]
+}

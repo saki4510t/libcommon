@@ -1,0 +1,131 @@
+{
+  "formatVersion": "1.1",
+  "component": {
+    "group": "com.serenegiant",
+    "module": "common-telephony",
+    "version": "10.2.1",
+    "attributes": {
+      "org.gradle.status": "release"
+    }
+  },
+  "createdBy": {
+    "gradle": {
+      "version": "8.2"
+    }
+  },
+  "variants": [
+    {
+      "name": "releaseApiElements-published",
+      "attributes": {
+        "org.gradle.category": "library",
+        "org.gradle.usage": "java-api",
+        "org.jetbrains.kotlin.platform.type": "androidJvm"
+      },
+      "dependencies": [
+        {
+          "group": "com.serenegiant",
+          "module": "common-core",
+          "version": {
+            "requires": "10.2.1"
+          }
+        },
+        {
+          "group": "org.jetbrains.kotlin",
+          "module": "kotlin-stdlib",
+          "version": {
+            "requires": "1.9.24"
+          }
+        }
+      ],
+      "files": [
+        {
+          "name": "common-telephony-10.2.1.aar",
+          "url": "common-telephony-10.2.1.aar",
+          "size": 1810,
+          "sha512": "4042e497c26912b23de906eeb89f2ac9abb281b80311bb96157d16b6f7591776bbe8fabf14a8a9ace847eb3623a9e3fc335a03101cbdaacfc3b82c7686ca8202",
+          "sha256": "54ae52fca295188850d0485c1cad3321dbe2ad92dc1b35ff77b26dc84965f504",
+          "sha1": "c951c712d0d80cd01b35d7dabe114da106575200",
+          "md5": "2c380802b6c17f2c16b5851587b2e5c6"
+        }
+      ]
+    },
+    {
+      "name": "releaseRuntimeElements-published",
+      "attributes": {
+        "org.gradle.category": "library",
+        "org.gradle.usage": "java-runtime",
+        "org.jetbrains.kotlin.platform.type": "androidJvm"
+      },
+      "dependencies": [
+        {
+          "group": "androidx.appcompat",
+          "module": "appcompat",
+          "version": {
+            "requires": "1.6.1"
+          }
+        },
+        {
+          "group": "androidx.core",
+          "module": "core-ktx",
+          "version": {
+            "requires": "1.13.1"
+          }
+        },
+        {
+          "group": "org.jetbrains.kotlinx",
+          "module": "kotlinx-coroutines-android",
+          "version": {
+            "requires": "1.8.1"
+          }
+        },
+        {
+          "group": "com.serenegiant",
+          "module": "common-core",
+          "version": {
+            "requires": "10.2.1"
+          }
+        },
+        {
+          "group": "org.jetbrains.kotlin",
+          "module": "kotlin-stdlib",
+          "version": {
+            "requires": "1.9.24"
+          }
+        }
+      ],
+      "files": [
+        {
+          "name": "common-telephony-10.2.1.aar",
+          "url": "common-telephony-10.2.1.aar",
+          "size": 1810,
+          "sha512": "4042e497c26912b23de906eeb89f2ac9abb281b80311bb96157d16b6f7591776bbe8fabf14a8a9ace847eb3623a9e3fc335a03101cbdaacfc3b82c7686ca8202",
+          "sha256": "54ae52fca295188850d0485c1cad3321dbe2ad92dc1b35ff77b26dc84965f504",
+          "sha1": "c951c712d0d80cd01b35d7dabe114da106575200",
+          "md5": "2c380802b6c17f2c16b5851587b2e5c6"
+        }
+      ]
+    },
+    {
+      "name": "releaseSourcesElements-published",
+      "attributes": {
+        "org.gradle.category": "documentation",
+        "org.gradle.dependency.bundling": "external",
+        "org.gradle.docstype": "sources",
+        "org.gradle.libraryelements": "jar",
+        "org.gradle.usage": "java-runtime",
+        "org.jetbrains.kotlin.platform.type": "androidJvm"
+      },
+      "files": [
+        {
+          "name": "common-telephony-10.2.1-sources.jar",
+          "url": "common-telephony-10.2.1-sources.jar",
+          "size": 2929,
+          "sha512": "7f8f09273b5fa7d302024315b6e261ba38f5abe8fe87477e832a7b0c0fc649d43485b28abca510db04fe39c98a631f06f58a87a6e394d614500540255b6dfbdb",
+          "sha256": "47cf0a851033bbc6761636d740e51d3c71fd83f1f5755e404303c682f1485a35",
+          "sha1": "691dce04e12532cfe0d35d6edb4b0c40ba4ad658",
+          "md5": "a1be1cfa455affed1dfcb67f233efebd"
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,180 @@
+{
+  "formatVersion": "1.1",
+  "component": {
+    "group": "com.serenegiant",
+    "module": "common-databinding",
+    "version": "10.2.1",
+    "attributes": {
+      "org.gradle.status": "release"
+    }
+  },
+  "createdBy": {
+    "gradle": {
+      "version": "8.2"
+    }
+  },
+  "variants": [
+    {
+      "name": "releaseApiElements-published",
+      "attributes": {
+        "org.gradle.category": "library",
+        "org.gradle.usage": "java-api",
+        "org.jetbrains.kotlin.platform.type": "androidJvm"
+      },
+      "dependencies": [
+        {
+          "group": "com.serenegiant",
+          "module": "common-view",
+          "version": {
+            "requires": "10.2.1"
+          }
+        },
+        {
+          "group": "androidx.databinding",
+          "module": "databinding-common",
+          "version": {
+            "requires": "8.2.2"
+          }
+        },
+        {
+          "group": "androidx.databinding",
+          "module": "databinding-runtime",
+          "version": {
+            "requires": "8.2.2"
+          }
+        },
+        {
+          "group": "androidx.databinding",
+          "module": "databinding-adapters",
+          "version": {
+            "requires": "8.2.2"
+          }
+        },
+        {
+          "group": "androidx.databinding",
+          "module": "databinding-ktx",
+          "version": {
+            "requires": "8.2.2"
+          }
+        },
+        {
+          "group": "org.jetbrains.kotlin",
+          "module": "kotlin-stdlib",
+          "version": {
+            "requires": "1.9.24"
+          }
+        }
+      ],
+      "files": [
+        {
+          "name": "common-databinding-10.2.1.aar",
+          "url": "common-databinding-10.2.1.aar",
+          "size": 10464,
+          "sha512": "92a56effe3bcdd19264f61723cc1b214b2c7003f25c9c8ad712a49c38bf2bbba887074e04864b7621332c4638aa2a7f9fb3a387164dfbc79ef381d69523de91d",
+          "sha256": "6de1b079e2cd214e82a6c1d6c9691b9a4328f5d73780442b2c546e70f164b3ff",
+          "sha1": "9c2c9167a0b6db531003ca322f79a93718c86c62",
+          "md5": "7ca67263847ab26a6b749a1e24c5a66a"
+        }
+      ]
+    },
+    {
+      "name": "releaseRuntimeElements-published",
+      "attributes": {
+        "org.gradle.category": "library",
+        "org.gradle.usage": "java-runtime",
+        "org.jetbrains.kotlin.platform.type": "androidJvm"
+      },
+      "dependencies": [
+        {
+          "group": "androidx.appcompat",
+          "module": "appcompat",
+          "version": {
+            "requires": "1.6.1"
+          }
+        },
+        {
+          "group": "androidx.core",
+          "module": "core-ktx",
+          "version": {
+            "requires": "1.13.1"
+          }
+        },
+        {
+          "group": "com.serenegiant",
+          "module": "common-view",
+          "version": {
+            "requires": "10.2.1"
+          }
+        },
+        {
+          "group": "androidx.databinding",
+          "module": "databinding-common",
+          "version": {
+            "requires": "8.2.2"
+          }
+        },
+        {
+          "group": "androidx.databinding",
+          "module": "databinding-runtime",
+          "version": {
+            "requires": "8.2.2"
+          }
+        },
+        {
+          "group": "androidx.databinding",
+          "module": "databinding-adapters",
+          "version": {
+            "requires": "8.2.2"
+          }
+        },
+        {
+          "group": "androidx.databinding",
+          "module": "databinding-ktx",
+          "version": {
+            "requires": "8.2.2"
+          }
+        },
+        {
+          "group": "org.jetbrains.kotlin",
+          "module": "kotlin-stdlib",
+          "version": {
+            "requires": "1.9.24"
+          }
+        }
+      ],
+      "files": [
+        {
+          "name": "common-databinding-10.2.1.aar",
+          "url": "common-databinding-10.2.1.aar",
+          "size": 10464,
+          "sha512": "92a56effe3bcdd19264f61723cc1b214b2c7003f25c9c8ad712a49c38bf2bbba887074e04864b7621332c4638aa2a7f9fb3a387164dfbc79ef381d69523de91d",
+          "sha256": "6de1b079e2cd214e82a6c1d6c9691b9a4328f5d73780442b2c546e70f164b3ff",
+          "sha1": "9c2c9167a0b6db531003ca322f79a93718c86c62",
+          "md5": "7ca67263847ab26a6b749a1e24c5a66a"
+        }
+      ]
+    },
+    {
+      "name": "releaseSourcesElements-published",
+      "attributes": {
+        "org.gradle.category": "documentation",
+        "org.gradle.dependency.bundling": "external",
+        "org.gradle.docstype": "sources",
+        "org.gradle.libraryelements": "jar",
+        "org.gradle.usage": "java-runtime",
+        "org.jetbrains.kotlin.platform.type": "androidJvm"
+      },
+      "files": [
+        {
+          "name": "common-databinding-10.2.1-sources.jar",
+          "url": "common-databinding-10.2.1-sources.jar",
+          "size": 3589,
+          "sha512": "2e5a888adc9230772420d02e7d29b651d2c4158b8519b7c95cf4366172b1122f84b8b50eabc6c625b8a713f18009e76c4b6786758f029cb9f820a8c52af4c732",
+          "sha256": "04f2f41a72213d762632be9882767823ed1b01933958151c82ba69d7103eaa9f",
+          "sha1": "e71598859b58bf47279b0f78c211e8fb527b23c0",
+          "md5": "ed3afba23e7c2750635ff0cfb1342c11"
+        }
+      ]
+    }
+  ]
+}

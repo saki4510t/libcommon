@@ -1,0 +1,138 @@
+{
+  "formatVersion": "1.1",
+  "component": {
+    "group": "com.serenegiant",
+    "module": "common-keyboard",
+    "version": "10.2.1",
+    "attributes": {
+      "org.gradle.status": "release"
+    }
+  },
+  "createdBy": {
+    "gradle": {
+      "version": "8.2"
+    }
+  },
+  "variants": [
+    {
+      "name": "releaseApiElements-published",
+      "attributes": {
+        "org.gradle.category": "library",
+        "org.gradle.usage": "java-api",
+        "org.jetbrains.kotlin.platform.type": "androidJvm"
+      },
+      "dependencies": [
+        {
+          "group": "com.serenegiant",
+          "module": "common-core",
+          "version": {
+            "requires": "10.2.1"
+          }
+        },
+        {
+          "group": "org.jetbrains.kotlin",
+          "module": "kotlin-stdlib",
+          "version": {
+            "requires": "1.9.24"
+          }
+        }
+      ],
+      "files": [
+        {
+          "name": "common-keyboard-10.2.1.aar",
+          "url": "common-keyboard-10.2.1.aar",
+          "size": 40322,
+          "sha512": "df37b1b7f8bf4ca1504748e3e093ec84b5512d8b5e44b9417051ff410343c4aaebec33a58a614cbcc95f3b178325e8a2b56a50d36197091ffaf0b27e708b563f",
+          "sha256": "601e8deb4fc48e82c381632cd419cb30c0b3c84e20da6ebf52abf07a7a79aa65",
+          "sha1": "459e405de584c275f9dcc3458be8c4682aeed3af",
+          "md5": "50c92b9459edbc2045173db12fd32324"
+        }
+      ]
+    },
+    {
+      "name": "releaseRuntimeElements-published",
+      "attributes": {
+        "org.gradle.category": "library",
+        "org.gradle.usage": "java-runtime",
+        "org.jetbrains.kotlin.platform.type": "androidJvm"
+      },
+      "dependencies": [
+        {
+          "group": "androidx.appcompat",
+          "module": "appcompat",
+          "version": {
+            "requires": "1.6.1"
+          }
+        },
+        {
+          "group": "com.google.android.material",
+          "module": "material",
+          "version": {
+            "requires": "1.12.0"
+          }
+        },
+        {
+          "group": "androidx.core",
+          "module": "core-ktx",
+          "version": {
+            "requires": "1.13.1"
+          }
+        },
+        {
+          "group": "org.jetbrains.kotlinx",
+          "module": "kotlinx-coroutines-android",
+          "version": {
+            "requires": "1.8.1"
+          }
+        },
+        {
+          "group": "com.serenegiant",
+          "module": "common-core",
+          "version": {
+            "requires": "10.2.1"
+          }
+        },
+        {
+          "group": "org.jetbrains.kotlin",
+          "module": "kotlin-stdlib",
+          "version": {
+            "requires": "1.9.24"
+          }
+        }
+      ],
+      "files": [
+        {
+          "name": "common-keyboard-10.2.1.aar",
+          "url": "common-keyboard-10.2.1.aar",
+          "size": 40322,
+          "sha512": "df37b1b7f8bf4ca1504748e3e093ec84b5512d8b5e44b9417051ff410343c4aaebec33a58a614cbcc95f3b178325e8a2b56a50d36197091ffaf0b27e708b563f",
+          "sha256": "601e8deb4fc48e82c381632cd419cb30c0b3c84e20da6ebf52abf07a7a79aa65",
+          "sha1": "459e405de584c275f9dcc3458be8c4682aeed3af",
+          "md5": "50c92b9459edbc2045173db12fd32324"
+        }
+      ]
+    },
+    {
+      "name": "releaseSourcesElements-published",
+      "attributes": {
+        "org.gradle.category": "documentation",
+        "org.gradle.dependency.bundling": "external",
+        "org.gradle.docstype": "sources",
+        "org.gradle.libraryelements": "jar",
+        "org.gradle.usage": "java-runtime",
+        "org.jetbrains.kotlin.platform.type": "androidJvm"
+      },
+      "files": [
+        {
+          "name": "common-keyboard-10.2.1-sources.jar",
+          "url": "common-keyboard-10.2.1-sources.jar",
+          "size": 48893,
+          "sha512": "f1ad8106c5cb9310de9f90bdf7f618f0d93754620adb10a7cf217fc8f999fd99dedf706d66aef21aa4eb7960229ca59d408598b82d4274310f504cd6d39963b7",
+          "sha256": "ac5953534ef80bad6da5294b3afb6857a17e7d38501c630cf6a7666769e832d1",
+          "sha1": "636767f65849581329f5ab948a3484f0659fa4da",
+          "md5": "19406e75954f3964a89233b8987037ce"
+        }
+      ]
+    }
+  ]
+}
