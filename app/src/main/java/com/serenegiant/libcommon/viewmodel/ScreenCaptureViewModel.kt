@@ -27,17 +27,16 @@ import android.os.Build
 import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.lifecycle.AndroidViewModel
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.map
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.serenegiant.service.ScreenRecorderService
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.map
 
 @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
 class ScreenCaptureViewModel(application: Application) : AndroidViewModel(application) {
 
-	var isRecording = false
-	val isChecked by lazy { MutableLiveData(isRecording) }
-	val recordingLabel = isChecked.map {
+	val isRecording = MutableStateFlow(false)
+	val recordingLabel = isRecording.map {
 		if (it) "stop" else "start"
 	}
 	private val mBroadcastReceiver = MyBroadcastReceiver()
@@ -65,9 +64,9 @@ class ScreenCaptureViewModel(application: Application) : AndroidViewModel(applic
 	 * @param data
 	 */
 	fun startScreenCapture(data: Intent) {
-		if (DEBUG) Log.v(TAG, "startScreenCapture:${isRecording},${data}")
-		if (!isRecording) {
-			isRecording = true
+		if (DEBUG) Log.v(TAG, "startScreenCapture:${isRecording.value},${data}")
+		if (!isRecording.value) {
+			isRecording.value = true
 			val context = getApplication<Application>()
 			val intent = Intent(context, ScreenRecorderService::class.java)
 			intent.action = ScreenRecorderService.ACTION_START
@@ -80,7 +79,7 @@ class ScreenCaptureViewModel(application: Application) : AndroidViewModel(applic
 	 * スクリーンキャプチャー終了要求
 	 */
 	fun stopScreenCapture() {
-		if (isReceived && isRecording) {
+		if (isReceived && isRecording.value) {
 			if (DEBUG) Log.v(TAG, "stopScreenCapture:")
 			val context = getApplication<Application>()
 			val intent = Intent(context, ScreenRecorderService::class.java)
@@ -110,10 +109,7 @@ class ScreenCaptureViewModel(application: Application) : AndroidViewModel(applic
 //				val isPausing = intent.getBooleanExtra(
 //					ScreenRecorderService.EXTRA_QUERY_RESULT_PAUSING, false)
 				isReceived = true
-				if (isRecording != recording) {
-					isRecording = recording
-					isChecked.value = recording
-				}
+				isRecording.value = recording
 			}
 		}
 	}

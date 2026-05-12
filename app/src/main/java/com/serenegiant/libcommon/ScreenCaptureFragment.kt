@@ -28,12 +28,16 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import android.widget.ToggleButton
 import androidx.annotation.RequiresApi
 import androidx.fragment.app.viewModels
-import com.serenegiant.libcommon.databinding.FragmentScreenCaptureBinding
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import com.serenegiant.libcommon.viewmodel.ScreenCaptureViewModel
 import com.serenegiant.media.ScreenCaptureUtils
 import com.serenegiant.media.ScreenCaptureUtils.ScreenCaptureCallback
+import kotlinx.coroutines.launch
 
 /**
  * MediaProjectionManager/MediaProjectionを使った画面録画サンプル
@@ -45,6 +49,7 @@ class ScreenCaptureFragment : BaseFragment() {
 	 * スクリーンキャプチャー要求用のヘルパーオブジェクト
 	 */
 	private lateinit var mScreenCapture: ScreenCaptureUtils
+	private lateinit var mRecordingButton: ToggleButton
 
 	override fun onAttach(context: Context) {
 		super.onAttach(context)
@@ -64,7 +69,7 @@ class ScreenCaptureFragment : BaseFragment() {
 
 			override fun onFailed() {
 				if (DEBUG) Log.v(TAG, "onFailed:")
-				mViewModel.isChecked.value = false
+				mViewModel.isRecording.value = false
 				showToast(Toast.LENGTH_LONG, "User denied to start screen capture!")
 			}
 		})
@@ -76,30 +81,38 @@ class ScreenCaptureFragment : BaseFragment() {
 		savedInstanceState: Bundle?
 	): View {
 		if (DEBUG) Log.v(TAG, "onCreateView:")
-		return FragmentScreenCaptureBinding.inflate(
-			inflater, container, false)
-			.apply {
-				viewModel = mViewModel
-				lifecycleOwner = this@ScreenCaptureFragment
+		return inflater.inflate(R.layout.fragment_screen_capture, container, false)
+		.apply {
+			mRecordingButton = findViewById(R.id.recordingButton)
+			mRecordingButton.setOnCheckedChangeListener { _, isChecked ->
+				mViewModel.isRecording.value = isChecked
 			}
-			.run {
-				root
-			}
+		}
 	}
 
 	override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
 		super.onViewCreated(view, savedInstanceState)
 		if (DEBUG) Log.v(TAG, "onViewCreated:")
 		mViewModel.run {
-			isChecked.observe(viewLifecycleOwner) {
-				if (DEBUG) Log.v(TAG, "check changed:isCheck=${it}/${isChecked.value}," +
-					"isReceived=${isReceived},isRecording=${isRecording}")
-				// 最初のステータス更新要求が終了するまではなにもしない
-				if (isReceived) {
-					if (it && (it != isRecording)) {
-						mScreenCapture.requestScreenCapture()
-					} else if (!it) {
-						stopScreenCapture()
+			lifecycleScope.launch {
+				viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+					isRecording.collect {
+						if (DEBUG) Log.v(TAG, "isReceived=${isReceived},isRecording=${it}")
+						// 最初のステータス更新要求が終了するまではなにもしない
+						if (isReceived) {
+							if (it) {
+								mScreenCapture.requestScreenCapture()
+							} else {
+								stopScreenCapture()
+							}
+						}
+					}
+				}
+			}
+			lifecycleScope.launch {
+				viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+					recordingLabel.collect {
+						mRecordingButton.text = it
 					}
 				}
 			}

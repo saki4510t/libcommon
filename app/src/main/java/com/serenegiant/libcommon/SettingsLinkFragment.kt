@@ -23,7 +23,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
-import com.serenegiant.libcommon.databinding.FragmentSettingsLinkBinding
 import com.serenegiant.content.SettingsUtils
 
 /**
@@ -31,21 +30,17 @@ import com.serenegiant.content.SettingsUtils
  * 端末のアプリ設定画面への繊維ボタンを表示するFragment
  */
 class SettingsLinkFragment : Fragment() {
-	private lateinit var mBinding: FragmentSettingsLinkBinding
 	override fun onCreateView(
 		inflater: LayoutInflater,
 		container: ViewGroup?,
 		savedInstanceState: Bundle?): View {
 
-		return FragmentSettingsLinkBinding.inflate(inflater,
-			container, false)
+		return inflater.inflate(R.layout.fragment_settings_link, container, false)
 		.apply {
-			mBinding = this
-			onClickListener = View.OnClickListener { v -> // 端末のアプリ設定を開く
+			val linkBtn = findViewById<View>(R.id.linkBtn)
+			linkBtn?.setOnClickListener { v ->
 				SettingsUtils.openSettingsAppDetails(v.context)
 			}
-		}.run {
-			root
 		}
 	}
 

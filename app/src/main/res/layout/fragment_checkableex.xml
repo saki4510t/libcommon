@@ -20,123 +20,112 @@
 */
 -->
 
-<layout
+<androidx.constraintlayout.widget.ConstraintLayout
 	xmlns:android="http://schemas.android.com/apk/res/android"
 	xmlns:app="http://schemas.android.com/apk/res-auto"
-	xmlns:tools="http://schemas.android.com/tools" >
+	xmlns:tools="http://schemas.android.com/tools"
+	android:layout_width="match_parent"
+	android:layout_height="match_parent">
 
-	<data>
-		<variable
-			name="viewModel"
-			type="com.serenegiant.libcommon.CheckableExFragment.ViewModel" />
+	<!-- CheckableImageButton
+		デフォルトclickable=true, focusable=true
+	-->
+	<com.serenegiant.widget.CheckableImageButton
+		android:id="@+id/checkBtn1"
+		android:layout_width="100dp"
+		android:layout_height="100dp"
+		android:layout_marginStart="32dp"
+		android:layout_marginLeft="32dp"
+		android:layout_marginTop="16dp"
+		app:layout_constraintStart_toStartOf="parent"
+		app:layout_constraintTop_toTopOf="parent"
+		app:srcCompat="@drawable/checkable1" />
+<!--		android:checked="@={viewModel.isChecked}"-->
 
-	</data>
+	<com.serenegiant.widget.CheckableButton
+		android:id="@+id/checkBtn2"
+		android:layout_width="100dp"
+		android:layout_height="100dp"
+		android:layout_marginTop="16dp"
+		android:layout_marginEnd="32dp"
+		android:layout_marginRight="32dp"
+		android:background="@drawable/checkable1"
+		android:text="@string/title_checkable_ex"
+		app:layout_constraintEnd_toEndOf="parent"
+		app:layout_constraintTop_toTopOf="parent" />
+<!--		android:checked="@={viewModel.isChecked}"-->
 
-	<androidx.constraintlayout.widget.ConstraintLayout
-		android:layout_width="match_parent"
-		android:layout_height="match_parent">
-
-		<!-- CheckableImageButton
-			デフォルトclickable=true, focusable=true
-		-->
-		<com.serenegiant.widget.CheckableImageButton
-			android:id="@+id/checkBtn1"
-			android:layout_width="100dp"
-			android:layout_height="100dp"
-			android:layout_marginStart="32dp"
-			android:layout_marginLeft="32dp"
-			android:layout_marginTop="16dp"
-			android:checked="@={viewModel.isChecked}"
-			app:layout_constraintStart_toStartOf="parent"
-			app:layout_constraintTop_toTopOf="parent"
-			app:srcCompat="@drawable/checkable1" />
-
-		<com.serenegiant.widget.CheckableButton
-			android:id="@+id/checkBtn2"
-			android:layout_width="100dp"
-			android:layout_height="100dp"
-			android:layout_marginTop="16dp"
-			android:layout_marginEnd="32dp"
-			android:layout_marginRight="32dp"
-			android:background="@drawable/checkable1"
-			android:checked="@={viewModel.isChecked}"
-			android:text="@string/title_checkable_ex"
-			app:layout_constraintEnd_toEndOf="parent"
-			app:layout_constraintTop_toTopOf="parent" />
+	<!--
+		子Viewがタッチイベントを処理しない場合はこのCheckableLinearLayoutがクリックイベントを処理する
+		デフォルトではクリックイベントを受け付けないのでclickable=trueを指定
+		子Viewのチェック状態を反転する
+	 -->
+	<com.serenegiant.widget.CheckableLinearLayout
+		android:id="@+id/checkableGroup"
+		android:layout_width="0dp"
+		android:layout_height="0dp"
+		android:orientation="vertical"
+		android:padding="32dp"
+		android:background="@color/SLATEGRAY"
+		android:clickable="true"
+		android:focusable="true"
+		app:layout_constraintBottom_toBottomOf="parent"
+		app:layout_constraintEnd_toEndOf="parent"
+		app:layout_constraintStart_toStartOf="parent"
+		app:layout_constraintTop_toBottomOf="@+id/checkBtn1">
+<!--			android:checked="@={viewModel.isGroupChecked}"-->
 
 		<!--
-			子Viewがタッチイベントを処理しない場合はこのCheckableLinearLayoutがクリックイベントを処理する
-			デフォルトではクリックイベントを受け付けないのでclickable=trueを指定
-			子Viewのチェック状態を反転する
+			onClickListenerを指定しないCheckableImageView,
+			自前ではクリックイベントを処理しないので上位のCheckableLinearLayoutが処理する
+				= CheckableLinearLayout内の子Viewのチェック状態が反転する
+		-->
+		<com.serenegiant.widget.CheckableImageView
+			android:id="@+id/checkableImageView1"
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:layout_weight="1"
+			app:srcCompat="@drawable/checkable2" />
+
+		<!--
+			データバインディングは割り当てていないけど
+			デフォルトclickable=true, focusable=trueなので
+			クリックイベントを処理して自分のチェック状態を反転する
+		-->
+		<com.serenegiant.widget.CheckableImageButton
+			android:id="@+id/checkableImageView12"
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:layout_weight="1"
+			app:srcCompat="@drawable/checkable1" />
+
+		<!--
+			onClickListenerを指定したCheckableImageView,
+			onClickListenerを指定することでclickable=trueになるので
+			クリックイベントを処理して自分のチェック状態を反転する
 		 -->
-		<com.serenegiant.widget.CheckableLinearLayout
-			android:id="@+id/checkableGroup"
-			android:layout_width="0dp"
-			android:layout_height="0dp"
-			android:orientation="vertical"
-			android:padding="32dp"
-			android:background="@color/SLATEGRAY"
-			android:checked="@={viewModel.isGroupChecked}"
-			android:clickable="true"
-			android:focusable="true"
-			app:layout_constraintBottom_toBottomOf="parent"
-			app:layout_constraintEnd_toEndOf="parent"
-			app:layout_constraintStart_toStartOf="parent"
-			app:layout_constraintTop_toBottomOf="@+id/checkBtn1">
+		<com.serenegiant.widget.CheckableImageView
+			android:id="@+id/checkableImageView3"
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:layout_weight="1"
+			app:srcCompat="@drawable/checkable2" />
+<!--			android:onClickListener="@{viewModel}"-->
 
-			<!--
-				onClickListenerを指定しないCheckableImageView,
-				自前ではクリックイベントを処理しないので上位のCheckableLinearLayoutが処理する
-					= CheckableLinearLayout内の子Viewのチェック状態が反転する
-			-->
-			<com.serenegiant.widget.CheckableImageView
-				android:id="@+id/checkableImageView1"
-				android:layout_width="match_parent"
-				android:layout_height="wrap_content"
-				android:layout_weight="1"
-				app:srcCompat="@drawable/checkable2" />
+		<CheckBox
+			android:id="@+id/checkBox"
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:layout_weight="0.25"
+			android:text="CheckBox"
+			tools:ignore="HardcodedText" />
 
-			<!--
-				データバインディングは割り当てていないけど
-				デフォルトclickable=true, focusable=trueなので
-				クリックイベントを処理して自分のチェック状態を反転する
-			-->
-			<com.serenegiant.widget.CheckableImageButton
-				android:id="@+id/checkableImageView12"
-				android:layout_width="match_parent"
-				android:layout_height="wrap_content"
-				android:layout_weight="1"
-				app:srcCompat="@drawable/checkable1" />
-
-			<!--
-				onClickListenerを指定したCheckableImageView,
-				onClickListenerを指定することでclickable=trueになるので
-				クリックイベントを処理して自分のチェック状態を反転する
-			 -->
-			<com.serenegiant.widget.CheckableImageView
-				android:id="@+id/checkableImageView3"
-				android:layout_width="match_parent"
-				android:layout_height="wrap_content"
-				android:layout_weight="1"
-				android:onClickListener="@{viewModel}"
-				app:srcCompat="@drawable/checkable2" />
-
-			<CheckBox
-				android:id="@+id/checkBox"
-				android:layout_width="match_parent"
-				android:layout_height="wrap_content"
-				android:layout_weight="0.25"
-				android:text="CheckBox"
-				tools:ignore="HardcodedText" />
-
-			<RadioButton
-				android:id="@+id/radioButton"
-				android:layout_width="match_parent"
-				android:layout_height="wrap_content"
-				android:layout_weight="0.25"
-				android:text="RadioButton"
-				tools:ignore="HardcodedText" />
-		</com.serenegiant.widget.CheckableLinearLayout>
-	</androidx.constraintlayout.widget.ConstraintLayout>
-
-</layout>
+		<RadioButton
+			android:id="@+id/radioButton"
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:layout_weight="0.25"
+			android:text="RadioButton"
+			tools:ignore="HardcodedText" />
+	</com.serenegiant.widget.CheckableLinearLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>

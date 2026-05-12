@@ -26,10 +26,9 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.databinding.DataBindingUtil
+import android.widget.TextView
 import androidx.lifecycle.lifecycleScope
 import com.serenegiant.app.ActivityUtils
-import com.serenegiant.libcommon.databinding.FragmentUsbMonitorBinding
 import com.serenegiant.usb.DeviceFilter
 import com.serenegiant.usb.USBMonitor
 import com.serenegiant.usb.UsbConnector
@@ -47,7 +46,7 @@ import kotlinx.coroutines.launch
 class UsbMonitorFragment : BaseFragment() {
 
 	private lateinit var mUSBMonitor: USBMonitor
-	private lateinit var mBinding: FragmentUsbMonitorBinding
+	private lateinit var mMessageTv: TextView
 
 	override fun onAttach(context: Context) {
 		super.onAttach(context)
@@ -70,13 +69,9 @@ class UsbMonitorFragment : BaseFragment() {
 		if (DEBUG) Log.v(TAG, "onCreateView:")
 		val customInflater
 			= ViewUtils.createCustomLayoutInflater(requireContext(), inflater, R.style.AppTheme_Usb)
-		return DataBindingUtil.inflate<FragmentUsbMonitorBinding?>(
-			customInflater,
-			R.layout.fragment_usb_monitor, container, false
-		).apply {
-			mBinding = this
-		}.run {
-			root
+		return customInflater.inflate(R.layout.fragment_usb_monitor, container, false)
+		.apply {
+			mMessageTv = findViewById(R.id.message)
 		}
 	}
 
@@ -85,7 +80,7 @@ class UsbMonitorFragment : BaseFragment() {
 		if (DEBUG) Log.v(TAG, "internalOnResume:")
 		if (!mUSBMonitor.isRegistered) {
 			if (DEBUG) Log.v(TAG, "onCreate:register USBMonitor")
-			mBinding.message.text = "${mBinding.message.text}\nregister USBMonitor"
+			mMessageTv.text = "${mMessageTv.text}\nregister USBMonitor"
 			mUSBMonitor.register()
 		}
 	}
@@ -94,7 +89,7 @@ class UsbMonitorFragment : BaseFragment() {
 		if (DEBUG) Log.v(TAG, "internalOnPause:")
 		if (mUSBMonitor.isRegistered) {
 			if (DEBUG) Log.v(TAG, "onDestroy:unregister USBMonitor")
-			mBinding.message.text = "${mBinding.message.text}\nunregister USBMonitor"
+			mMessageTv.text = "${mMessageTv.text}\nunregister USBMonitor"
 			mUSBMonitor.unregister()
 		}
 		super.internalOnPause()
@@ -102,7 +97,7 @@ class UsbMonitorFragment : BaseFragment() {
 
 	override fun onDetach() {
 		if (DEBUG) Log.v(TAG, "onDetach:")
-		mBinding.message.text = "${mBinding.message.text}\ndestroy USBMonitor"
+		mMessageTv.text = "${mMessageTv.text}\ndestroy USBMonitor"
 		mUSBMonitor.destroy()
 		super.onDetach()
 	}
@@ -114,7 +109,7 @@ class UsbMonitorFragment : BaseFragment() {
 		override fun onAttach(device: UsbDevice) {
 			if (DEBUG) Log.v(TAG, "OnDeviceConnectListener:onAttach:${device.deviceName}")
 			lifecycleScope.launch {
-				mBinding.message.text = "${mBinding.message.text}\nonAttach:${device.deviceName}"
+				mMessageTv.text = "${mMessageTv.text}\nonAttach:${device.deviceName}"
 			}
 			// USB機器が接続された時
 			if (false) {
@@ -141,7 +136,7 @@ class UsbMonitorFragment : BaseFragment() {
 			//     非表示にする。
 			ActivityUtils.bringToForeground(requireActivity())
 			lifecycleScope.launch {
-				mBinding.message.text = "${mBinding.message.text}\nonPermission:${device.deviceName}"
+				mMessageTv.text = "${mMessageTv.text}\nonPermission:${device.deviceName}"
 			}
 			// XXX USBMonitor#openDeviceを呼ぶと#onConnected/#onDisconnectedの呼び出し処理が含まれる特別な
 			//     UsbConnectorオブジェクトが生成される
@@ -162,7 +157,7 @@ class UsbMonitorFragment : BaseFragment() {
 		override fun onConnected(device: UsbDevice, connector: UsbConnector) {
 			if (DEBUG) Log.v(TAG, "OnDeviceConnectListener#onConnected:${device.deviceName}")
 			lifecycleScope.launch {
-				mBinding.message.text = "${mBinding.message.text}\nonConnected:${device.deviceName}"
+				mMessageTv.text = "${mMessageTv.text}\nonConnected:${device.deviceName}"
 			}
 			// XXX このコールバック関数に引き渡されるUsbConnectorはUSBMonitor#UsbControlBlockで
 			//     #onConnected/#onDisconnectを呼び出すためにUsbConnectorを拡張したオブジェクトである。
@@ -184,7 +179,7 @@ class UsbMonitorFragment : BaseFragment() {
 				Log.v(TAG, "info=$info")
 				Log.v(TAG, "device=$device")
 				lifecycleScope.launch {
-					mBinding.message.text = "${mBinding.message.text}\ninfo($info)"
+					mMessageTv.text = "${mMessageTv.text}\ninfo($info)"
 				}
 				if (connection != null) {
 					try {
@@ -216,7 +211,7 @@ class UsbMonitorFragment : BaseFragment() {
 			if (DEBUG) Log.v(TAG, "OnDeviceConnectListener#onDisconnect:${device.deviceName}")
 			// USB機器がcloseした時
 			lifecycleScope.launch {
-				mBinding.message.text = "${mBinding.message.text}\nonDisconnect:${device.deviceName}"
+				mMessageTv.text = "${mMessageTv.text}\nonDisconnect:${device.deviceName}"
 			}
 		}
 
@@ -224,7 +219,7 @@ class UsbMonitorFragment : BaseFragment() {
 			if (DEBUG) Log.v(TAG, "OnDeviceConnectListener#onDetach:${device.deviceName}")
 			// USB機器が取り外された時
 			lifecycleScope.launch {
-				mBinding.message.text = "${mBinding.message.text}\nonDetach:${device.deviceName}"
+				mMessageTv.text = "${mMessageTv.text}\nonDetach:${device.deviceName}"
 			}
 		}
 
@@ -232,14 +227,14 @@ class UsbMonitorFragment : BaseFragment() {
 			if (DEBUG) Log.v(TAG, "OnDeviceConnectListener#onCancel:${device.deviceName}")
 			// パーミッションを取得できなかった時
 			lifecycleScope.launch {
-				mBinding.message.text = "${mBinding.message.text}\nonCancel:${device.deviceName}"
+				mMessageTv.text = "${mMessageTv.text}\nonCancel:${device.deviceName}"
 			}
 		}
 
 		override fun onError(usbDevice: UsbDevice?, throwable: Throwable) {
 			Log.w(TAG, throwable)
 			lifecycleScope.launch {
-				mBinding.message.text = "${mBinding.message.text}\nonError:${usbDevice?.deviceName}"
+				mMessageTv.text = "${mMessageTv.text}\nonError:${usbDevice?.deviceName}"
 			}
 		}
 	}

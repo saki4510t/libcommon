@@ -32,14 +32,13 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.TextView
 import androidx.annotation.RequiresApi
-import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.lifecycleScope
 import com.serenegiant.camera.Camera2Utils
 import com.serenegiant.camera.CameraConst
 import com.serenegiant.camera.CameraUtils
 import com.serenegiant.graphics.ImageFormatUtils
-import com.serenegiant.libcommon.databinding.FragmentCameraInfoBinding
 import com.serenegiant.system.BuildCheck
 import com.serenegiant.content.ContextUtils
 import com.serenegiant.content.PermissionUtils
@@ -51,7 +50,7 @@ import kotlinx.coroutines.yield
 
 class CameraInfoFragment  : BaseFragment() {
 
-	private lateinit var mBinding: FragmentCameraInfoBinding
+	private lateinit var mMessageTv: TextView
 
 	override fun onAttach(context: Context) {
 		super.onAttach(context)
@@ -65,13 +64,10 @@ class CameraInfoFragment  : BaseFragment() {
 
 		if (DEBUG) Log.v(TAG, "onCreateView:")
 		val customInflater = ViewUtils.createCustomLayoutInflater(requireContext(), inflater, R.style.AppTheme_Usb)
-		return DataBindingUtil.inflate<FragmentCameraInfoBinding?>(
-			customInflater,
-			R.layout.fragment_camera_info, container, false
-		).apply {
-			mBinding = this
-		}.run {
-			root
+		return customInflater.inflate(R.layout.fragment_camera_info, container, false
+		)
+		.apply {
+			mMessageTv = findViewById(R.id.message)
 		}
 	}
 
@@ -207,7 +203,7 @@ class CameraInfoFragment  : BaseFragment() {
 	@SuppressLint("SetTextI18n")
 	private suspend fun addMessage(msg: String) {
 		withContext(Dispatchers.Main) {
-			mBinding.message.text = "${mBinding.message.text}\n$msg"
+			mMessageTv.text = "${mMessageTv.text}\n$msg"
 		}
 		yield()
 	}

@@ -28,21 +28,23 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.AdapterView
+import android.widget.ImageButton
+import androidx.appcompat.widget.AppCompatSpinner
 import androidx.core.content.ContextCompat
-import androidx.databinding.DataBindingUtil
 import androidx.documentfile.provider.DocumentFile
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import com.serenegiant.graphics.BitmapHelper
-import com.serenegiant.libcommon.databinding.FragmentCameraSourcePipelineBinding
 import com.serenegiant.libcommon.viewmodel.CameraSourcePipelineViewModel
 import com.serenegiant.system.BuildCheck
 import com.serenegiant.content.UriHelper
 import com.serenegiant.view.ViewAnimationHelper
 import com.serenegiant.view.ViewAnimationHelper.ViewAnimationListener
 import com.serenegiant.view.ViewUtils
+import com.serenegiant.widget.MaskImageView
 import com.serenegiant.widget.ResolutionAdapter
+import com.serenegiant.widget.ScaledSurfaceView
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -50,12 +52,13 @@ import kotlinx.coroutines.launch
 
 class CameraSourcePipelineFragment : Fragment() {
 	private val mViewModel: CameraSourcePipelineViewModel by viewModels()
-	private lateinit var mBinding : FragmentCameraSourcePipelineBinding
 	/**
 	 * 解像度切り替え用
 	 */
 	private lateinit var mAdapter: ResolutionAdapter
-
+	private lateinit var mCameraView: ScaledSurfaceView
+	private lateinit var mSpinner: AppCompatSpinner
+	private lateinit var mThumbnail: MaskImageView
 
 	override fun onAttach(context: Context) {
 		super.onAttach(context)
@@ -74,19 +77,17 @@ class CameraSourcePipelineFragment : Fragment() {
 		savedInstanceState: Bundle?
 	): View {
 		if (DEBUG) Log.v(TAG, "onCreateView:")
-		val customInflater = ViewUtils.createCustomLayoutInflater(requireContext(), inflater, R.style.AppTheme_Camera)
-		return DataBindingUtil.inflate<FragmentCameraSourcePipelineBinding>(
-			customInflater,
-			R.layout.fragment_camera_source_pipeline, container, false
-		).apply {
-			mBinding = this
-			viewModel = mViewModel
-			cameraView.apply {
+		val customInflater = ViewUtils.createCustomLayoutInflater(requireContext(), inflater, R.style.AppTheme_Usb)
+		return customInflater.inflate(R.layout.fragment_camera_source_pipeline, container, false)
+		.apply {
+			mCameraView = findViewById(R.id.camera_view)
+			mCameraView.apply {
 				holder.addCallback(mViewModel)
 			}
 			mAdapter = ResolutionAdapter(requireActivity())
-			spinner.adapter = mAdapter
-			spinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+			mSpinner = findViewById(R.id.spinner)
+			mSpinner.adapter = mAdapter
+			mSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
 				override fun onItemSelected(
 					parent: AdapterView<*>?,
 					view: View, position: Int, id: Long) {
@@ -100,21 +101,21 @@ class CameraSourcePipelineFragment : Fragment() {
 
 				override fun onNothingSelected(parent: AdapterView<*>?) {}
 			}
+			val recordButton = findViewById<ImageButton>(R.id.record_button)
 			recordButton.setOnClickListener {
 				// 静止画撮影要求
 				setThumbnailVisibility(false)
 				mViewModel.triggerStillCapture()
 			}
 			// 静止画撮影後のサムネイル表示用
-			thumbnail.setMaskDrawable(
+			mThumbnail = findViewById(R.id.thumbnail)
+			mThumbnail.setMaskDrawable(
 				ContextCompat.getDrawable(
 					requireContext(),
 					com.serenegiant.common.R.drawable.mask_circle
 				)
 			)
-			thumbnail.visibility = View.INVISIBLE
-		}.run {
-			root
+			mThumbnail.visibility = View.INVISIBLE
 		}
 	}
 
@@ -139,9 +140,9 @@ class CameraSourcePipelineFragment : Fragment() {
 							if (DEBUG) Log.v(TAG, "found=$found/$current")
 							val f = found
 							mAdapter.replaceAll(supported)
-							mBinding.spinner.isEnabled = true
+							mSpinner.isEnabled = true
 							if (f > 0) {
-								mBinding.spinner.setSelection(f)
+								mSpinner.setSelection(f)
 							}
 						}
 					}
@@ -151,7 +152,7 @@ class CameraSourcePipelineFragment : Fragment() {
 				viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
 					currentViewSize.collect { sz ->
 						if (DEBUG) Log.v(TAG, "currentViewSize=$sz")
-						mBinding.cameraView.apply {
+						mCameraView.apply {
 //							holder.setFixedSize(sz.width, sz.height)
 //							aspectRatio = sz.width / sz.height.toDouble()
 							setAspectRatio(sz.width, sz.height)
@@ -180,9 +181,9 @@ class CameraSourcePipelineFragment : Fragment() {
 		if (DEBUG) Log.v(TAG, "setThumbnailVisibility:$visible")
 		lifecycleScope.launch {
 			if (visible) {
-				zoomIn(mBinding.thumbnail)
+				zoomIn(mThumbnail)
 			} else {
-				mBinding.thumbnail.visibility = View.INVISIBLE
+				mThumbnail.visibility = View.INVISIBLE
 			}
 		}
 	}
@@ -204,8 +205,8 @@ class CameraSourcePipelineFragment : Fragment() {
 		mUpdateThumbnailJob = lifecycleScope.launch(Dispatchers.Default) {
 			delay(if (BuildCheck.isKitKat()) 300L else 500L)
 			if (DEBUG) Log.v(TAG, "UpdateThumbnailTask#run:" + path.uri)
-			val w = mBinding.thumbnail.width
-			val h = mBinding.thumbnail.height
+			val w = mThumbnail.width
+			val h = mThumbnail.height
 			try {
 				val thumbnail = if (BuildCheck.isKitKat()) {
 					BitmapHelper.asBitmap(requireContext().contentResolver,
@@ -220,7 +221,7 @@ class CameraSourcePipelineFragment : Fragment() {
 				if (thumbnail != null) {
 					lifecycleScope.launch {
 						if (DEBUG) Log.v(TAG, "UpdateThumbnailTask#run:サムネイルを表示する")
-						mBinding.thumbnail.setImageBitmap(thumbnail)
+						mThumbnail.setImageBitmap(thumbnail)
 						setThumbnailVisibility(true)
 					}
 				}

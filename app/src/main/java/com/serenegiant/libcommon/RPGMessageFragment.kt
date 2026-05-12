@@ -28,26 +28,21 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.WindowManager
 import androidx.lifecycle.lifecycleScope
-import com.serenegiant.libcommon.databinding.FragmentRpgMessageViewBinding
 import com.serenegiant.widget.RPGMessageView
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 
 class RPGMessageFragment : BaseFragment() {
-	private lateinit var mBinding: FragmentRpgMessageViewBinding
+	private lateinit var mRPGMessageView: RPGMessageView
 
 	override fun onCreateView(inflater: LayoutInflater,
 		container: ViewGroup?, savedInstanceState: Bundle?): View {
 
 		if (DEBUG) Log.v(TAG, "onCreateView:")
-		return FragmentRpgMessageViewBinding.inflate(inflater, container, false)
+		return inflater.inflate(R.layout.fragment_rpg_message_view, container, false)
 		.apply {
-			mBinding = this
-			lifecycleOwner = this@RPGMessageFragment.viewLifecycleOwner
-		}
-		.run {
-			root
+			mRPGMessageView = findViewById(R.id.message)
 		}
 	}
 
@@ -56,7 +51,7 @@ class RPGMessageFragment : BaseFragment() {
 		requireActivity().window.addFlags(
 			WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS or WindowManager.LayoutParams.FLAG_FULLSCREEN)
 		requireActivity().requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE
-		mBinding.message.apply {
+		mRPGMessageView.apply {
 			setTypeface(Typeface.SERIF)
 		}
 		.eventListener = object : RPGMessageView.MessageEventListener {
@@ -95,20 +90,20 @@ class RPGMessageFragment : BaseFragment() {
 		super.onResume()
 		lifecycleScope.launch {
 			delay(1000)
-			mBinding.message.setText(MESSAGE)
+			mRPGMessageView.setText(MESSAGE)
 			var cnt = 0
 			if (APPEND_MESSAGE) {
 				while (isActive) {
 					delay(APPEND_INTERVAL_MS)
-					mBinding.message.addLine("Message${cnt++}\n")
+					mRPGMessageView.addLine("Message${cnt++}\n")
 					delay(1000)
-					mBinding.message.addLine("Message${cnt++}\n")
+					mRPGMessageView.addLine("Message${cnt++}\n")
 					delay(1000)
-					mBinding.message.addLine("Message${cnt++}\n")
+					mRPGMessageView.addLine("Message${cnt++}\n")
 					delay(1000)
-					mBinding.message.addLine("Message${cnt++}\n")
+					mRPGMessageView.addLine("Message${cnt++}\n")
 					delay(1000)
-					mBinding.message.addLine("Message${cnt++}\n")
+					mRPGMessageView.addLine("Message${cnt++}\n")
 				}
 			}
 		}

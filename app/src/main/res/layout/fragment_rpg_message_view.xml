@@ -19,34 +19,32 @@
  *  limitations under the License.
 */
 -->
-<layout>
-	<androidx.constraintlayout.widget.ConstraintLayout
-		xmlns:android="http://schemas.android.com/apk/res/android"
-		xmlns:app="http://schemas.android.com/apk/res-auto"
-		xmlns:tools="http://schemas.android.com/tools"
-		android:layout_width="match_parent"
-		android:layout_height="match_parent"
-		>
+<androidx.constraintlayout.widget.ConstraintLayout
+	xmlns:android="http://schemas.android.com/apk/res/android"
+	xmlns:app="http://schemas.android.com/apk/res-auto"
+	xmlns:tools="http://schemas.android.com/tools"
+	android:layout_width="match_parent"
+	android:layout_height="match_parent"
+	>
 
-		<com.serenegiant.widget.RPGMessageView
-			android:id="@+id/message"
-			android:layout_width="0dp"
-			android:layout_height="140dp"
-			android:background="@color/ALICEBLUE"
-			android:layout_marginStart="8dp"
-			android:layout_marginLeft="8dp"
-			android:layout_marginEnd="8dp"
-			android:layout_marginRight="8dp"
-			android:layout_marginBottom="8dp"
-			android:textColor="@color/RED"
-			app:layout_constraintBottom_toBottomOf="parent"
-			app:layout_constraintEnd_toEndOf="parent"
-			app:layout_constraintStart_toStartOf="parent"
-			app:cols="30"
-			app:rows="4"
-			app:textStrokeColor="@color/BLACK"
-			app:textStrokeWidth="1dp"
-			app:textBackground="@color/QUARTER_CLEAR_BLACK"
-		/>
-	</androidx.constraintlayout.widget.ConstraintLayout>
-</layout>
+	<com.serenegiant.widget.RPGMessageView
+		android:id="@+id/message"
+		android:layout_width="0dp"
+		android:layout_height="140dp"
+		android:background="@color/ALICEBLUE"
+		android:layout_marginStart="8dp"
+		android:layout_marginLeft="8dp"
+		android:layout_marginEnd="8dp"
+		android:layout_marginRight="8dp"
+		android:layout_marginBottom="8dp"
+		android:textColor="@color/RED"
+		app:layout_constraintBottom_toBottomOf="parent"
+		app:layout_constraintEnd_toEndOf="parent"
+		app:layout_constraintStart_toStartOf="parent"
+		app:cols="30"
+		app:rows="4"
+		app:textStrokeColor="@color/BLACK"
+		app:textStrokeWidth="1dp"
+		app:textBackground="@color/QUARTER_CLEAR_BLACK"
+	/>
+</androidx.constraintlayout.widget.ConstraintLayout>

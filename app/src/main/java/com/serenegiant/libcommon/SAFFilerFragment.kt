@@ -1,22 +1,4 @@
 package com.serenegiant.libcommon
-
-import android.os.Build
-import android.os.Bundle
-import android.util.Log
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
-import androidx.annotation.RequiresApi
-import androidx.databinding.DataBindingUtil
-import androidx.documentfile.provider.DocumentFile
-import androidx.documentfile.provider.SAFRootTreeDocumentFile
-import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
-import com.serenegiant.libcommon.databinding.FragmentSafFilerBinding
-import com.serenegiant.documentfile.DocumentTreeRecyclerAdapter
-import com.serenegiant.documentfile.DocumentTreeRecyclerAdapter.DocumentTreeRecyclerAdapterListener
-import java.io.IOException
-
 /*
 * libcommon
 * utility/helper classes for myself
@@ -34,28 +16,40 @@ import java.io.IOException
 *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 *  See the License for the specific language governing permissions and
 *  limitations under the License.
-*/ /**
+*/
+import android.os.Build
+import android.os.Bundle
+import android.util.Log
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import androidx.annotation.RequiresApi
+import androidx.documentfile.provider.DocumentFile
+import androidx.documentfile.provider.SAFRootTreeDocumentFile
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+import com.serenegiant.documentfile.DocumentTreeRecyclerAdapter
+import com.serenegiant.documentfile.DocumentTreeRecyclerAdapter.DocumentTreeRecyclerAdapterListener
+import com.serenegiant.widget.RecyclerViewWithEmptyView
+import java.io.IOException
+
+/**
  * DocumentTreeRecyclerAdapterとSAFRootTreeDocumentFileのテスト用Fragment
  */
 @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
-class SAFFilerFragment
-/**
- * デフォルトコンストラクタ
- */
-	: BaseFragment() {
-	private var mBinding: FragmentSafFilerBinding? = null
-	private var mAdapter: com.serenegiant.documentfile.DocumentTreeRecyclerAdapter? = null
+class SAFFilerFragment : BaseFragment() {
+	private lateinit var mList: RecyclerViewWithEmptyView
+	private var mAdapter: DocumentTreeRecyclerAdapter? = null
 	override fun onCreateView(
 		inflater: LayoutInflater,
 		container: ViewGroup?,
 		savedInstanceState: Bundle?
 	): View {
 		if (DEBUG) Log.v(TAG, "onCreateView:")
-		mBinding = DataBindingUtil.inflate(
-			inflater,
-			R.layout.fragment_saf_filer, container, false
-		)
-		return mBinding!!.root
+		return inflater.inflate(R.layout.fragment_saf_filer, container, false
+		).apply {
+			mList = findViewById(R.id.list)
+		}
 	}
 
 	override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -78,10 +72,10 @@ class SAFFilerFragment
 	 * 表示を初期化
 	 */
 	private fun initView() {
-		mAdapter = com.serenegiant.documentfile.DocumentTreeRecyclerAdapter(
+		mAdapter = DocumentTreeRecyclerAdapter(
 			requireContext(),
 			R.layout.list_item_title, R.id.content,
-			androidx.documentfile.provider.SAFRootTreeDocumentFile.fromContext(requireContext())
+			SAFRootTreeDocumentFile.fromContext(requireContext())
 		)
 		mAdapter!!.setListener(
 			object : DocumentTreeRecyclerAdapterListener {
@@ -112,8 +106,8 @@ class SAFFilerFragment
 					return false
 				}
 			})
-		mBinding!!.list.layoutManager = LinearLayoutManager(requireContext())
-		mBinding!!.list.adapter = mAdapter
+		mList.layoutManager = LinearLayoutManager(requireContext())
+		mList.adapter = mAdapter
 	}
 
 	companion object {

@@ -25,9 +25,8 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.databinding.DataBindingUtil
+import android.widget.TextView
 import androidx.lifecycle.lifecycleScope
-import com.serenegiant.libcommon.databinding.FragmentCpuMonitorBinding
 import com.serenegiant.system.CpuMonitor
 import com.serenegiant.view.ViewUtils
 import kotlinx.coroutines.Dispatchers
@@ -44,7 +43,7 @@ import java.util.Locale
 class CpuMonitorFragment : BaseFragment() {
 
 	private val mCpuMonitor = CpuMonitor()
-	private lateinit var mBinding: FragmentCpuMonitorBinding
+	private lateinit var mMessageTv: TextView
 	private var mCpuMonitorJob: Job? = null
 
 	override fun onAttach(context: Context) {
@@ -58,13 +57,10 @@ class CpuMonitorFragment : BaseFragment() {
 		if (DEBUG) Log.v(TAG, "onCreateView:")
 		val customInflater
 			= ViewUtils.createCustomLayoutInflater(requireContext(), inflater, R.style.AppTheme)
-		return DataBindingUtil.inflate<FragmentCpuMonitorBinding?>(
-			customInflater,
+		return customInflater.inflate(
 			R.layout.fragment_cpu_monitor, container, false
 		).apply {
-			mBinding = this
-		}.run {
-			root
+			mMessageTv = findViewById(R.id.message)
 		}
 	}
 
@@ -88,10 +84,10 @@ class CpuMonitorFragment : BaseFragment() {
 					}
 				}
 				if (cpuInfoString.isNotBlank()) {
-					mBinding.message.text = cpuInfoString
+					mMessageTv.text = cpuInfoString
 					delay(1000)
 				} else {
-					mBinding.message.text = "Failed to get cpu information"
+					mMessageTv.text = "Failed to get cpu information"
 					mCpuMonitorJob?.cancel()
 					break
 				}

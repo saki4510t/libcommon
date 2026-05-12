@@ -27,11 +27,10 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.databinding.DataBindingUtil
+import android.widget.TextView
 import androidx.lifecycle.lifecycleScope
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.serenegiant.app.ActivityUtils
-import com.serenegiant.libcommon.databinding.FragmentUsbPermissionBinding
 import com.serenegiant.usb.DeviceFilter
 import com.serenegiant.usb.UsbConnector
 import com.serenegiant.usb.UsbDetector
@@ -54,7 +53,7 @@ class UsbPermissionFragment : BaseFragment() {
 
 	private lateinit var mUsbDetector: UsbDetector
 	private lateinit var mUsbPermission: UsbPermission
-	private lateinit var mBinding: FragmentUsbPermissionBinding
+	private lateinit var mMessageTv: TextView
 
 	override fun onAttach(context: Context) {
 		super.onAttach(context)
@@ -77,13 +76,9 @@ class UsbPermissionFragment : BaseFragment() {
 		if (DEBUG) Log.v(TAG, "onCreateView:")
 		val customInflater
 			= ViewUtils.createCustomLayoutInflater(requireContext(), inflater, R.style.AppTheme_Usb)
-		return DataBindingUtil.inflate<FragmentUsbPermissionBinding?>(
-			customInflater,
-			R.layout.fragment_usb_permission, container, false
+		return customInflater.inflate(R.layout.fragment_usb_permission, container, false
 		).apply {
-			mBinding = this
-		}.run {
-			root
+			mMessageTv = findViewById(R.id.message)
 		}
 	}
 
@@ -93,23 +88,23 @@ class UsbPermissionFragment : BaseFragment() {
 		if (!mUsbDetector.isRegistered) {
 			if (DEBUG) Log.v(TAG, "onCreate:register UsbDetector")
 			mUsbDetector.register()
-			mBinding.message.text = "${mBinding.message.text}\nregister UsbDetector"
+			mMessageTv.text = "${mMessageTv.text}\nregister UsbDetector"
 		}
 		if (!mUsbPermission.isRegistered) {
 			if (DEBUG) Log.v(TAG, "onCreate:register UsbPermission")
 			mUsbPermission.register()
-			mBinding.message.text = "${mBinding.message.text}\nregister UsbPermission"
+			mMessageTv.text = "${mMessageTv.text}\nregister UsbPermission"
 		}
 	}
 
 	override fun internalOnPause() {
 		if (DEBUG) Log.v(TAG, "internalOnPause:")
 		if (mUsbDetector.isRegistered) {
-			mBinding.message.text = "${mBinding.message.text}\nunregister UsbDetector"
+			mMessageTv.text = "${mMessageTv.text}\nunregister UsbDetector"
 			mUsbDetector.unregister()
 		}
 		if (mUsbPermission.isRegistered) {
-			mBinding.message.text = "${mBinding.message.text}\nunregister UsbPermission"
+			mMessageTv.text = "${mMessageTv.text}\nunregister UsbPermission"
 			mUsbPermission.unregister()
 		}
 		super.internalOnPause()
@@ -140,7 +135,7 @@ class UsbPermissionFragment : BaseFragment() {
 					putExtra(Const.EXTRA_REQUEST_USB_PERMISSION, device)
 				})
 			lifecycleScope.launch {
-				mBinding.message.text = "${mBinding.message.text}\nonAttach(${device.deviceName})"
+				mMessageTv.text = "${mMessageTv.text}\nonAttach(${device.deviceName})"
 			}
 		}
 
@@ -148,7 +143,7 @@ class UsbPermissionFragment : BaseFragment() {
 			if (DEBUG) Log.v(TAG, "UsbDetector.Callback#onDetach:${device.deviceName}")
 			// USB機器が取り外された時
 			lifecycleScope.launch {
-				mBinding.message.text = "${mBinding.message.text}\nonDetach(${device.deviceName})"
+				mMessageTv.text = "${mMessageTv.text}\nonDetach(${device.deviceName})"
 			}
 		}
 
@@ -172,7 +167,7 @@ class UsbPermissionFragment : BaseFragment() {
 			//     非表示にする。
 			ActivityUtils.bringToForeground(requireActivity())
 			lifecycleScope.launch {
-				mBinding.message.text = "${mBinding.message.text}\nonPermission(${device.deviceName})"
+				mMessageTv.text = "${mMessageTv.text}\nonPermission(${device.deviceName})"
 			}
 			// パーミッションを取得できた時, openする
 			val connector = UsbConnector(requireContext(), device)
@@ -197,7 +192,7 @@ class UsbPermissionFragment : BaseFragment() {
 				Log.v(TAG, "info=$info")
 				Log.v(TAG, "device=$device")
 				lifecycleScope.launch {
-					mBinding.message.text = "${mBinding.message.text}\ninfo($info)"
+					mMessageTv.text = "${mMessageTv.text}\ninfo($info)"
 				}
 				if (connection != null) {
 					Log.v(TAG, String.format("bcdUSB=0x%04x", UsbDeviceInfo.getBcdUSB(connection)))
@@ -226,14 +221,14 @@ class UsbPermissionFragment : BaseFragment() {
 			if (DEBUG) Log.v(TAG, "UsbPermission.Callback#onCancel:${device.deviceName}")
 			// パーミッションを取得できなかった時
 			lifecycleScope.launch {
-				mBinding.message.text = "${mBinding.message.text}\nonCancel(${device.deviceName}}"
+				mMessageTv.text = "${mMessageTv.text}\nonCancel(${device.deviceName}}"
 			}
 		}
 
 		override fun onError(usbDevice: UsbDevice?, throwable: Throwable) {
 			Log.w(TAG, throwable)
 			lifecycleScope.launch {
-				mBinding.message.text = "${mBinding.message.text}\nonError:${usbDevice?.deviceName}"
+				mMessageTv.text = "${mMessageTv.text}\nonError:${usbDevice?.deviceName}"
 			}
 		}
 	}

@@ -28,10 +28,10 @@ import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.serenegiant.libcommon.TitleFragment.OnListFragmentInteractionListener
-import com.serenegiant.libcommon.databinding.FragmentItemListBinding
 import com.serenegiant.libcommon.list.DummyContent
 import com.serenegiant.libcommon.list.DummyContent.DummyItem
 import com.serenegiant.libcommon.list.MyItemRecyclerViewAdapter
+import com.serenegiant.widget.SwipeRefreshLayout
 
 /**
  * A fragment representing a list of Items.
@@ -68,15 +68,16 @@ class TitleFragment: BaseFragment() {
 	override fun onCreateView(inflater: LayoutInflater,
 		container: ViewGroup?, savedInstanceState: Bundle?): View {
 		if (DEBUG) Log.v(TAG, "onCreateView:")
-		return FragmentItemListBinding.inflate(inflater, container, false)
+		return inflater.inflate(R.layout.fragment_item_list, container, false)
 		.apply {
+			val swipeRefresh: SwipeRefreshLayout = findViewById(R.id.swipeRefresh)
 			swipeRefresh.setOnRefreshListener {
 				// 何もしてないけどしたつもりになってちょっと待ってからプログレス表示を非表示にする
 				runOnUiThread({
 					swipeRefresh.isRefreshing = false
 				}, 1000)
 			}
-			this@TitleFragment.list = list
+			list = findViewById(R.id.list)
 			list.run {
 				// Set the adapter
 				layoutManager = if (mColumnCount <= 1) {
@@ -86,9 +87,6 @@ class TitleFragment: BaseFragment() {
 				}
 				adapter = MyItemRecyclerViewAdapter(DummyContent.ITEMS, mListener)
 			}
-		}
-		.run {
-			root
 		}
 	}
 

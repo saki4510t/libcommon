@@ -26,10 +26,15 @@ import android.view.View
 import android.view.View.OnClickListener
 import android.view.ViewGroup
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.MutableLiveData
-import com.serenegiant.libcommon.databinding.FragmentCheckableexBinding
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
+import com.serenegiant.view.ViewUtils
 import com.serenegiant.widget.CheckableEx
 import com.serenegiant.widget.CheckableEx.OnCheckedChangeListener
+import com.serenegiant.widget.CheckableImageView
+import kotlinx.coroutines.launch
 
 class CheckableExFragment : BaseFragment() {
 
@@ -47,33 +52,51 @@ class CheckableExFragment : BaseFragment() {
 
 	private val mViewModel: ViewModel by viewModels()
 	private lateinit var checkableGroup : CheckableEx
+	private lateinit var checkBtn1: CheckableEx
+	private lateinit var checkBtn2: CheckableEx
+	private lateinit var checkableImageView3: CheckableImageView
 
 	override fun onCreateView(inflater: LayoutInflater,
 		container: ViewGroup?, savedInstanceState: Bundle?): View {
-
 		if (DEBUG) Log.v(TAG, "onCreateView:")
-		return FragmentCheckableexBinding.inflate(inflater, container, false)
+		val customInflater = ViewUtils.createCustomLayoutInflater(requireContext(), inflater, R.style.AppTheme_Usb)
+		return customInflater.inflate(R.layout.fragment_checkableex, container, false
+		)
 		.apply {
-			viewModel = mViewModel
-			lifecycleOwner = viewLifecycleOwner
-			this@CheckableExFragment.checkableGroup = checkableGroup
-		}
-		.run {
-			root
+			checkBtn1 = findViewById(R.id.checkBtn1)
+			checkBtn1.setOnCheckedChangeListener { _, isChecked ->
+				mViewModel.isChecked.value = isChecked
+			}
+			checkBtn2 = findViewById(R.id.checkBtn2)
+			checkBtn2.setOnCheckedChangeListener { _, isChecked ->
+				mViewModel.isChecked.value = isChecked
+			}
+			checkableImageView3 = findViewById(R.id.checkableImageView3)
+			checkableImageView3.setOnClickListener(mViewModel)
+			checkableGroup = findViewById(R.id.checkableGroup)
+			checkableGroup.setOnCheckedChangeListener { _, isChecked ->
+				mViewModel.isGroupChecked.value = isChecked
+			}
 		}
 	}
 
 	override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
 		super.onViewCreated(view, savedInstanceState)
+		if (DEBUG) Log.v(TAG, "onViewCreated:")
 		mViewModel.apply {
-			isChecked.observe(viewLifecycleOwner) {
-				isGroupChecked.value = it
+			lifecycleScope.launch {
+				viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+					isChecked.observe(viewLifecycleOwner) {
+						isGroupChecked.value = it
+					}
+				}
 			}
 		}
 	}
 
 	override fun onAttach(context: Context) {
 		super.onAttach(context)
+		if (DEBUG) Log.v(TAG, "onAttach:")
 		requireActivity().title = getString(R.string.title_checkable_ex)
 	}
 

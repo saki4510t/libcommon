@@ -19,39 +19,27 @@
  *  limitations under the License.
 */
 -->
-<layout
+<androidx.coordinatorlayout.widget.CoordinatorLayout
 	xmlns:android="http://schemas.android.com/apk/res/android"
 	xmlns:app="http://schemas.android.com/apk/res-auto"
-	xmlns:tools="http://schemas.android.com/tools">
+	xmlns:tools="http://schemas.android.com/tools"
+	android:id="@+id/frame"
+	android:layout_width="match_parent"
+	android:layout_height="match_parent" >
 
-	<data>
-		<variable
-			name="viewModel"
-			type="com.serenegiant.libcommon.viewmodel.ScreenCaptureViewModel" />
-	</data>
-
-	<androidx.coordinatorlayout.widget.CoordinatorLayout
-		android:id="@+id/frame"
+	<androidx.constraintlayout.widget.ConstraintLayout
 		android:layout_width="match_parent"
 		android:layout_height="match_parent" >
 
-		<androidx.constraintlayout.widget.ConstraintLayout
-			android:layout_width="match_parent"
-			android:layout_height="match_parent" >
+		<ToggleButton
+			android:id="@+id/recordingButton"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			app:layout_constraintBottom_toBottomOf="parent"
+			app:layout_constraintEnd_toEndOf="parent"
+			app:layout_constraintStart_toStartOf="parent"
+			app:layout_constraintTop_toTopOf="parent" />
 
-			<ToggleButton
-				android:id="@+id/recordingButton"
-				android:layout_width="wrap_content"
-				android:layout_height="wrap_content"
-				android:checked="@={viewModel.isChecked}"
-				android:text="@{viewModel.recordingLabel}"
-				app:layout_constraintBottom_toBottomOf="parent"
-				app:layout_constraintEnd_toEndOf="parent"
-				app:layout_constraintStart_toStartOf="parent"
-				app:layout_constraintTop_toTopOf="parent" />
+	</androidx.constraintlayout.widget.ConstraintLayout>
 
-		</androidx.constraintlayout.widget.ConstraintLayout>
-
-	</androidx.coordinatorlayout.widget.CoordinatorLayout>
-
-</layout>
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

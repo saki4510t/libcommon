@@ -25,11 +25,12 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.Window
+import android.widget.ImageView
+import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
-import com.serenegiant.libcommon.databinding.FragmentWindowInsetsBinding
 import com.serenegiant.view.SysUiUtils
 
 class WindowInsetsFragment : BaseFragment() {
@@ -54,16 +55,15 @@ class WindowInsetsFragment : BaseFragment() {
 		container: ViewGroup?, savedInstanceState: Bundle?): View {
 
 		if (DEBUG) Log.v(TAG, "onCreateView:")
-		return FragmentWindowInsetsBinding.inflate(inflater, container, false)
+		return inflater.inflate(R.layout.fragment_window_insets, container, false)
 		.apply {
-			onLongClickListener = View.OnLongClickListener {
-				toggleFullScreen(root)
+			val imageView = findViewById<ImageView>(R.id.imageView)
+			val textView = findViewById<TextView>(R.id.textView)
+			imageView.setOnLongClickListener {
+				toggleFullScreen(this)
 				textView.text = "$mIsFullScreen"
-				return@OnLongClickListener true
+				return@setOnLongClickListener true
 			}
-		}
-		.run {
-			root
 		}
 	}
 
