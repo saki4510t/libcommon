@@ -112,7 +112,7 @@ class CameraSourcePipelineFragment : Fragment() {
 			mThumbnail.setMaskDrawable(
 				ContextCompat.getDrawable(
 					requireContext(),
-					com.serenegiant.common.R.drawable.mask_circle
+					com.serenegiant.resources.R.drawable.mask_circle
 				)
 			)
 			mThumbnail.visibility = View.INVISIBLE
