@@ -1,0 +1,362 @@
+{
+  "formatVersion": "1.1",
+  "component": {
+    "group": "com.serenegiant",
+    "module": "common",
+    "version": "10.3.0",
+    "attributes": {
+      "org.gradle.status": "release"
+    }
+  },
+  "createdBy": {
+    "gradle": {
+      "version": "8.2"
+    }
+  },
+  "variants": [
+    {
+      "name": "releaseApiElements-published",
+      "attributes": {
+        "org.gradle.category": "library",
+        "org.gradle.usage": "java-api",
+        "org.jetbrains.kotlin.platform.type": "androidJvm"
+      },
+      "dependencies": [
+        {
+          "group": "com.serenegiant",
+          "module": "common-core",
+          "version": {
+            "requires": "10.3.0"
+          }
+        },
+        {
+          "group": "com.serenegiant",
+          "module": "common-accessibility",
+          "version": {
+            "requires": "10.3.0"
+          }
+        },
+        {
+          "group": "com.serenegiant",
+          "module": "common-bluetooth",
+          "version": {
+            "requires": "10.3.0"
+          }
+        },
+        {
+          "group": "com.serenegiant",
+          "module": "common-camera",
+          "version": {
+            "requires": "10.3.0"
+          }
+        },
+        {
+          "group": "com.serenegiant",
+          "module": "common-databinding",
+          "version": {
+            "requires": "10.3.0"
+          }
+        },
+        {
+          "group": "com.serenegiant",
+          "module": "common-dialog",
+          "version": {
+            "requires": "10.3.0"
+          }
+        },
+        {
+          "group": "com.serenegiant",
+          "module": "common-documentfile",
+          "version": {
+            "requires": "10.3.0"
+          }
+        },
+        {
+          "group": "com.serenegiant",
+          "module": "common-gl",
+          "version": {
+            "requires": "10.3.0"
+          }
+        },
+        {
+          "group": "com.serenegiant",
+          "module": "common-keyboard",
+          "version": {
+            "requires": "10.3.0"
+          }
+        },
+        {
+          "group": "com.serenegiant",
+          "module": "common-media",
+          "version": {
+            "requires": "10.3.0"
+          }
+        },
+        {
+          "group": "com.serenegiant",
+          "module": "common-mediaeffect",
+          "version": {
+            "requires": "10.3.0"
+          }
+        },
+        {
+          "group": "com.serenegiant",
+          "module": "common-net",
+          "version": {
+            "requires": "10.3.0"
+          }
+        },
+        {
+          "group": "com.serenegiant",
+          "module": "common-notification",
+          "version": {
+            "requires": "10.3.0"
+          }
+        },
+        {
+          "group": "com.serenegiant",
+          "module": "common-resources",
+          "version": {
+            "requires": "10.3.0"
+          }
+        },
+        {
+          "group": "com.serenegiant",
+          "module": "common-preference",
+          "version": {
+            "requires": "10.3.0"
+          }
+        },
+        {
+          "group": "com.serenegiant",
+          "module": "common-telephony",
+          "version": {
+            "requires": "10.3.0"
+          }
+        },
+        {
+          "group": "com.serenegiant",
+          "module": "common-usb",
+          "version": {
+            "requires": "10.3.0"
+          }
+        },
+        {
+          "group": "com.serenegiant",
+          "module": "common-view",
+          "version": {
+            "requires": "10.3.0"
+          }
+        },
+        {
+          "group": "org.jetbrains.kotlin",
+          "module": "kotlin-stdlib",
+          "version": {
+            "requires": "1.9.24"
+          }
+        }
+      ],
+      "files": [
+        {
+          "name": "common-10.3.0.aar",
+          "url": "common-10.3.0.aar",
+          "size": 1311,
+          "sha512": "920d70de073264bec33b9a95691394212c4a6e60097e9a419c6793ed31a895092f48be2f23a247680d7c790790ff34cb1591440b893e1d780e8e7eb2767f8df3",
+          "sha256": "10ab2e21b1996617ec956379e4a9a2e233843e9dcabb651a996fd963bc29c68f",
+          "sha1": "651a81c7d1ceb12dd4cc5ac577ba1af125e1c46e",
+          "md5": "67779bf55127272ccb46ba7f1ff02ba3"
+        }
+      ]
+    },
+    {
+      "name": "releaseRuntimeElements-published",
+      "attributes": {
+        "org.gradle.category": "library",
+        "org.gradle.usage": "java-runtime",
+        "org.jetbrains.kotlin.platform.type": "androidJvm"
+      },
+      "dependencies": [
+        {
+          "group": "androidx.appcompat",
+          "module": "appcompat",
+          "version": {
+            "requires": "1.6.1"
+          }
+        },
+        {
+          "group": "androidx.core",
+          "module": "core-ktx",
+          "version": {
+            "requires": "1.13.1"
+          }
+        },
+        {
+          "group": "com.serenegiant",
+          "module": "common-core",
+          "version": {
+            "requires": "10.3.0"
+          }
+        },
+        {
+          "group": "com.serenegiant",
+          "module": "common-accessibility",
+          "version": {
+            "requires": "10.3.0"
+          }
+        },
+        {
+          "group": "com.serenegiant",
+          "module": "common-bluetooth",
+          "version": {
+            "requires": "10.3.0"
+          }
+        },
+        {
+          "group": "com.serenegiant",
+          "module": "common-camera",
+          "version": {
+            "requires": "10.3.0"
+          }
+        },
+        {
+          "group": "com.serenegiant",
+          "module": "common-databinding",
+          "version": {
+            "requires": "10.3.0"
+          }
+        },
+        {
+          "group": "com.serenegiant",
+          "module": "common-dialog",
+          "version": {
+            "requires": "10.3.0"
+          }
+        },
+        {
+          "group": "com.serenegiant",
+          "module": "common-documentfile",
+          "version": {
+            "requires": "10.3.0"
+          }
+        },
+        {
+          "group": "com.serenegiant",
+          "module": "common-gl",
+          "version": {
+            "requires": "10.3.0"
+          }
+        },
+        {
+          "group": "com.serenegiant",
+          "module": "common-keyboard",
+          "version": {
+            "requires": "10.3.0"
+          }
+        },
+        {
+          "group": "com.serenegiant",
+          "module": "common-media",
+          "version": {
+            "requires": "10.3.0"
+          }
+        },
+        {
+          "group": "com.serenegiant",
+          "module": "common-mediaeffect",
+          "version": {
+            "requires": "10.3.0"
+          }
+        },
+        {
+          "group": "com.serenegiant",
+          "module": "common-net",
+          "version": {
+            "requires": "10.3.0"
+          }
+        },
+        {
+          "group": "com.serenegiant",
+          "module": "common-notification",
+          "version": {
+            "requires": "10.3.0"
+          }
+        },
+        {
+          "group": "com.serenegiant",
+          "module": "common-resources",
+          "version": {
+            "requires": "10.3.0"
+          }
+        },
+        {
+          "group": "com.serenegiant",
+          "module": "common-preference",
+          "version": {
+            "requires": "10.3.0"
+          }
+        },
+        {
+          "group": "com.serenegiant",
+          "module": "common-telephony",
+          "version": {
+            "requires": "10.3.0"
+          }
+        },
+        {
+          "group": "com.serenegiant",
+          "module": "common-usb",
+          "version": {
+            "requires": "10.3.0"
+          }
+        },
+        {
+          "group": "com.serenegiant",
+          "module": "common-view",
+          "version": {
+            "requires": "10.3.0"
+          }
+        },
+        {
+          "group": "org.jetbrains.kotlin",
+          "module": "kotlin-stdlib",
+          "version": {
+            "requires": "1.9.24"
+          }
+        }
+      ],
+      "files": [
+        {
+          "name": "common-10.3.0.aar",
+          "url": "common-10.3.0.aar",
+          "size": 1311,
+          "sha512": "920d70de073264bec33b9a95691394212c4a6e60097e9a419c6793ed31a895092f48be2f23a247680d7c790790ff34cb1591440b893e1d780e8e7eb2767f8df3",
+          "sha256": "10ab2e21b1996617ec956379e4a9a2e233843e9dcabb651a996fd963bc29c68f",
+          "sha1": "651a81c7d1ceb12dd4cc5ac577ba1af125e1c46e",
+          "md5": "67779bf55127272ccb46ba7f1ff02ba3"
+        }
+      ]
+    },
+    {
+      "name": "releaseSourcesElements-published",
+      "attributes": {
+        "org.gradle.category": "documentation",
+        "org.gradle.dependency.bundling": "external",
+        "org.gradle.docstype": "sources",
+        "org.gradle.libraryelements": "jar",
+        "org.gradle.usage": "java-runtime",
+        "org.jetbrains.kotlin.platform.type": "androidJvm"
+      },
+      "files": [
+        {
+          "name": "common-10.3.0-sources.jar",
+          "url": "common-10.3.0-sources.jar",
+          "size": 699,
+          "sha512": "c4505a255c71425d248fa2319a474d77ec27f1c2d2e85898b75c61ed654f2393618aaa05b72cb3e621e39dbe655244cc0e3cdc1c9974880071dd976370ea2b04",
+          "sha256": "b4b52f0bd6fde7e58335de2fd4a483a03db770a02bd4ea9a7f85dc568d62e01b",
+          "sha1": "6e5b7e031fafe803c44a922073022c92ceff3461",
+          "md5": "e6951075d09a2d043782dbe3a910c6fa"
+        }
+      ]
+    }
+  ]
+}
