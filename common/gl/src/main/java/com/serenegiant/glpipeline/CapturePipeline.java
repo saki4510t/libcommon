@@ -326,6 +326,7 @@ public class CapturePipeline extends ProxyPipeline {
 				mWorkBuffer.clear();
 				GLUtils.glReadPixels(mWorkBuffer, width, height);
 				offscreen.swap();
+				mManager.makeDefault(0xff000000);
 				final Bitmap bitmap = mPool.obtain(width, height);
 				if (bitmap != null) {
 					try {
@@ -343,6 +344,7 @@ public class CapturePipeline extends ProxyPipeline {
 				} else if (DEBUG) {
 					Log.d(TAG, "doCapture:couldn't get bitmap from pool");
 				}
+				mManager.swap();
 			}
 		} catch (final Exception e) {
 			ThreadPool.queueEvent(() -> {
