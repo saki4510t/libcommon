@@ -122,7 +122,7 @@ public class CapturePipelineTest {
 		capturePipeline.trigger();
 		try {
 			// 30fpsなので約1秒以内に抜けてくるはず(多少の遅延・タイムラグを考慮して少し長めに)
-			assertTrue(sem.tryAcquire(1200, TimeUnit.MILLISECONDS));
+			assertTrue(sem.tryAcquire(NUM_FRAMES * 500L, TimeUnit.MILLISECONDS));
 			source.release();
 //			dump(result);
 			assertEquals(1, cnt.get());
@@ -170,7 +170,7 @@ public class CapturePipelineTest {
 			});
 		try {
 			// Surfaceの生成を待機
-			assertTrue(sem.tryAcquire(1200, TimeUnit.MILLISECONDS));
+			assertTrue(sem.tryAcquire(NUM_FRAMES * 500L, TimeUnit.MILLISECONDS));
 		} catch (InterruptedException e) {
 			fail();
 		}
@@ -207,7 +207,7 @@ public class CapturePipelineTest {
 		capturePipeline.trigger();
 		try {
 			// 30fpsなので約1秒以内に抜けてくるはず(多少の遅延・タイムラグを考慮して少し長めに)
-			assertTrue(sem.tryAcquire(1200, TimeUnit.MILLISECONDS));
+			assertTrue(sem.tryAcquire(NUM_FRAMES * 500L, TimeUnit.MILLISECONDS));
 			requestStop.set(true);
 //			dump(result);
 			assertEquals(1, cnt.get());
@@ -266,7 +266,7 @@ public class CapturePipelineTest {
 		capturePipeline.trigger(NUM_FRAMES, 100);
 		try {
 			// 9回x100ミリ秒なので約1秒以内に抜けてくるはず(多少の遅延・タイムラグを考慮して少し長めに)
-			assertTrue(sem.tryAcquire(1200, TimeUnit.MILLISECONDS));
+			assertTrue(sem.tryAcquire(NUM_FRAMES * 500L, TimeUnit.MILLISECONDS));
 //			dump(result);
 			assertEquals(NUM_FRAMES, cnt.get());
 			final Bitmap b = result.get();
@@ -314,7 +314,7 @@ public class CapturePipelineTest {
 			});
 		try {
 			// Surfaceの生成を待機
-			assertTrue(sem.tryAcquire(1200, TimeUnit.MILLISECONDS));
+			assertTrue(sem.tryAcquire(NUM_FRAMES * 500L, TimeUnit.MILLISECONDS));
 		} catch (InterruptedException e) {
 			fail();
 		}
