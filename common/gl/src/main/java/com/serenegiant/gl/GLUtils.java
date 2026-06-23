@@ -311,7 +311,7 @@ public class GLUtils implements GLConst {
 		final Bitmap result = glReadPixelsToBitmap(workBuffer, width, height, bitmap);
 		readSurface.release();
 		// テクスチャ変換行列を適用する
-		final android.graphics.Matrix matrix = MatrixUtils.toAndroidMatrix(texMatrix);
+		final android.graphics.Matrix matrix = MatrixUtils.toAndroidMatrix(texMatrix, 0);
 		if (isOES || !matrix.isIdentity()) {
 			// テクスチャ変換行列を適用した新しいBitmapを生成して返す
 			if (isOES) {

@@ -82,24 +82,38 @@ public class MatrixUtils {
 	 * モデルビュー変換行列に左右・上下反転をセット
 	 * @param mvp
 	 * @param mirror
+	 * @deprecated offset付きの同名関数を使う
 	 */
+	@Deprecated
 	public static void setMirror(@NonNull @Size(min=16) final float[] mvp, @IMirror.MirrorMode final int mirror) {
+		setMirror(mvp, 0, mirror);
+	}
+
+	/**
+	 * モデルビュー変換行列に左右・上下反転をセット
+	 * @param mvp
+	 * @param offset
+	 * @param mirror
+	 */
+	public static void setMirror(
+		@NonNull @Size(min=16) final float[] mvp,
+		final int offset, @IMirror.MirrorMode final int mirror) {
 		switch (mirror) {
 		case MIRROR_NORMAL -> {
-			mvp[0] = Math.abs(mvp[0]);
-			mvp[5] = Math.abs(mvp[5]);
+			mvp[offset] = Math.abs(mvp[offset]);
+			mvp[offset + 5] = Math.abs(mvp[offset + 5]);
 		}
 		case MIRROR_HORIZONTAL -> {
-			mvp[0] = -Math.abs(mvp[0]);    // flip left-right
-			mvp[5] = Math.abs(mvp[5]);
+			mvp[offset] = -Math.abs(mvp[offset]);    // flip left-right
+			mvp[offset + 5] = Math.abs(mvp[offset + 5]);
 		}
 		case MIRROR_VERTICAL -> {
-			mvp[0] = Math.abs(mvp[0]);
-			mvp[5] = -Math.abs(mvp[5]);    // flip up-side down
+			mvp[offset] = Math.abs(mvp[offset]);
+			mvp[offset + 5] = -Math.abs(mvp[offset + 5]);    // flip up-side down
 		}
 		case MIRROR_BOTH -> {
-			mvp[0] = -Math.abs(mvp[0]);    // flip left-right
-			mvp[5] = -Math.abs(mvp[5]);    // flip up-side down
+			mvp[offset] = -Math.abs(mvp[offset]);    // flip left-right
+			mvp[offset + 5] = -Math.abs(mvp[offset + 5]);    // flip up-side down
 		}
 		}
 	}
@@ -123,8 +137,35 @@ public class MatrixUtils {
 	 * 現在のモデルビュー変換行列をxy平面で指定した角度回転させる
 	 * @param mvp
 	 * @param degrees
+	 * @deprecated offset付きの同名関数を使う
 	 */
+	@Deprecated
 	public static void rotate(@NonNull @Size(min=16) final float[] mvp, final int degrees) {
+		android.opengl.Matrix.rotateM(mvp, 0, degrees, 0.0f, 0.0f, 1.0f);
+	}
+
+	/**
+	 * 現在のモデルビュー変換行列をxy平面で指定した角度回転させる
+	 * @param mvp
+	 * @param offset
+	 * @param degrees
+	 */
+	public static void rotate(
+		@NonNull @Size(min=16) final float[] mvp,
+		final int offset,
+		final int degrees) {
+		android.opengl.Matrix.rotateM(mvp, offset, degrees, 0.0f, 0.0f, 1.0f);
+	}
+
+	/**
+	 * モデルビュー変換行列にxy平面で指定した角度回転させた回転行列をセットする
+	 * @param mvp
+	 * @param degrees
+	 * @deprecated offset付きの同名関数を使う
+	 */
+	@Deprecated
+	public static void setRotation(@NonNull @Size(min=16) final float[] mvp, final int degrees) {
+		android.opengl.Matrix.setIdentityM(mvp, 0);
 		android.opengl.Matrix.rotateM(mvp, 0, degrees, 0.0f, 0.0f, 1.0f);
 	}
 
@@ -133,9 +174,11 @@ public class MatrixUtils {
 	 * @param mvp
 	 * @param degrees
 	 */
-	public static void setRotation(@NonNull @Size(min=16) final float[] mvp, final int degrees) {
-		android.opengl.Matrix.setIdentityM(mvp, 0);
-		android.opengl.Matrix.rotateM(mvp, 0, degrees, 0.0f, 0.0f, 1.0f);
+	public static void setRotation(
+		@NonNull @Size(min=16) final float[] mvp,
+		final int offset, final int degrees) {
+		android.opengl.Matrix.setIdentityM(mvp, offset);
+		android.opengl.Matrix.rotateM(mvp, offset, degrees, 0.0f, 0.0f, 1.0f);
 	}
 
 	/**
@@ -193,21 +236,40 @@ public class MatrixUtils {
 	 * @param result
 	 * @param aMatrix
 	 * @return
+	 * @deprecated offset付きの同名関数を使う
 	 */
+	@Deprecated
 	public static Matrix toAndroidMatrix(
 		@NonNull @Size(min=16)final float[] transform,
 		@NonNull final Matrix result,
 		@NonNull @Size(min=9) final float[] aMatrix) {
+		return toAndroidMatrix(transform, 0, result, aMatrix);
+	}
 
-		aMatrix[Matrix.MSCALE_X] = transform[ 0];
-		aMatrix[Matrix.MSKEW_Y] = transform[ 1];
-		aMatrix[Matrix.MPERSP_0] = transform[ 3];
-		aMatrix[Matrix.MSKEW_X] = transform[ 4];
-		aMatrix[Matrix.MSCALE_Y] = transform[ 5];
-		aMatrix[Matrix.MPERSP_1] = transform[ 7];
-		aMatrix[Matrix.MTRANS_X] = transform[12];
-		aMatrix[Matrix.MTRANS_Y] = transform[13];
-		aMatrix[Matrix.MPERSP_2] = transform[15];
+	/**
+	 * OpenGLの4x4(列優先)行列をandroid.graphics.Matrixの3x3行列に変換する
+	 * (アフィン変換のみ)
+	 * @param transform
+	 * @param offset
+	 * @param result
+	 * @param aMatrix
+	 * @return
+	 */
+	public static Matrix toAndroidMatrix(
+		@NonNull @Size(min=16)final float[] transform,
+		final int offset,
+		@NonNull final Matrix result,
+		@NonNull @Size(min=9) final float[] aMatrix) {
+
+		aMatrix[Matrix.MSCALE_X] = transform[offset];
+		aMatrix[Matrix.MSKEW_Y] = transform[offset + 1];
+		aMatrix[Matrix.MPERSP_0] = transform[offset + 3];
+		aMatrix[Matrix.MSKEW_X] = transform[offset + 4];
+		aMatrix[Matrix.MSCALE_Y] = transform[offset + 5];
+		aMatrix[Matrix.MPERSP_1] = transform[offset + 7];
+		aMatrix[Matrix.MTRANS_X] = transform[offset +12];
+		aMatrix[Matrix.MTRANS_Y] = transform[offset +13];
+		aMatrix[Matrix.MPERSP_2] = transform[offset +15];
 		result.setValues(aMatrix);
 
 		return result;
@@ -218,41 +280,73 @@ public class MatrixUtils {
 	 * (アフィン変換のみ)
 	 * @param transform
 	 * @return
+	 * @deprecated offset付きの同名関数を使う
 	 */
-	public static Matrix toAndroidMatrix(@NonNull @Size(min=16)final float[] transform) {
+	@Deprecated
+	public static Matrix toAndroidMatrix(
+		@NonNull @Size(min=16)final float[] transform) {
 		final Matrix result = new Matrix();
 		final float[] work = new float[9];
-		return toAndroidMatrix(transform, result, work);
+		return toAndroidMatrix(transform, 0, result, work);
+	}
+
+	/**
+	 * OpenGLの4x4(列優先)行列をandroid.graphics.Matrixの3x3行列に変換する
+	 * (アフィン変換のみ)
+	 * @param transform
+	 * @param offset
+	 * @return
+	 */
+	public static Matrix toAndroidMatrix(
+		@NonNull @Size(min=16)final float[] transform,
+		final int offset) {
+		final Matrix result = new Matrix();
+		final float[] work = new float[9];
+		return toAndroidMatrix(transform, offset, result, work);
 	}
 
 	/**
 	 * OpenGL|ESの4x4行列を列優先で文字列化
 	 * @param transform
 	 * @return
+	 * @deprecated offset付きの同名関数を使う
 	 */
+	@Deprecated
 	public static String toGLMatrixString(
 		@NonNull @Size(min=16) final float[] transform) {
+		return toGLMatrixString(transform, 0);
+	}
+
+	/**
+	 * OpenGL|ESの4x4行列を列優先で文字列化
+	 * @param transform
+	 * @param offset
+	 * @return
+	 */
+	public static String toGLMatrixString(
+		@NonNull @Size(min=16) final float[] transform,
+		final int offset) {
 
 		return "GLMatrix[" +
-			transform[0] + ", " +
-			transform[1] + ", " +
-			transform[2] + ", " +
-			transform[3] +
+			transform[offset] + ", " +
+			transform[offset + 1] + ", " +
+			transform[offset + 2] + ", " +
+			transform[offset + 3] +
 			"][" +
-			transform[4] + ", " +
-			transform[5] + ", " +
-			transform[6] + ", " +
-			transform[7] +
+			transform[offset + 4] + ", " +
+			transform[offset + 5] + ", " +
+			transform[offset + 6] + ", " +
+			transform[offset + 7] +
 			"][" +
-			transform[8] + ", " +
-			transform[9] + ", " +
-			transform[10] + ", " +
-			transform[11] +
+			transform[offset + 8] + ", " +
+			transform[offset + 9] + ", " +
+			transform[offset + 10] + ", " +
+			transform[offset + 11] +
 			"][" +
-			transform[12] + ", " +
-			transform[13] + ", " +
-			transform[14] + ", " +
-			transform[15] +
+			transform[offset + 12] + ", " +
+			transform[offset + 13] + ", " +
+			transform[offset + 14] + ", " +
+			transform[offset + 15] +
 			']';
 	}
 

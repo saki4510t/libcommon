@@ -53,7 +53,7 @@ public class MatrixTest {
 			assertTrue(compare(matrix, mat, true));
 			final float[] glMat = MatrixUtils.toGLMatrix(matrix);
 			assertTrue(compare(matrix, glMat, true));
-			final Matrix m = MatrixUtils.toAndroidMatrix(glMat);
+			final Matrix m = MatrixUtils.toAndroidMatrix(glMat, 0);
 			assertTrue(compare(m, glMat, true));
 		}
 	}
@@ -71,7 +71,7 @@ public class MatrixTest {
 			assertTrue(compare(matrix, mat, true));
 			final float[] glMat = MatrixUtils.toGLMatrix(matrix);
 			assertTrue(compare(matrix, glMat, true));
-			final Matrix m = MatrixUtils.toAndroidMatrix(glMat);
+			final Matrix m = MatrixUtils.toAndroidMatrix(glMat, 0);
 			assertTrue(compare(m, glMat, true));
 		}
 	}
