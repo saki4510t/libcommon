@@ -20,6 +20,8 @@ package com.serenegiant.app;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.content.Context;
+import android.os.Build;
 import android.os.PowerManager;
 import android.util.Log;
 import android.view.WindowManager;
@@ -106,5 +108,20 @@ public class PowerHelper {
 			WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED
 			| WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD
 			| WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+	}
+
+	/**
+	 * 端末がインタラクティブモードかどうかを取得
+	 * @param context
+	 * @return
+	 */
+	@SuppressWarnings("deprecation")
+	public static boolean isInteractive(@NonNull final Context context) {
+		final PowerManager pm = ContextUtils.requireSystemService(context, PowerManager.class);
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT_WATCH) {
+			return pm.isInteractive();
+		} else {
+			return pm.isScreenOn();
+		}
 	}
 }
