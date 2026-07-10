@@ -178,4 +178,30 @@ public interface Const {
 	})
 	@Retention(RetentionPolicy.SOURCE)
 	public @interface RequestCode {}
+
+	/**
+	 * リクエストコードを文字列にする
+	 * @param reqCode
+	 * @return
+	 */
+	public static String toRequestCodeString(@RequestCode final int reqCode) {
+		switch (reqCode) {
+		case REQ_CODE_SET_CUR:	return "SET_CUR";
+		case REQ_CODE_SET_MIN:	return "SET_MIN";
+		case REQ_CODE_SET_MAX:	return "SET_MAX";
+		case REQ_CODE_SET_RES:	return "SET_RES";
+		case REQ_CODE_SET_LEN:	return "SET_LEN";
+		case REQ_CODE_SET_INFO:	return "SET_INFO";
+		case REQ_CODE_SET_DEF:	return "SET_DEF";
+		case REQ_CODE_GET_CUR:	return "GET_CUR";
+		case REQ_CODE_GET_MIN:	return "GET_MIN";
+		case REQ_CODE_GET_MAX:	return "GET_MAX";
+		case REQ_CODE_GET_RES:	return "GET_RES";
+		case REQ_CODE_GET_LEN:	return "GET_LEN";
+		case REQ_CODE_GET_INFO:	return "GET_INFO";
+		case REQ_CODE_GET_DEF:	return "GET_DEF";
+		default:
+			return String.format("UNKNOWN 0x%08x", reqCode);
+		}
+	}
 }
