@@ -1,0 +1,131 @@
+{
+  "formatVersion": "1.1",
+  "component": {
+    "group": "com.serenegiant",
+    "module": "common-usb",
+    "version": "10.3.2",
+    "attributes": {
+      "org.gradle.status": "release"
+    }
+  },
+  "createdBy": {
+    "gradle": {
+      "version": "8.2"
+    }
+  },
+  "variants": [
+    {
+      "name": "releaseApiElements-published",
+      "attributes": {
+        "org.gradle.category": "library",
+        "org.gradle.usage": "java-api",
+        "org.jetbrains.kotlin.platform.type": "androidJvm"
+      },
+      "dependencies": [
+        {
+          "group": "com.serenegiant",
+          "module": "common-core",
+          "version": {
+            "requires": "10.3.2"
+          }
+        },
+        {
+          "group": "org.jetbrains.kotlin",
+          "module": "kotlin-stdlib",
+          "version": {
+            "requires": "1.9.24"
+          }
+        }
+      ],
+      "files": [
+        {
+          "name": "common-usb-10.3.2.aar",
+          "url": "common-usb-10.3.2.aar",
+          "size": 71415,
+          "sha512": "63d9d3f494122f7162a48b61bde457a82edb418dc5c2f80ab8f3afa60e553a928658e38e012483625b020a98b2480250ebe2cead32ebe4527c3491692ce6f5b7",
+          "sha256": "e9171fbba86f2d3e5cbe545d3a7aad655802c0eafd09bb17520ca173437edc58",
+          "sha1": "230cd0bdaae3b7212ea736733e318d08fb5894e5",
+          "md5": "675992399ed8e8f32377fcccb070c9a0"
+        }
+      ]
+    },
+    {
+      "name": "releaseRuntimeElements-published",
+      "attributes": {
+        "org.gradle.category": "library",
+        "org.gradle.usage": "java-runtime",
+        "org.jetbrains.kotlin.platform.type": "androidJvm"
+      },
+      "dependencies": [
+        {
+          "group": "androidx.appcompat",
+          "module": "appcompat",
+          "version": {
+            "requires": "1.6.1"
+          }
+        },
+        {
+          "group": "androidx.core",
+          "module": "core-ktx",
+          "version": {
+            "requires": "1.13.1"
+          }
+        },
+        {
+          "group": "org.jetbrains.kotlinx",
+          "module": "kotlinx-coroutines-android",
+          "version": {
+            "requires": "1.8.1"
+          }
+        },
+        {
+          "group": "com.serenegiant",
+          "module": "common-core",
+          "version": {
+            "requires": "10.3.2"
+          }
+        },
+        {
+          "group": "org.jetbrains.kotlin",
+          "module": "kotlin-stdlib",
+          "version": {
+            "requires": "1.9.24"
+          }
+        }
+      ],
+      "files": [
+        {
+          "name": "common-usb-10.3.2.aar",
+          "url": "common-usb-10.3.2.aar",
+          "size": 71415,
+          "sha512": "63d9d3f494122f7162a48b61bde457a82edb418dc5c2f80ab8f3afa60e553a928658e38e012483625b020a98b2480250ebe2cead32ebe4527c3491692ce6f5b7",
+          "sha256": "e9171fbba86f2d3e5cbe545d3a7aad655802c0eafd09bb17520ca173437edc58",
+          "sha1": "230cd0bdaae3b7212ea736733e318d08fb5894e5",
+          "md5": "675992399ed8e8f32377fcccb070c9a0"
+        }
+      ]
+    },
+    {
+      "name": "releaseSourcesElements-published",
+      "attributes": {
+        "org.gradle.category": "documentation",
+        "org.gradle.dependency.bundling": "external",
+        "org.gradle.docstype": "sources",
+        "org.gradle.libraryelements": "jar",
+        "org.gradle.usage": "java-runtime",
+        "org.jetbrains.kotlin.platform.type": "androidJvm"
+      },
+      "files": [
+        {
+          "name": "common-usb-10.3.2-sources.jar",
+          "url": "common-usb-10.3.2-sources.jar",
+          "size": 99685,
+          "sha512": "50271d6d529fce4527c474096c3e110b2be75b9633a772a988447c23d1129a82f45b6054e2eb80e3e7822dca5380fa0e730d21e7380d85396bc8edd93c074bc7",
+          "sha256": "8e5f2b3a157c88a9d8b56400c3fe8fc2f62874d71a2acb843b56e8a7c70e1e32",
+          "sha1": "d1b93acd92d9bcb544f07c1c5e7e716840ccd2c3",
+          "md5": "f561908341ab710424c14fe0391fa053"
+        }
+      ]
+    }
+  ]
+}
