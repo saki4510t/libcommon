@@ -20,6 +20,7 @@ package com.serenegiant.gl
 
 import android.util.Log
 import com.serenegiant.egl.EGLBase
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.android.asCoroutineDispatcher
@@ -28,13 +29,13 @@ import kotlinx.coroutines.awaitCancellation
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import java.util.concurrent.Executors
-import kotlin.coroutines.CoroutineContext
 
 private const val DEBUG = false
 private val TAG = GLCoroutineScope::class.java.simpleName
 
 abstract class GLCoroutineScope internal constructor(): CoroutineScope {
 	abstract val glContext: GLContext
+	abstract val dispatcher: CoroutineDispatcher
 	val egl: EGLBase
 		get() = glContext.egl
 
@@ -52,8 +53,9 @@ abstract class GLCoroutineScope internal constructor(): CoroutineScope {
 
 private class GLCoroutineScopeImpl(
 	override val glContext: GLContext,
-	override val coroutineContext: CoroutineContext
+	override val dispatcher: CoroutineDispatcher
 ) : GLCoroutineScope() {
+	override val coroutineContext = SupervisorJob() + dispatcher
 	private val mOwnGLContext = !glContext.isInitialized
 
 	init {
@@ -83,7 +85,7 @@ fun glCoroutineScope(): GLCoroutineScope {
 	val executor = Executors.newSingleThreadExecutor()
 	return GLCoroutineScopeImpl(
 		GLContext(),
-		SupervisorJob() + executor.asCoroutineDispatcher())
+		executor.asCoroutineDispatcher())
 }
 
 /**
@@ -92,5 +94,5 @@ fun glCoroutineScope(): GLCoroutineScope {
 fun GLManager.glCoroutineScope(): GLCoroutineScope {
 	return GLCoroutineScopeImpl(
 		glContext,
-		SupervisorJob() + glHandler.asCoroutineDispatcher())
+		glHandler.asCoroutineDispatcher())
 }
