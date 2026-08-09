@@ -23,29 +23,29 @@ ext {
 
 	// variable that can be referenced to keep support libs consistent
 	jUnitVersion = '4.13.2'
-	androidTestCoreVersion = '1.5.0'
-	androidTestJnuit = '1.1.5'
-	androidTestRunner = '1.5.2'
-	androidTestRules = '1.5.0'
-	androidTestEspresso = '3.5.1'
+	androidTestCoreVersion = '1.6.1'// 1.7.x以降だとminSDK=21が必要
+	androidTestJnuit = '1.2.0'
+	androidTestRunner = '1.6.2'		// 1.7.x以降だとminSDK=21が必要
+	androidTestRules = '1.6.1'		// 1.7.x以降だとminSDK=21が必要
+	androidTestEspresso = '3.6.1'	// 3.7.x以降だとminSDK=21が必要
 
 	androidXAppCompat = '1.6.1'	// 1.7.x以降にするとminSDK=21が必須なので1.6.xを使う
 	androidXExif = '1.3.7'
 	androidXLifecycle = '2.8.3'
 	androidXMultiDex = '2.0.1'
 	androidXMaterial = '1.12.0'
-	androidXRecyclerview = '1.3.2'
+	androidXRecyclerview = '1.3.2'	// 1.4.x以降だとAPI>=35でビルドが必要
 	androidXPreference = '1.2.1'
-	androidXConstraint = '2.1.4'
+	androidXConstraint = '2.1.4'	// 2.2.x以降だとminSDK=21が必要
 	androidXLeanback = '1.0.0'
 	androidXDataBinding = '8.5.1'
 
-	androidXCoreKtx = '1.13.1'
-	androidXLifecycleKtx = '2.8.3'
+	androidXCoreKtx = '1.13.1'		// 1.14.x以降だとAPI>=35でビルドが必要
+	androidXLifecycleKtx = '2.8.3'	// 2.9.x以降だとminSDK=21が必要
 	androidXFragmentKtx = '1.7.1'	// 1.8.x以降にするとminSDK=21が必須なので1.7.xを使う
 
 	kotlinStdLibVersion = '1.9.24'
-	kotlinCoroutinesVersion = '1.8.1'
+	kotlinCoroutinesVersion = '1.9.0'
 
     versionCodeNum = 486
     versionNameString = '10.3.2'
