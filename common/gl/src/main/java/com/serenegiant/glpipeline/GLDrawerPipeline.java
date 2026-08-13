@@ -42,10 +42,10 @@ import androidx.annotation.WorkerThread;
  * パイプライン → DrawerPipeline (→ パイプライン)
  *                (→ Surface)
  */
-public class DrawerPipeline extends GLProxyPipeline
+public class GLDrawerPipeline extends GLProxyPipeline
 	implements GLSurfacePipeline, IMirror {
 	private static final boolean DEBUG = false;	// set false on production
-	private static final String TAG = DrawerPipeline.class.getSimpleName();
+	private static final String TAG = GLDrawerPipeline.class.getSimpleName();
 
 	@NonNull
 	private final GLManager mManager;
@@ -101,7 +101,7 @@ public class DrawerPipeline extends GLProxyPipeline
 	 * @throws IllegalStateException
 	 * @throws IllegalArgumentException
 	 */
-	public DrawerPipeline(
+	public GLDrawerPipeline(
 		@NonNull final GLManager manager)
 		throws IllegalStateException, IllegalArgumentException {
 
@@ -118,7 +118,7 @@ public class DrawerPipeline extends GLProxyPipeline
 	 * @throws IllegalStateException
 	 * @throws IllegalArgumentException
 	 */
-	public DrawerPipeline(
+	public GLDrawerPipeline(
 		@NonNull final GLManager manager,
 		@Nullable final Object surface, @Nullable final Fraction maxFps)
 		throws IllegalStateException, IllegalArgumentException {
@@ -135,7 +135,7 @@ public class DrawerPipeline extends GLProxyPipeline
 	 * @throws IllegalStateException
 	 * @throws IllegalArgumentException
 	 */
-	public DrawerPipeline(
+	public GLDrawerPipeline(
 		@NonNull final GLManager manager, @NonNull final GLDrawer2D.DrawerFactory drawerFactory)
 		throws IllegalStateException, IllegalArgumentException {
 
@@ -154,7 +154,7 @@ public class DrawerPipeline extends GLProxyPipeline
 	 * @throws IllegalStateException
 	 * @throws IllegalArgumentException
 	 */
-	public DrawerPipeline(
+	public GLDrawerPipeline(
 		@NonNull final GLManager manager,
 		@NonNull final GLDrawer2D.DrawerFactory drawerFactory,
 		@PipelineMode final int pipelineMode,

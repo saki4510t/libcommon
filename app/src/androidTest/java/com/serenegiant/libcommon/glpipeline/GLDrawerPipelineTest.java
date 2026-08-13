@@ -25,7 +25,7 @@ import android.view.Surface;
 
 import com.serenegiant.gl.GLDrawer2D;
 import com.serenegiant.gl.GLManager;
-import com.serenegiant.glpipeline.DrawerPipeline;
+import com.serenegiant.glpipeline.GLDrawerPipeline;
 import com.serenegiant.glpipeline.GLPipeline;
 import com.serenegiant.glpipeline.GLPipelineSurfaceSource;
 import com.serenegiant.glpipeline.ImageSourcePipeline;
@@ -105,8 +105,8 @@ import static com.serenegiant.libcommon.TestUtils.*;
  * GL_TEXTURE_EXTERNAL_OES      3個               あり　          上下反転なし           NG*
  */
 @RunWith(AndroidJUnit4.class)
-public class DrawerPipelineTest {
-	private static final String TAG = DrawerPipelineTest.class.getSimpleName();
+public class GLDrawerPipelineTest {
+	private static final String TAG = GLDrawerPipelineTest.class.getSimpleName();
 
 	private static final int WIDTH = 128;
 	private static final int HEIGHT = 128;
@@ -196,7 +196,7 @@ public class DrawerPipelineTest {
 
 		// 映像ソースを生成
 		final ImageSourcePipeline source = new ImageSourcePipeline(manager, original, null);
-		final DrawerPipeline pipeline1 = new DrawerPipeline(manager, GLDrawer2D.DEFAULT_FACTORY);
+		final GLDrawerPipeline pipeline1 = new GLDrawerPipeline(manager, GLDrawer2D.DEFAULT_FACTORY);
 
 		GLPipeline.append(source, pipeline1);
 		GLPipeline.append(source, proxy);
@@ -240,8 +240,8 @@ public class DrawerPipelineTest {
 
 		// 映像ソースを生成
 		final ImageSourcePipeline source = new ImageSourcePipeline(manager, original, null);
-		final DrawerPipeline pipeline1 = new DrawerPipeline(manager, GLDrawer2D.DEFAULT_FACTORY);
-		final DrawerPipeline pipeline2 = new DrawerPipeline(manager, GLDrawer2D.DEFAULT_FACTORY);
+		final GLDrawerPipeline pipeline1 = new GLDrawerPipeline(manager, GLDrawer2D.DEFAULT_FACTORY);
+		final GLDrawerPipeline pipeline2 = new GLDrawerPipeline(manager, GLDrawer2D.DEFAULT_FACTORY);
 
 		GLPipeline.append(source, pipeline1);
 		GLPipeline.append(source, pipeline2);
@@ -287,9 +287,9 @@ public class DrawerPipelineTest {
 
 		// 映像ソースを生成
 		final ImageSourcePipeline source = new ImageSourcePipeline(manager, original, null);
-		final DrawerPipeline pipeline1 = new DrawerPipeline(manager, GLDrawer2D.DEFAULT_FACTORY);
-		final DrawerPipeline pipeline2 = new DrawerPipeline(manager, GLDrawer2D.DEFAULT_FACTORY);
-		final DrawerPipeline pipeline3 = new DrawerPipeline(manager, GLDrawer2D.DEFAULT_FACTORY);
+		final GLDrawerPipeline pipeline1 = new GLDrawerPipeline(manager, GLDrawer2D.DEFAULT_FACTORY);
+		final GLDrawerPipeline pipeline2 = new GLDrawerPipeline(manager, GLDrawer2D.DEFAULT_FACTORY);
+		final GLDrawerPipeline pipeline3 = new GLDrawerPipeline(manager, GLDrawer2D.DEFAULT_FACTORY);
 
 		GLPipeline.append(source, pipeline1);
 		GLPipeline.append(source, pipeline2);
@@ -433,7 +433,7 @@ public class DrawerPipelineTest {
 		assertNotNull(inputSurface);
 
 		// 検証するDrawerPipelineを生成
-		final DrawerPipeline pipeline1 = new DrawerPipeline(manager, GLDrawer2D.DEFAULT_FACTORY);
+		final GLDrawerPipeline pipeline1 = new GLDrawerPipeline(manager, GLDrawer2D.DEFAULT_FACTORY);
 
 		GLPipeline.append(source, pipeline1);
 		GLPipeline.append(source, proxy);
@@ -508,8 +508,8 @@ public class DrawerPipelineTest {
 		assertNotNull(inputSurface);
 
 		// 検証するDrawerPipelineを生成
-		final DrawerPipeline pipeline1 = new DrawerPipeline(manager, GLDrawer2D.DEFAULT_FACTORY);
-		final DrawerPipeline pipeline2 = new DrawerPipeline(manager, GLDrawer2D.DEFAULT_FACTORY);
+		final GLDrawerPipeline pipeline1 = new GLDrawerPipeline(manager, GLDrawer2D.DEFAULT_FACTORY);
+		final GLDrawerPipeline pipeline2 = new GLDrawerPipeline(manager, GLDrawer2D.DEFAULT_FACTORY);
 
 		GLPipeline.append(source, pipeline1);
 		GLPipeline.append(source, pipeline2);
@@ -586,9 +586,9 @@ public class DrawerPipelineTest {
 		assertNotNull(inputSurface);
 
 		// 検証するDrawerPipelineを生成
-		final DrawerPipeline pipeline1 = new DrawerPipeline(manager, GLDrawer2D.DEFAULT_FACTORY);
-		final DrawerPipeline pipeline2 = new DrawerPipeline(manager, GLDrawer2D.DEFAULT_FACTORY);
-		final DrawerPipeline pipeline3 = new DrawerPipeline(manager, GLDrawer2D.DEFAULT_FACTORY);
+		final GLDrawerPipeline pipeline1 = new GLDrawerPipeline(manager, GLDrawer2D.DEFAULT_FACTORY);
+		final GLDrawerPipeline pipeline2 = new GLDrawerPipeline(manager, GLDrawer2D.DEFAULT_FACTORY);
+		final GLDrawerPipeline pipeline3 = new GLDrawerPipeline(manager, GLDrawer2D.DEFAULT_FACTORY);
 
 		GLPipeline.append(source, pipeline1);
 		GLPipeline.append(source, pipeline2);
@@ -640,7 +640,7 @@ public class DrawerPipelineTest {
 		// 映像ソースを生成
 		final ImageSourcePipeline source = new ImageSourcePipeline(manager, original, null);
 		// テスト対象のDrawerPipelineを生成
-		final DrawerPipeline pipeline = new DrawerPipeline(manager);
+		final GLDrawerPipeline pipeline = new GLDrawerPipeline(manager);
 
 		final Semaphore sem = new Semaphore(0);
 
@@ -730,7 +730,7 @@ public class DrawerPipelineTest {
 		assertNotNull(inputSurface);
 
 		// 検証するDrawerPipelineを生成
-		final DrawerPipeline pipeline1 = new DrawerPipeline(manager, GLDrawer2D.DEFAULT_FACTORY);
+		final GLDrawerPipeline pipeline1 = new GLDrawerPipeline(manager, GLDrawer2D.DEFAULT_FACTORY);
 
 		// パイプラインを経由した映像の受け取り用にProxyPipelineを生成する
 		final AtomicReference<Bitmap> result1 = new AtomicReference<>();
