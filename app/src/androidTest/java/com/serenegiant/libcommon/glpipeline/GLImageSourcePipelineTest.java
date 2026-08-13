@@ -26,7 +26,7 @@ import com.serenegiant.gl.GLManager;
 import com.serenegiant.gl.GLUtils;
 import com.serenegiant.glpipeline.GLPipeline;
 import com.serenegiant.glpipeline.GLImageSourcePipeline;
-import com.serenegiant.glpipeline.OnFramePipeline;
+import com.serenegiant.glpipeline.GLOnFramePipeline;
 import com.serenegiant.glutils.GLBitmapImageReader;
 import com.serenegiant.glutils.GLFrameAvailableCallback;
 import com.serenegiant.glutils.ImageReader;
@@ -125,7 +125,7 @@ public class GLImageSourcePipelineTest {
 		}, HandlerThreadHandler.createHandler(TAG));
 
 		final GLImageSourcePipeline source = new GLImageSourcePipeline(manager, original, null);
-		final OnFramePipeline pipeline = new OnFramePipeline(reader);
+		final GLOnFramePipeline pipeline = new GLOnFramePipeline(reader);
 		source.setPipeline(pipeline);
 		assertTrue(validatePipelineOrder(source, source, pipeline));
 
@@ -226,7 +226,7 @@ public class GLImageSourcePipelineTest {
 		};
 
 		final GLImageSourcePipeline source = new GLImageSourcePipeline(manager, original, null);
-		final OnFramePipeline pipeline = new OnFramePipeline(callback);
+		final GLOnFramePipeline pipeline = new GLOnFramePipeline(callback);
 		source.setPipeline(pipeline);
 		assertTrue(validatePipelineOrder(source, source, pipeline));
 

@@ -28,7 +28,7 @@ import com.serenegiant.glutils.GLFrameAvailableCallback
  * パイプライン → OnFramePipeline (→ パイプライン)
  *                → onFrameAvailableコールバック呼び出し
  */
-class OnFramePipeline(private val mListener: GLFrameAvailableCallback)
+class GLOnFramePipeline(private val mListener: GLFrameAvailableCallback)
 : GLProxyPipeline() {
 	override fun onFrameAvailable(
 		isGLES3: Boolean,

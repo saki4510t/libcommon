@@ -215,7 +215,7 @@ class SimpleVideoSourceCameraTextureView @JvmOverloads constructor(
 						// OnFramePipelineを追加する
 						if (DEBUG) Log.v(TAG, "addSurface:create OnFramePipeline")
 						val p = GLPipeline.findLast(source)
-						p.pipeline = OnFramePipeline(object: GLFrameAvailableCallback {
+						p.pipeline = GLOnFramePipeline(object: GLFrameAvailableCallback {
 							var cnt: Int = 0
 
 							override fun onFrameAvailable(

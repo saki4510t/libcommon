@@ -69,3 +69,4 @@ typealias FaceDetectPipeline = GLFaceDetectPipeline
 typealias HistogramPipeline = GLHistogramPipeline
 typealias MaskPipeline = GLMaskPipeline
 typealias ImageSourcePipeline = GLImageSourcePipeline
+typealias OnFramePipeline = GLOnFramePipeline
