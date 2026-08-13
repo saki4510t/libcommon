@@ -34,9 +34,9 @@ import androidx.annotation.Size;
  * これが生成する映像ソースのテクスチャはGL_TEXTURE_2D
  * ビットマップ → ImageSourcePipeline (→ パイプライン)
  */
-public class ImageSourcePipeline extends GLProxyPipeline implements GLPipelineSource {
+public class GLImageSourcePipeline extends GLProxyPipeline implements GLPipelineSource {
 	private static final boolean DEBUG = false;	// set false on production
-	private static final String TAG = ImageSourcePipeline.class.getSimpleName();
+	private static final String TAG = GLImageSourcePipeline.class.getSimpleName();
 
 	/**
 	 * GLTextureを使って静止画をテクスチャとして読み込みChoreographerを使って定期的に
@@ -54,7 +54,7 @@ public class ImageSourcePipeline extends GLProxyPipeline implements GLPipelineSo
 	 * @param bitmap nullのときは後で#setSourceを呼び出さないと#onFrameAvailableが呼び出されない
 	 * @param fps nullの時は30fps相当
 	 */
-	public ImageSourcePipeline(
+	public GLImageSourcePipeline(
 		@NonNull final GLManager manager,
 		@Nullable final Bitmap bitmap, @Nullable final Fraction fps) {
 		super();

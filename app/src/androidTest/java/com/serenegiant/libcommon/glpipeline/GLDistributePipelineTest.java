@@ -25,7 +25,7 @@ import android.util.Log;
 import com.serenegiant.gl.GLManager;
 import com.serenegiant.glpipeline.GLDistributePipeline;
 import com.serenegiant.glpipeline.GLPipeline;
-import com.serenegiant.glpipeline.ImageSourcePipeline;
+import com.serenegiant.glpipeline.GLImageSourcePipeline;
 import com.serenegiant.graphics.BitmapHelper;
 
 import org.junit.After;
@@ -95,7 +95,7 @@ public class GLDistributePipelineTest {
 		final GLManager manager = mManager;
 
 		// 映像ソースを生成
-		final ImageSourcePipeline source = new ImageSourcePipeline(manager, original, null);
+		final GLImageSourcePipeline source = new GLImageSourcePipeline(manager, original, null);
 
 		final GLDistributePipeline distributor = new GLDistributePipeline();
 		source.setPipeline(distributor);

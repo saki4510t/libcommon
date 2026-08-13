@@ -25,7 +25,7 @@ import android.view.Surface;
 
 import com.serenegiant.glpipeline.GLPipeline;
 import com.serenegiant.glpipeline.GLPipelineSurfaceSource;
-import com.serenegiant.glpipeline.ImageSourcePipeline;
+import com.serenegiant.glpipeline.GLImageSourcePipeline;
 import com.serenegiant.glpipeline.SurfaceRendererPipeline;
 import com.serenegiant.glpipeline.SurfaceSourcePipeline;
 import com.serenegiant.gl.GLManager;
@@ -98,7 +98,7 @@ public class SurfaceRendererPipelineTest {
 
 		final GLManager manager = mManager;
 
-		final ImageSourcePipeline source = new ImageSourcePipeline(manager, original, null);
+		final GLImageSourcePipeline source = new GLImageSourcePipeline(manager, original, null);
 		final SurfaceRendererPipeline renderer = new SurfaceRendererPipeline(manager);
 		GLPipeline.append(source, renderer);
 
@@ -258,7 +258,7 @@ public class SurfaceRendererPipelineTest {
 		final GLPipeline proxy = createImageReceivePipeline(manager, WIDTH, HEIGHT, NUM_FRAMES, sem, result, cnt);
 
 		// 映像ソースを生成
-		final ImageSourcePipeline source = new ImageSourcePipeline(manager, original, null);
+		final GLImageSourcePipeline source = new GLImageSourcePipeline(manager, original, null);
 		GLPipeline.append(source, renderer);
 		GLPipeline.append(surfaceSource, proxy);
 

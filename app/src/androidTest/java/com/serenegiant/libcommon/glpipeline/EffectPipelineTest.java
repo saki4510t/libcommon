@@ -27,7 +27,7 @@ import com.serenegiant.gl.GLManager;
 import com.serenegiant.glpipeline.GLEffectPipeline;
 import com.serenegiant.glpipeline.GLPipeline;
 import com.serenegiant.glpipeline.GLPipelineSurfaceSource;
-import com.serenegiant.glpipeline.ImageSourcePipeline;
+import com.serenegiant.glpipeline.GLImageSourcePipeline;
 import com.serenegiant.glpipeline.SurfaceSourcePipeline;
 import com.serenegiant.glutils.GLSurfaceReceiver;
 import com.serenegiant.graphics.BitmapHelper;
@@ -99,7 +99,7 @@ public class EffectPipelineTest {
 		final GLManager manager = mManager;
 
 		// 映像ソースを生成
-		final ImageSourcePipeline source = new ImageSourcePipeline(manager, original, null);
+		final GLImageSourcePipeline source = new GLImageSourcePipeline(manager, original, null);
 
 		final GLEffectPipeline pipeline1 = new GLEffectPipeline(manager);
 
@@ -147,7 +147,7 @@ public class EffectPipelineTest {
 		final GLManager manager = mManager;
 
 		// 映像ソースを生成
-		final ImageSourcePipeline source = new ImageSourcePipeline(manager, original, null);
+		final GLImageSourcePipeline source = new GLImageSourcePipeline(manager, original, null);
 
 		final GLEffectPipeline pipeline1 = new GLEffectPipeline(manager);
 		final GLEffectPipeline pipeline2 = new GLEffectPipeline(manager);
@@ -201,7 +201,7 @@ public class EffectPipelineTest {
 		final GLManager manager = mManager;
 
 		// 映像ソースを生成
-		final ImageSourcePipeline source = new ImageSourcePipeline(manager, original, null);
+		final GLImageSourcePipeline source = new GLImageSourcePipeline(manager, original, null);
 
 		final GLEffectPipeline pipeline1 = new GLEffectPipeline(manager);
 		final GLEffectPipeline pipeline2 = new GLEffectPipeline(manager);
@@ -492,7 +492,7 @@ public class EffectPipelineTest {
 		final GLManager manager = mManager;
 
 		// 映像ソースを生成
-		final ImageSourcePipeline source = new ImageSourcePipeline(manager, original, null);
+		final GLImageSourcePipeline source = new GLImageSourcePipeline(manager, original, null);
 		// テスト対象のEffectPipelineを生成
 		final GLEffectPipeline pipeline = new GLEffectPipeline(manager);
 

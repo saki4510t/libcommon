@@ -28,7 +28,7 @@ import com.serenegiant.gl.GLManager;
 import com.serenegiant.glpipeline.GLDrawerPipeline;
 import com.serenegiant.glpipeline.GLPipeline;
 import com.serenegiant.glpipeline.GLPipelineSurfaceSource;
-import com.serenegiant.glpipeline.ImageSourcePipeline;
+import com.serenegiant.glpipeline.GLImageSourcePipeline;
 import com.serenegiant.glpipeline.SurfaceSourcePipeline;
 import com.serenegiant.glutils.GLSurfaceReceiver;
 import com.serenegiant.graphics.BitmapHelper;
@@ -154,7 +154,7 @@ public class GLDrawerPipelineTest {
 		final GLPipeline proxy = createImageReceivePipeline(manager, WIDTH, HEIGHT, NUM_FRAMES, sem, result, cnt);
 
 		// 映像ソースを生成
-		final ImageSourcePipeline source = new ImageSourcePipeline(manager, original, null);
+		final GLImageSourcePipeline source = new GLImageSourcePipeline(manager, original, null);
 
 		GLPipeline.append(source, proxy);
 		assertTrue(validatePipelineOrder(source, source, proxy));
@@ -195,7 +195,7 @@ public class GLDrawerPipelineTest {
 		final GLPipeline proxy = createImageReceivePipeline(manager, WIDTH, HEIGHT, NUM_FRAMES, sem, result, cnt);
 
 		// 映像ソースを生成
-		final ImageSourcePipeline source = new ImageSourcePipeline(manager, original, null);
+		final GLImageSourcePipeline source = new GLImageSourcePipeline(manager, original, null);
 		final GLDrawerPipeline pipeline1 = new GLDrawerPipeline(manager, GLDrawer2D.DEFAULT_FACTORY);
 
 		GLPipeline.append(source, pipeline1);
@@ -239,7 +239,7 @@ public class GLDrawerPipelineTest {
 		final GLPipeline proxy = createImageReceivePipeline(manager, WIDTH, HEIGHT, NUM_FRAMES, sem, result, cnt);
 
 		// 映像ソースを生成
-		final ImageSourcePipeline source = new ImageSourcePipeline(manager, original, null);
+		final GLImageSourcePipeline source = new GLImageSourcePipeline(manager, original, null);
 		final GLDrawerPipeline pipeline1 = new GLDrawerPipeline(manager, GLDrawer2D.DEFAULT_FACTORY);
 		final GLDrawerPipeline pipeline2 = new GLDrawerPipeline(manager, GLDrawer2D.DEFAULT_FACTORY);
 
@@ -286,7 +286,7 @@ public class GLDrawerPipelineTest {
 		final GLPipeline proxy = createImageReceivePipeline(manager, WIDTH, HEIGHT, NUM_FRAMES, sem, result, cnt);
 
 		// 映像ソースを生成
-		final ImageSourcePipeline source = new ImageSourcePipeline(manager, original, null);
+		final GLImageSourcePipeline source = new GLImageSourcePipeline(manager, original, null);
 		final GLDrawerPipeline pipeline1 = new GLDrawerPipeline(manager, GLDrawer2D.DEFAULT_FACTORY);
 		final GLDrawerPipeline pipeline2 = new GLDrawerPipeline(manager, GLDrawer2D.DEFAULT_FACTORY);
 		final GLDrawerPipeline pipeline3 = new GLDrawerPipeline(manager, GLDrawer2D.DEFAULT_FACTORY);
@@ -638,7 +638,7 @@ public class GLDrawerPipelineTest {
 		final GLManager manager = mManager;
 
 		// 映像ソースを生成
-		final ImageSourcePipeline source = new ImageSourcePipeline(manager, original, null);
+		final GLImageSourcePipeline source = new GLImageSourcePipeline(manager, original, null);
 		// テスト対象のDrawerPipelineを生成
 		final GLDrawerPipeline pipeline = new GLDrawerPipeline(manager);
 

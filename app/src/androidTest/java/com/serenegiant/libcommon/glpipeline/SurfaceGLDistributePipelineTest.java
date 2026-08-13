@@ -24,7 +24,7 @@ import android.view.Surface;
 
 import com.serenegiant.gl.GLManager;
 import com.serenegiant.glpipeline.GLPipeline;
-import com.serenegiant.glpipeline.ImageSourcePipeline;
+import com.serenegiant.glpipeline.GLImageSourcePipeline;
 import com.serenegiant.glpipeline.SurfaceDistributePipeline;
 import com.serenegiant.glutils.GLSurfaceReceiver;
 import com.serenegiant.graphics.BitmapHelper;
@@ -98,7 +98,7 @@ public class SurfaceGLDistributePipelineTest {
 		final SurfaceDistributePipeline distributor = new SurfaceDistributePipeline(manager);
 
 		// 映像ソースを生成
-		final ImageSourcePipeline source = new ImageSourcePipeline(manager, original, null);
+		final GLImageSourcePipeline source = new GLImageSourcePipeline(manager, original, null);
 		GLPipeline.append(source, distributor);
 		assertTrue(validatePipelineOrder(source, source, distributor));
 

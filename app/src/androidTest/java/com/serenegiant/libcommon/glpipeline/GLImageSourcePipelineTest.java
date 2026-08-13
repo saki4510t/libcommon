@@ -25,7 +25,7 @@ import android.util.Log;
 import com.serenegiant.gl.GLManager;
 import com.serenegiant.gl.GLUtils;
 import com.serenegiant.glpipeline.GLPipeline;
-import com.serenegiant.glpipeline.ImageSourcePipeline;
+import com.serenegiant.glpipeline.GLImageSourcePipeline;
 import com.serenegiant.glpipeline.OnFramePipeline;
 import com.serenegiant.glutils.GLBitmapImageReader;
 import com.serenegiant.glutils.GLFrameAvailableCallback;
@@ -57,8 +57,8 @@ import static org.junit.Assert.*;
  * 供給する映像自体は問題ないはず(ImageTextureSourceTestで検証済み)
  */
 @RunWith(AndroidJUnit4.class)
-public class ImageSourcePipelineTest {
-	private static final String TAG = ImageSourcePipelineTest.class.getSimpleName();
+public class GLImageSourcePipelineTest {
+	private static final String TAG = GLImageSourcePipelineTest.class.getSimpleName();
 
 	private static final int WIDTH = 128;
 	private static final int HEIGHT = 128;
@@ -124,7 +124,7 @@ public class ImageSourcePipelineTest {
 			}
 		}, HandlerThreadHandler.createHandler(TAG));
 
-		final ImageSourcePipeline source = new ImageSourcePipeline(manager, original, null);
+		final GLImageSourcePipeline source = new GLImageSourcePipeline(manager, original, null);
 		final OnFramePipeline pipeline = new OnFramePipeline(reader);
 		source.setPipeline(pipeline);
 		assertTrue(validatePipelineOrder(source, source, pipeline));
@@ -167,7 +167,7 @@ public class ImageSourcePipelineTest {
 		final GLPipeline proxy = createImageReceivePipeline(manager, WIDTH, HEIGHT, NUM_FRAMES, sem, result, cnt);
 
 		// 映像ソースを生成
-		final ImageSourcePipeline source = new ImageSourcePipeline(manager, original, null);
+		final GLImageSourcePipeline source = new GLImageSourcePipeline(manager, original, null);
 		source.setPipeline(proxy);
 		assertTrue(validatePipelineOrder(source, source, proxy));
 
@@ -225,7 +225,7 @@ public class ImageSourcePipelineTest {
 			}
 		};
 
-		final ImageSourcePipeline source = new ImageSourcePipeline(manager, original, null);
+		final GLImageSourcePipeline source = new GLImageSourcePipeline(manager, original, null);
 		final OnFramePipeline pipeline = new OnFramePipeline(callback);
 		source.setPipeline(pipeline);
 		assertTrue(validatePipelineOrder(source, source, pipeline));

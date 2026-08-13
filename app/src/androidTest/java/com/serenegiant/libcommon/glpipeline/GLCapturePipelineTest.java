@@ -26,7 +26,7 @@ import android.view.Surface;
 import com.serenegiant.gl.GLManager;
 import com.serenegiant.glpipeline.GLCapturePipeline;
 import com.serenegiant.glpipeline.GLPipelineSurfaceSource;
-import com.serenegiant.glpipeline.ImageSourcePipeline;
+import com.serenegiant.glpipeline.GLImageSourcePipeline;
 import com.serenegiant.glpipeline.SurfaceSourcePipeline;
 import com.serenegiant.graphics.BitmapHelper;
 
@@ -94,7 +94,7 @@ public class GLCapturePipelineTest {
 		final GLManager manager = mManager;
 
 		// 映像ソースを生成
-		final ImageSourcePipeline source = new ImageSourcePipeline(manager, original, null);
+		final GLImageSourcePipeline source = new GLImageSourcePipeline(manager, original, null);
 
 		final AtomicReference<Bitmap> result = new AtomicReference<>();
 		final Semaphore sem = new Semaphore(0);
@@ -236,7 +236,7 @@ public class GLCapturePipelineTest {
 		final GLManager manager = mManager;
 
 		// 映像ソースを生成
-		final ImageSourcePipeline source = new ImageSourcePipeline(manager, original, null);
+		final GLImageSourcePipeline source = new GLImageSourcePipeline(manager, original, null);
 
 		final AtomicReference<Bitmap> result = new AtomicReference<>();
 		final Semaphore sem = new Semaphore(0);

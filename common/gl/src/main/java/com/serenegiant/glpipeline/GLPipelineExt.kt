@@ -68,3 +68,4 @@ typealias DistributePipeline = GLDistributePipeline
 typealias FaceDetectPipeline = GLFaceDetectPipeline
 typealias HistogramPipeline = GLHistogramPipeline
 typealias MaskPipeline = GLMaskPipeline
+typealias ImageSourcePipeline = GLImageSourcePipeline

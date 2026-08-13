@@ -30,7 +30,7 @@ import androidx.annotation.WorkerThread
 import androidx.core.content.ContextCompat
 import com.serenegiant.glpipeline.SurfaceDistributePipeline
 import com.serenegiant.glpipeline.GLPipeline
-import com.serenegiant.glpipeline.ImageSourcePipeline
+import com.serenegiant.glpipeline.GLImageSourcePipeline
 import com.serenegiant.gl.GLDrawer2D
 import com.serenegiant.graphics.BitmapHelper
 import com.serenegiant.graphics.MatrixUtils
@@ -54,7 +54,7 @@ class DummyCameraGLView @JvmOverloads constructor(
 		: AspectScaledGLView(context, attrs, defStyle), ICameraView, GLPipelineView {
 
 	private var mOnFrameAvailableListener: OnFrameAvailableListener? = null
-	private var mImageSourcePipeline: ImageSourcePipeline? = null
+	private var mImageSourcePipeline: GLImageSourcePipeline? = null
 	private var mDistributor: SurfaceDistributePipeline? = null
 	private val mMvpMatrix = FloatArray(16)
 	@Volatile
@@ -114,7 +114,7 @@ class DummyCameraGLView @JvmOverloads constructor(
 		val dr: Drawable? = ContextCompat.getDrawable(context, R.mipmap.ic_launcher)
 		val image = if (dr != null) BitmapHelper.fromDrawable(dr, 640, 480) else null
 		mImageSourcePipeline =
-			ImageSourcePipeline(
+			GLImageSourcePipeline(
 				getGLManager(),
 				image,
 				null
