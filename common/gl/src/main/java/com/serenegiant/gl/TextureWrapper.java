@@ -57,14 +57,14 @@ public class TextureWrapper implements GLConst, Parcelable {
 
 	/**
 	 * Parcelable実装用のコンストラクタ
-	 * @param in
+	 * @param src
 	 */
-	protected TextureWrapper(@NonNull final Parcel in) {
-		texTarget = in.readInt();
-		texUnit = in.readInt();
-		texId = in.readInt();
-		width = in.readInt();
-		height = in.readInt();
+	protected TextureWrapper(@NonNull final Parcel src) {
+		texTarget = src.readInt();
+		texUnit = src.readInt();
+		texId = src.readInt();
+		width = src.readInt();
+		height = src.readInt();
 	}
 
 	@Override
@@ -85,8 +85,8 @@ public class TextureWrapper implements GLConst, Parcelable {
 		= new Creator<TextureWrapper>() {
 
 		@Override
-		public TextureWrapper createFromParcel(Parcel in) {
-			return new TextureWrapper(in);
+		public TextureWrapper createFromParcel(Parcel src) {
+			return new TextureWrapper(src);
 		}
 
 		@Override

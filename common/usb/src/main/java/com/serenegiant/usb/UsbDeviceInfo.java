@@ -384,16 +384,16 @@ public class UsbDeviceInfo implements Const, Parcelable {
 
 	/**
 	 * Parcelable用のコンストラクタ
-	 * @param in
+	 * @param src
 	 */
-	public UsbDeviceInfo(@NonNull final Parcel in) {
-		device = in.readParcelable(UsbDevice.class.getClassLoader());
-		bcdUsb = in.readString();
-		manufacturer = in.readString();
-		product = in.readString();
-		version = in.readString();
-		serial = in.readString();
-		configCounts = in.readInt();
+	public UsbDeviceInfo(@NonNull final Parcel src) {
+		device = src.readParcelable(UsbDevice.class.getClassLoader());
+		bcdUsb = src.readString();
+		manufacturer = src.readString();
+		product = src.readString();
+		version = src.readString();
+		serial = src.readString();
+		configCounts = src.readInt();
 	}
 
 	/**
@@ -436,8 +436,8 @@ public class UsbDeviceInfo implements Const, Parcelable {
 
 	public static final Creator<UsbDeviceInfo> CREATOR = new Creator<UsbDeviceInfo>() {
 		@Override
-		public UsbDeviceInfo createFromParcel(@NonNull final Parcel in) {
-			return new UsbDeviceInfo(in);
+		public UsbDeviceInfo createFromParcel(@NonNull final Parcel src) {
+			return new UsbDeviceInfo(src);
 		}
 
 		@Override

@@ -210,11 +210,11 @@ public class Fraction implements Parcelable {
 
 	/**
 	 * Parcelable実装用のコンストラクタ
-	 * @param in
+	 * @param src
 	 */
-	protected Fraction(@NonNull final Parcel in) {
-		mNumerator = in.readInt();
-		mDenominator = in.readInt();
+	protected Fraction(@NonNull final Parcel src) {
+		mNumerator = src.readInt();
+		mDenominator = src.readInt();
 	}
 
 	/**
@@ -682,8 +682,8 @@ public class Fraction implements Parcelable {
 	 */
 	public static final Creator<Fraction> CREATOR = new Creator<Fraction>() {
 		@Override
-		public Fraction createFromParcel(Parcel in) {
-			return new Fraction(in);
+		public Fraction createFromParcel(@NonNull final Parcel src) {
+			return new Fraction(src);
 		}
 
 		@Override

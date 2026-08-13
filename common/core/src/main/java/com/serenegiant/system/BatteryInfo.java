@@ -144,18 +144,18 @@ public class BatteryInfo implements Parcelable {
 
 	/**
 	 * Parcelable実装用のコンストラクタ
-	 * @param in
+	 * @param src
 	 */
-	protected BatteryInfo(@NonNull final Parcel in) {
-		level = in.readInt();
-		scale = in.readInt();
-		temperature = in.readFloat();
-		battery = in.readFloat();
-		voltage = in.readFloat();
-		technology = in.readString();
-		status = in.readInt();
-		health = in.readInt();
-		plugged = in.readInt();
+	protected BatteryInfo(@NonNull final Parcel src) {
+		level = src.readInt();
+		scale = src.readInt();
+		temperature = src.readFloat();
+		battery = src.readFloat();
+		voltage = src.readFloat();
+		technology = src.readString();
+		status = src.readInt();
+		health = src.readInt();
+		plugged = src.readInt();
 	}
 
 	/**
@@ -250,8 +250,8 @@ public class BatteryInfo implements Parcelable {
 //--------------------------------------------------------------------------------
 	public static final Creator<BatteryInfo> CREATOR = new Creator<BatteryInfo>() {
 		@Override
-		public BatteryInfo createFromParcel(Parcel in) {
-			return new BatteryInfo(in);
+		public BatteryInfo createFromParcel(@NonNull final Parcel src) {
+			return new BatteryInfo(src);
 		}
 
 		@Override

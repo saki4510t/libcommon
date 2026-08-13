@@ -45,8 +45,8 @@ public class MediaInfo implements Parcelable {
 
 	public static final Creator<MediaInfo> CREATOR = new Creator<MediaInfo>() {
 		@Override
-		public MediaInfo createFromParcel(final Parcel in) {
-			return new MediaInfo(in);
+		public MediaInfo createFromParcel(@NonNull final Parcel src) {
+			return new MediaInfo(src);
 		}
 
 		@Override
@@ -94,20 +94,20 @@ public class MediaInfo implements Parcelable {
 
 	/**
 	 * Parcelable用のコンストラクタ
-	 * @param in
+	 * @param src
 	 */
-	protected MediaInfo(@NonNull final Parcel in) {
-		id = in.readLong();
-		data = in.readString();
-		title = in.readString();
-		mime = in.readString();
-		displayName = in.readString();
-		mediaType = in.readInt();
-		width = in.readInt();
-		height = in.readInt();
-		orientation = in.readInt();
-		dateTaken = in.readLong();
-		dateModified = in.readLong();
+	protected MediaInfo(@NonNull final Parcel src) {
+		id = src.readLong();
+		data = src.readString();
+		title = src.readString();
+		mime = src.readString();
+		displayName = src.readString();
+		mediaType = src.readInt();
+		width = src.readInt();
+		height = src.readInt();
+		orientation = src.readInt();
+		dateTaken = src.readLong();
+		dateModified = src.readLong();
 	}
 
 	/**

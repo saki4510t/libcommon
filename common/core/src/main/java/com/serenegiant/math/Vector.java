@@ -99,12 +99,12 @@ public class Vector implements Parcelable, Serializable, Cloneable {
 
 	/**
 	 * Parcelable用コンストラクタ
-	 * @param in
+	 * @param src
 	 */
-	protected Vector(@NonNull final Parcel in) {
-		x = in.readFloat();
-		y = in.readFloat();
-		z = in.readFloat();
+	protected Vector(@NonNull final Parcel src) {
+		x = src.readFloat();
+		y = src.readFloat();
+		z = src.readFloat();
 	}
 
 	@NonNull
@@ -1455,12 +1455,12 @@ public class Vector implements Parcelable, Serializable, Cloneable {
 
 	public static final Creator<Vector> CREATOR = new Creator<Vector>() {
 		@Override
-		public Vector createFromParcel(Parcel in) {
-			return new Vector(in);
+		public Vector createFromParcel(@NonNull final Parcel src) {
+			return new Vector(src);
 		}
 
 		@Override
-		public Vector[] newArray(int size) {
+		public Vector[] newArray(final int size) {
 			return new Vector[size];
 		}
 	};

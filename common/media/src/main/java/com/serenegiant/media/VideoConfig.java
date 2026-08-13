@@ -449,16 +449,16 @@ public class VideoConfig implements Parcelable, Cloneable {
 
 	/**
 	 * Parcelable用のコンストラクタ
-	 * @param in
+	 * @param src
 	 */
-	protected VideoConfig(final Parcel in) {
-		BPP = in.readFloat();
-		mIframeIntervalsS = in.readFloat();
-		mNumFramesBetweenIframeOn30fps = in.readFloat();
-		mCaptureFps = in.readInt();
-		mMaxDuration = in.readLong();
-		mUseMediaMuxer = in.readByte() != 0;
-		mUseSurfaceCapture = in.readByte() != 0;
+	protected VideoConfig(@NonNull final Parcel src) {
+		BPP = src.readFloat();
+		mIframeIntervalsS = src.readFloat();
+		mNumFramesBetweenIframeOn30fps = src.readFloat();
+		mCaptureFps = src.readInt();
+		mMaxDuration = src.readLong();
+		mUseMediaMuxer = src.readByte() != 0;
+		mUseSurfaceCapture = src.readByte() != 0;
 	}
 
 	@Override
@@ -467,7 +467,7 @@ public class VideoConfig implements Parcelable, Cloneable {
 	}
 
 	@Override
-	public void writeToParcel(final Parcel dest, final int flags) {
+	public void writeToParcel(@NonNull final Parcel dest, final int flags) {
 		dest.writeFloat(BPP);
 		dest.writeFloat(mIframeIntervalsS);
 		dest.writeFloat(mNumFramesBetweenIframeOn30fps);
@@ -479,8 +479,8 @@ public class VideoConfig implements Parcelable, Cloneable {
 
 	public static final Creator<VideoConfig> CREATOR = new Creator<VideoConfig>() {
 		@Override
-		public VideoConfig createFromParcel(Parcel in) {
-			return new VideoConfig(in);
+		public VideoConfig createFromParcel(@NonNull final Parcel src) {
+			return new VideoConfig(src);
 		}
 
 		@Override

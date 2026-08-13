@@ -54,7 +54,7 @@ import androidx.annotation.XmlRes;
 
 import static com.serenegiant.content.XmlHelper.getAttribute;
 
-public final class DeviceFilter implements Parcelable {
+public class DeviceFilter implements Parcelable {
 
 	private static final String TAG = "DeviceFilter";
 
@@ -349,21 +349,21 @@ public final class DeviceFilter implements Parcelable {
 
 	/**
 	 * コンストラクタ、Parcelable実装用
-	 * @param in
+	 * @param src
 	 */
-	protected DeviceFilter(@NonNull final Parcel in) {
-		mVendorId = in.readInt();
-		mProductId = in.readInt();
-		mClass = in.readInt();
-		mSubclass = in.readInt();
-		mProtocol = in.readInt();
-		mManufacturerName = in.readString();
-		mProductName = in.readString();
-		mSerialNumber = in.readString();
-		mIntfClass = in.createIntArray();
-		mIntfSubClass = in.createIntArray();
-		mIntfProtocol = in.createIntArray();
-		isExclude = in.readByte() != 0;
+	protected DeviceFilter(@NonNull final Parcel src) {
+		mVendorId = src.readInt();
+		mProductId = src.readInt();
+		mClass = src.readInt();
+		mSubclass = src.readInt();
+		mProtocol = src.readInt();
+		mManufacturerName = src.readString();
+		mProductName = src.readString();
+		mSerialNumber = src.readString();
+		mIntfClass = src.createIntArray();
+		mIntfSubClass = src.createIntArray();
+		mIntfProtocol = src.createIntArray();
+		isExclude = src.readByte() != 0;
 	}
 
 /*	public void write(XmlSerializer serializer) throws IOException {
@@ -694,8 +694,8 @@ public final class DeviceFilter implements Parcelable {
 		= new Creator<DeviceFilter>() {
 
 		@Override
-		public DeviceFilter createFromParcel(Parcel in) {
-			return new DeviceFilter(in);
+		public DeviceFilter createFromParcel(@NonNull final Parcel src) {
+			return new DeviceFilter(src);
 		}
 
 		@Override

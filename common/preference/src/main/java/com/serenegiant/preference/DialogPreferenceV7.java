@@ -489,10 +489,10 @@ public class DialogPreferenceV7 extends Preference
 		boolean isDialogShowing;
 		Bundle dialogBundle;
 		
-		public SavedState(Parcel source) {
-			super(source);
-			isDialogShowing = source.readInt() == 1;
-			dialogBundle = source.readBundle(getClass().getClassLoader());
+		public SavedState(@NonNull final Parcel src) {
+			super(src);
+			isDialogShowing = src.readInt() == 1;
+			dialogBundle = src.readBundle(getClass().getClassLoader());
 		}
 		
 		@Override
@@ -508,8 +508,8 @@ public class DialogPreferenceV7 extends Preference
 		
 		public static final Parcelable.Creator<SavedState> CREATOR =
 			new Parcelable.Creator<SavedState>() {
-				public SavedState createFromParcel(Parcel in) {
-					return new SavedState(in);
+				public SavedState createFromParcel(@NonNull final Parcel src) {
+					return new SavedState(src);
 				}
 				
 				public SavedState[] newArray(int size) {

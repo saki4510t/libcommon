@@ -36,9 +36,9 @@ public class StorageInfo implements Parcelable {
 		freeBytes = free;
 	}
 
-	protected StorageInfo(@NonNull final Parcel in) {
-		totalBytes = in.readLong();
-		freeBytes = in.readLong();
+	protected StorageInfo(@NonNull final Parcel src) {
+		totalBytes = src.readLong();
+		freeBytes = src.readLong();
 	}
 
 	@NonNull
@@ -56,15 +56,15 @@ public class StorageInfo implements Parcelable {
 	}
 
 	@Override
-	public void writeToParcel(final Parcel dest, final int flags) {
+	public void writeToParcel(@NonNull final Parcel dest, final int flags) {
 		dest.writeLong(totalBytes);
 		dest.writeLong(freeBytes);
 	}
 
 	public static final Creator<StorageInfo> CREATOR = new Creator<StorageInfo>() {
 		@Override
-		public StorageInfo createFromParcel(@NonNull final Parcel in) {
-			return new StorageInfo(in);
+		public StorageInfo createFromParcel(@NonNull final Parcel src) {
+			return new StorageInfo(src);
 		}
 
 		@Override

@@ -34,12 +34,12 @@ import androidx.annotation.RequiresPermission;
 public class BluetoothDeviceInfo implements Parcelable {
 	public static final Creator<BluetoothDeviceInfo> CREATOR = new Creator<BluetoothDeviceInfo>() {
 		@Override
-		public BluetoothDeviceInfo createFromParcel(Parcel in) {
-			return new BluetoothDeviceInfo(in);
+		public BluetoothDeviceInfo createFromParcel(@NonNull final Parcel src) {
+			return new BluetoothDeviceInfo(src);
 		}
 
 		@Override
-		public BluetoothDeviceInfo[] newArray(int size) {
+		public BluetoothDeviceInfo[] newArray(final int size) {
 			return new BluetoothDeviceInfo[size];
 		}
 	};
@@ -64,12 +64,12 @@ public class BluetoothDeviceInfo implements Parcelable {
 		bondState = device.getBondState();
 	}
 
-	protected BluetoothDeviceInfo(Parcel in) {
-		name = in.readString();
-		address = in.readString();
-		type = in.readInt();
-		deviceClass = in.readInt();
-		bondState = in.readInt();
+	protected BluetoothDeviceInfo(@NonNull final  Parcel src) {
+		name = src.readString();
+		address = src.readString();
+		type = src.readInt();
+		deviceClass = src.readInt();
+		bondState = src.readInt();
 	}
 
 	/**
