@@ -51,9 +51,9 @@ import static com.serenegiant.graphics.IMirror.MIRROR_VERTICAL;
  * パイプライン → CapturePipeline (→ パイプライン)
  *                → Bitmap → onCaptureコールバック呼び出し
  */
-public class CapturePipeline extends GLProxyPipeline {
+public class GLCapturePipeline extends GLProxyPipeline {
 	private static final boolean DEBUG = false;	// set false on production
-	private static final String TAG = CapturePipeline.class.getSimpleName();
+	private static final String TAG = GLCapturePipeline.class.getSimpleName();
 
 	/**
 	 * キャプチャ時のコールバックリスナー
@@ -165,7 +165,7 @@ public class CapturePipeline extends GLProxyPipeline {
 	/**
 	 * コンストラクタ
 	 */
-	public CapturePipeline(@NonNull final GLManager manager, @NonNull final Callback callback) {
+	public GLCapturePipeline(@NonNull final GLManager manager, @NonNull final Callback callback) {
 		super();
 		if (DEBUG) Log.v(TAG, "コンストラクタ");
 		mManager = manager;

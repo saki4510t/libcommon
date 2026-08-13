@@ -36,13 +36,12 @@ import androidx.annotation.LayoutRes
 import androidx.annotation.StringRes
 import androidx.annotation.WorkerThread
 import com.serenegiant.gl.GLManager
-import com.serenegiant.glpipeline.CapturePipeline
+import com.serenegiant.glpipeline.GLCapturePipeline
 import com.serenegiant.math.Fraction
 import com.serenegiant.media.OnFrameAvailableListener
 import com.serenegiant.mediastore.MediaStoreUtils
 import com.serenegiant.system.BuildCheck
 import com.serenegiant.content.PermissionUtils
-import com.serenegiant.documentfile.SAFUtils
 import com.serenegiant.system.FileUtils
 import com.serenegiant.view.ViewUtils
 import com.serenegiant.widget.*
@@ -67,7 +66,7 @@ abstract class AbstractCameraFragment : BaseFragment() {
 	 */
 	protected lateinit var mRecordButton: ImageButton
 
-	private var mCapture: CapturePipeline? = null
+	private var mCapture: GLCapturePipeline? = null
 
 	override fun onAttach(context: Context) {
 		super.onAttach(context)
@@ -105,7 +104,10 @@ abstract class AbstractCameraFragment : BaseFragment() {
 			v.pipelineMode = pipelineMode
 			v.enableFaceDetect = enableFaceDetect
 		}
-		mCapture = CapturePipeline(GLManager()/*FIXME View側が内包しているGLManagerを使わないといけない*/, mCaptureCallback)
+		mCapture = GLCapturePipeline(
+			GLManager()/*FIXME View側が内包しているGLManagerを使わないといけない*/,
+			mCaptureCallback
+		)
 	}
 
 	public override fun internalOnResume() {
@@ -336,7 +338,7 @@ abstract class AbstractCameraFragment : BaseFragment() {
 			&& PermissionUtils.hasCamera(activity)
 	}
 
-	private val mCaptureCallback = object : CapturePipeline.Callback {
+	private val mCaptureCallback = object : GLCapturePipeline.Callback {
 		@WorkerThread
 		override fun onCapture(bitmap: Bitmap) {
 			if (DEBUG) Log.v(TAG, "onCapture:bitmap=$bitmap")

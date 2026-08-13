@@ -43,7 +43,7 @@ import com.serenegiant.camera.CameraConst
 import com.serenegiant.camera.CameraPipelineSource
 import com.serenegiant.camera.CameraSize
 import com.serenegiant.gl.GLManager
-import com.serenegiant.glpipeline.CapturePipeline
+import com.serenegiant.glpipeline.GLCapturePipeline
 import com.serenegiant.glpipeline.SurfaceRendererPipeline
 import com.serenegiant.glpipeline.append
 import com.serenegiant.mediastore.MediaStoreUtils
@@ -73,7 +73,12 @@ class CameraSourcePipelineViewModel(app: Application)
 	private val mGLManager = GLManager()
 //	private val mRenderer = DrawerPipeline(mGLManager)	// パススルーモード以外のときはCapturePipelineへモデルビュー変換行列を適用してはいけない
 	private val mRenderer = SurfaceRendererPipeline(mGLManager)
-	private val mCapture: CapturePipeline by lazy { CapturePipeline(mGLManager, mCaptureCallback) }
+	private val mCapture: GLCapturePipeline by lazy {
+		GLCapturePipeline(
+			mGLManager,
+			mCaptureCallback
+		)
+	}
 	private var mSourcePipeline: CameraPipelineSource? = null
 	private var mResumed = false
 	private var mUpdateOrientationJob: Job? = null
@@ -137,7 +142,7 @@ class CameraSourcePipelineViewModel(app: Application)
 	/**
 	 * CapturePipelineでビットマップとしてキャプチャしたときのコールバック
 	 */
-	private val mCaptureCallback = object : CapturePipeline.Callback {
+	private val mCaptureCallback = object : GLCapturePipeline.Callback {
 		@WorkerThread
 		override fun onCapture(bitmap: Bitmap) {
 			if (DEBUG) Log.v(TAG, "onCapture:bitmap=$bitmap")

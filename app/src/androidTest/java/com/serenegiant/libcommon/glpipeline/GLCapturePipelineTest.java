@@ -24,7 +24,7 @@ import android.util.Log;
 import android.view.Surface;
 
 import com.serenegiant.gl.GLManager;
-import com.serenegiant.glpipeline.CapturePipeline;
+import com.serenegiant.glpipeline.GLCapturePipeline;
 import com.serenegiant.glpipeline.GLPipelineSurfaceSource;
 import com.serenegiant.glpipeline.ImageSourcePipeline;
 import com.serenegiant.glpipeline.SurfaceSourcePipeline;
@@ -50,8 +50,8 @@ import static org.junit.Assert.*;
 import static com.serenegiant.libcommon.TestUtils.*;
 
 @RunWith(AndroidJUnit4.class)
-public class CapturePipelineTest {
-	private static final String TAG = CapturePipelineTest.class.getSimpleName();
+public class GLCapturePipelineTest {
+	private static final String TAG = GLCapturePipelineTest.class.getSimpleName();
 
 	private static final int WIDTH = 128;
 	private static final int HEIGHT = 128;
@@ -99,7 +99,7 @@ public class CapturePipelineTest {
 		final AtomicReference<Bitmap> result = new AtomicReference<>();
 		final Semaphore sem = new Semaphore(0);
 		final AtomicInteger cnt = new AtomicInteger();
-		final CapturePipeline capturePipeline = new CapturePipeline(manager, new CapturePipeline.Callback() {
+		final GLCapturePipeline capturePipeline = new GLCapturePipeline(manager, new GLCapturePipeline.Callback() {
 			@Override
 			public void onCapture(@NonNull final Bitmap bitmap) {
 				if (cnt.incrementAndGet() == 1) {
@@ -180,7 +180,7 @@ public class CapturePipelineTest {
 		final AtomicReference<Bitmap> result = new AtomicReference<>();
 		final AtomicInteger cnt = new AtomicInteger();
 		final AtomicBoolean requestStop = new AtomicBoolean();
-		final CapturePipeline capturePipeline = new CapturePipeline(manager, new CapturePipeline.Callback() {
+		final GLCapturePipeline capturePipeline = new GLCapturePipeline(manager, new GLCapturePipeline.Callback() {
 			@Override
 			public void onCapture(@NonNull final Bitmap bitmap) {
 				if (cnt.incrementAndGet() == 1) {
@@ -241,7 +241,7 @@ public class CapturePipelineTest {
 		final AtomicReference<Bitmap> result = new AtomicReference<>();
 		final Semaphore sem = new Semaphore(0);
 		final AtomicInteger cnt = new AtomicInteger();
-		final CapturePipeline capturePipeline = new CapturePipeline(manager, new CapturePipeline.Callback() {
+		final GLCapturePipeline capturePipeline = new GLCapturePipeline(manager, new GLCapturePipeline.Callback() {
 			@Override
 			public void onCapture(@NonNull final Bitmap bitmap) {
 				if (cnt.incrementAndGet() == NUM_FRAMES) {
@@ -324,7 +324,7 @@ public class CapturePipelineTest {
 		final AtomicReference<Bitmap> result = new AtomicReference<>();
 		final AtomicInteger cnt = new AtomicInteger();
 		final AtomicBoolean requestStop = new AtomicBoolean();
-		final CapturePipeline capturePipeline = new CapturePipeline(manager, new CapturePipeline.Callback() {
+		final GLCapturePipeline capturePipeline = new GLCapturePipeline(manager, new GLCapturePipeline.Callback() {
 			@Override
 			public void onCapture(@NonNull final Bitmap bitmap) {
 				if (cnt.incrementAndGet() == NUM_FRAMES) {
