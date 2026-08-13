@@ -51,7 +51,7 @@ import static com.serenegiant.graphics.IMirror.MIRROR_VERTICAL;
  * パイプライン → CapturePipeline (→ パイプライン)
  *                → Bitmap → onCaptureコールバック呼び出し
  */
-public class CapturePipeline extends ProxyPipeline {
+public class CapturePipeline extends GLProxyPipeline {
 	private static final boolean DEBUG = false;	// set false on production
 	private static final String TAG = CapturePipeline.class.getSimpleName();
 

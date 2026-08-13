@@ -46,7 +46,7 @@ import androidx.annotation.WorkerThread;
  * パイプライン → FaceDetectPipeline (→ パイプライン)
  *                → 顔認識 → onDetectedコールバック呼び出し
  */
-public class FaceDetectPipeline extends ProxyPipeline {
+public class FaceDetectPipeline extends GLProxyPipeline {
 	private static final boolean DEBUG = false;	// set false on production
 	private static final String TAG = FaceDetectPipeline.class.getSimpleName();
 

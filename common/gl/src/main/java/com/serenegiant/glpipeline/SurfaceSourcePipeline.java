@@ -35,7 +35,7 @@ import androidx.annotation.Size;
  * useSharedContext=false, SurfaceSourcePipeline + SurfaceDistributePipeline ≒ IRendererHolder/RendererHolder
  * 映像 → Surface → SurfaceSourcePipeline (→ パイプライン)
  */
-public class SurfaceSourcePipeline extends ProxyPipeline implements GLPipelineSurfaceSource {
+public class SurfaceSourcePipeline extends GLProxyPipeline implements GLPipelineSurfaceSource {
 	private static final boolean DEBUG = false;	// set false on production
 	private static final String TAG = SurfaceSourcePipeline.class.getSimpleName();
 

@@ -49,7 +49,7 @@ import androidx.annotation.WorkerThread;
  * パイプライン → MediaEffectPipeline (→ パイプライン)
  *                (→ Surface)
  */
-public class MediaEffectPipeline extends ProxyPipeline
+public class MediaEffectPipeline extends GLProxyPipeline
 	implements GLSurfacePipeline, IMirror {
 	private static final boolean DEBUG = false;	// set false on production
 	private static final String TAG = MediaEffectPipeline.class.getSimpleName();

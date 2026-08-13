@@ -45,7 +45,7 @@ import androidx.annotation.WorkerThread;
  *                → Surface
  *                → ...
  */
-public class SurfaceDistributePipeline extends ProxyPipeline implements IMirror {
+public class SurfaceDistributePipeline extends GLProxyPipeline implements IMirror {
 	private static final boolean DEBUG = false;	// set false on production
 	private static final String TAG = SurfaceDistributePipeline.class.getSimpleName();
 	private static final String RENDERER_THREAD_NAME = "SurfaceDistributePipeline";

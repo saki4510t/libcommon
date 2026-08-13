@@ -45,7 +45,7 @@ import static com.serenegiant.gl.GLEffect.EFFECT_NON;
  * パイプライン → EffectPipeline (→ パイプライン)
  *                (→ Surface)
  */
-public class EffectPipeline extends ProxyPipeline
+public class EffectPipeline extends GLProxyPipeline
 	implements GLSurfacePipeline, IMirror, IEffect {
 	private static final boolean DEBUG = false;	// set false on production
 	private static final String TAG = EffectPipeline.class.getSimpleName();

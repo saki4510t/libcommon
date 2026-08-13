@@ -41,7 +41,7 @@ import androidx.annotation.WorkerThread;
  * パイプライン → SurfaceRendererPipeline (→ パイプライン)
  *                → Surface
  */
-public class SurfaceRendererPipeline extends ProxyPipeline
+public class SurfaceRendererPipeline extends GLProxyPipeline
 	implements GLSurfacePipeline, IMirror {
 
 	private static final boolean DEBUG = false;	// set false on production

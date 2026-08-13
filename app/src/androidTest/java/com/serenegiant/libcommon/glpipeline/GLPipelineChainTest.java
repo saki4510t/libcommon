@@ -19,7 +19,7 @@ package com.serenegiant.libcommon.glpipeline;
  */
 
 import com.serenegiant.glpipeline.GLPipeline;
-import com.serenegiant.glpipeline.ProxyPipeline;
+import com.serenegiant.glpipeline.GLProxyPipeline;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -47,10 +47,10 @@ public class GLPipelineChainTest {
 	 */
 	@Test
 	public void insertRemoveAppendFindTest() {
-		final ProxyPipeline src = new ProxyPipeline();
-		final ProxyPipeline dst1 = new ProxyPipeline();
-		final ProxyPipeline dst2 = new ProxyPipeline();
-		final ProxyPipeline dst3 = new ProxyPipeline();
+		final GLProxyPipeline src = new GLProxyPipeline();
+		final GLProxyPipeline dst1 = new GLProxyPipeline();
+		final GLProxyPipeline dst2 = new GLProxyPipeline();
+		final GLProxyPipeline dst3 = new GLProxyPipeline();
 
 		assertTrue(validatePipelineOrder(src, src));
 		// パイプラインがきちんと伝播して呼び出されるかどうかを確認
@@ -86,7 +86,7 @@ public class GLPipelineChainTest {
 		assertEquals(dst3, GLPipeline.findLast(src));
 
 		// GLPipeline#find
-		assertEquals(src, GLPipeline.find(dst3, ProxyPipeline.class));
+		assertEquals(src, GLPipeline.find(dst3, GLProxyPipeline.class));
 
 		// 全てを除去
 		dst1.remove(); dst2.remove(); dst3.remove();
@@ -108,9 +108,9 @@ public class GLPipelineChainTest {
 	 */
 	@Test
 	public void proxyPipelineTest() {
-		final ProxyPipeline src = new ProxyPipeline();
+		final GLProxyPipeline src = new GLProxyPipeline();
 		final AtomicInteger cnt1 = new AtomicInteger();
-		final ProxyPipeline dst1 = new ProxyPipeline() {
+		final GLProxyPipeline dst1 = new GLProxyPipeline() {
 			@Override
 			public void onFrameAvailable(
 				final boolean isGLES3,
@@ -122,7 +122,7 @@ public class GLPipelineChainTest {
 			}
 		};
 		final AtomicInteger cnt2 = new AtomicInteger();
-		final ProxyPipeline dst2 = new ProxyPipeline() {
+		final GLProxyPipeline dst2 = new GLProxyPipeline() {
 			@Override
 			public void onFrameAvailable(
 				final boolean isGLES3,
@@ -134,7 +134,7 @@ public class GLPipelineChainTest {
 			}
 		};
 		final AtomicInteger cnt3 = new AtomicInteger();
-		final ProxyPipeline dst3 = new ProxyPipeline() {
+		final GLProxyPipeline dst3 = new GLProxyPipeline() {
 			@Override
 			public void onFrameAvailable(
 				final boolean isGLES3,

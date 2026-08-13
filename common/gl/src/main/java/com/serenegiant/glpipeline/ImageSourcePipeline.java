@@ -22,7 +22,6 @@ import android.graphics.Bitmap;
 import android.util.Log;
 
 import com.serenegiant.gl.GLManager;
-import com.serenegiant.glutils.GLFrameAvailableCallback;
 import com.serenegiant.glutils.GLTextureSource;
 import com.serenegiant.math.Fraction;
 
@@ -35,7 +34,7 @@ import androidx.annotation.Size;
  * これが生成する映像ソースのテクスチャはGL_TEXTURE_2D
  * ビットマップ → ImageSourcePipeline (→ パイプライン)
  */
-public class ImageSourcePipeline extends ProxyPipeline implements GLPipelineSource {
+public class ImageSourcePipeline extends GLProxyPipeline implements GLPipelineSource {
 	private static final boolean DEBUG = false;	// set false on production
 	private static final String TAG = ImageSourcePipeline.class.getSimpleName();
 

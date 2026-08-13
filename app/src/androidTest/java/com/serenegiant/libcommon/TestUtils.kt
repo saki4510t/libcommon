@@ -28,7 +28,7 @@ import android.view.Surface
 import com.serenegiant.gl.GLManager
 import com.serenegiant.gl.GLUtils
 import com.serenegiant.glpipeline.GLPipeline
-import com.serenegiant.glpipeline.ProxyPipeline
+import com.serenegiant.glpipeline.GLProxyPipeline
 import com.serenegiant.glutils.GLSurfaceReceiver
 import com.serenegiant.glutils.GLSurfaceReceiver.DefaultCallback
 import com.serenegiant.graphics.IMirror
@@ -376,7 +376,7 @@ LOOP@	for (y in 0..< height) {
 	): GLPipeline {
 		require(numFrames >= 1) { "numFrames is too small, must be more than 0" }
 		require(!((width < 2) || (height < 2))) { "width and or height is too small, must be more than or equals 2" }
-		return object : ProxyPipeline(width, height) {
+		return object : GLProxyPipeline(width, height) {
 			override fun onFrameAvailable(
 				isGLES3: Boolean, isOES: Boolean,
 				width: Int, height: Int,

@@ -48,7 +48,7 @@ import static com.serenegiant.gl.ShaderConst.*;
  * パイプライン → MaskPipeline (→ パイプライン)
  *                (→ Surface)
  */
-public class MaskPipeline extends ProxyPipeline implements GLSurfacePipeline {
+public class MaskPipeline extends GLProxyPipeline implements GLSurfacePipeline {
 	private static final boolean DEBUG = false;	// set false on production
 	private static final String TAG = MaskPipeline.class.getSimpleName();
 

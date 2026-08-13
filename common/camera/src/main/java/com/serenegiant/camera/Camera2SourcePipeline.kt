@@ -42,7 +42,7 @@ import androidx.annotation.WorkerThread
 import com.serenegiant.camera.Camera2Utils.RequestTemplate
 import com.serenegiant.gl.GLManager
 import com.serenegiant.glpipeline.GLPipeline
-import com.serenegiant.glpipeline.ProxyPipeline
+import com.serenegiant.glpipeline.GLProxyPipeline
 import com.serenegiant.glutils.GLSurfaceReceiver
 import com.serenegiant.system.BuildCheck
 import com.serenegiant.content.ContextUtils
@@ -82,7 +82,7 @@ class Camera2SourcePipeline(
 	private val burstNum: Int = 1,
 	private val afMode: Int = CaptureRequest.CONTROL_AF_MODE_CONTINUOUS_VIDEO,
 	private val needCaptureCallback: Boolean = false
-) : ProxyPipeline(width, height), CameraPipelineSource {
+) : GLProxyPipeline(width, height), CameraPipelineSource {
 
 	private val mWeakContext = WeakReference(context)
 	/**

@@ -29,7 +29,7 @@ import com.serenegiant.glutils.GLFrameAvailableCallback
  *                → onFrameAvailableコールバック呼び出し
  */
 class OnFramePipeline(private val mListener: GLFrameAvailableCallback)
-: ProxyPipeline() {
+: GLProxyPipeline() {
 	override fun onFrameAvailable(
 		isGLES3: Boolean,
 		isOES: Boolean,

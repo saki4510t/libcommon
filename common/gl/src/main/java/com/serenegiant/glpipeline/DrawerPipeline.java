@@ -42,7 +42,7 @@ import androidx.annotation.WorkerThread;
  * パイプライン → DrawerPipeline (→ パイプライン)
  *                (→ Surface)
  */
-public class DrawerPipeline extends ProxyPipeline
+public class DrawerPipeline extends GLProxyPipeline
 	implements GLSurfacePipeline, IMirror {
 	private static final boolean DEBUG = false;	// set false on production
 	private static final String TAG = DrawerPipeline.class.getSimpleName();

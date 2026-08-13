@@ -59,3 +59,5 @@ fun GLPipeline.findLast(): GLPipeline {
 fun <T : GLPipeline> GLPipeline.find(clazz: Class<T>): T? {
 	return GLPipeline.find(this, clazz)
 }
+
+typealias ProxyPipeline = GLProxyPipeline

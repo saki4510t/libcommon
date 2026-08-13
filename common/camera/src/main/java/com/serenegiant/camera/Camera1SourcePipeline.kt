@@ -27,7 +27,7 @@ import androidx.annotation.Size
 import androidx.annotation.WorkerThread
 import com.serenegiant.gl.GLManager
 import com.serenegiant.glpipeline.GLPipeline
-import com.serenegiant.glpipeline.ProxyPipeline
+import com.serenegiant.glpipeline.GLProxyPipeline
 import com.serenegiant.glutils.GLSurfaceReceiver
 import com.serenegiant.view.ViewUtils
 import java.lang.ref.WeakReference
@@ -52,7 +52,7 @@ class Camera1SourcePipeline(
 	@CameraConst.FaceType face: Int = CameraConst.FACING_BACK,
 	width: Int = CameraConst.DEFAULT_WIDTH, height: Int = CameraConst.DEFAULT_HEIGHT,
 	useSharedContext: Boolean = false
-) : ProxyPipeline(width, height), CameraPipelineSource {
+) : GLProxyPipeline(width, height), CameraPipelineSource {
 	private val mWeakContext = WeakReference(context)
 	/**
 	 * GLES環境保持用のGLManager

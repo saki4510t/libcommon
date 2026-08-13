@@ -43,7 +43,7 @@ import androidx.annotation.WorkerThread;
  *                (→ Surface)
  */
 @RequiresApi(api = Build.VERSION_CODES.N)
-public class HistogramPipeline extends ProxyPipeline
+public class HistogramPipeline extends GLProxyPipeline
 	implements GLSurfacePipeline, IMirror {
 	private static final boolean DEBUG = false;	// set false on production
 	private static final String TAG = HistogramPipeline.class.getSimpleName();
