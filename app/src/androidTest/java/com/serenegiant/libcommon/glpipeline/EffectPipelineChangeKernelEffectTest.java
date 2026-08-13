@@ -26,7 +26,7 @@ import android.view.Surface;
 import com.serenegiant.gl.GLEffect;
 import com.serenegiant.gl.GLEffectDrawer2D;
 import com.serenegiant.gl.GLManager;
-import com.serenegiant.glpipeline.EffectPipeline;
+import com.serenegiant.glpipeline.GLEffectPipeline;
 import com.serenegiant.glpipeline.GLPipeline;
 import com.serenegiant.glpipeline.GLPipelineSurfaceSource;
 import com.serenegiant.glpipeline.ImageSourcePipeline;
@@ -110,7 +110,7 @@ public class EffectPipelineChangeKernelEffectTest {
 		// 映像ソースを生成
 		final ImageSourcePipeline source = new ImageSourcePipeline(manager, original, null);
 
-		final EffectPipeline pipeline1 = new EffectPipeline(manager, GLEffectDrawer2D.DEFAULT_EFFECT_FACTORY);
+		final GLEffectPipeline pipeline1 = new GLEffectPipeline(manager, GLEffectDrawer2D.DEFAULT_EFFECT_FACTORY);
 
 		final Semaphore sem = new Semaphore(0);
 		final AtomicReference<Bitmap> result = new AtomicReference<>();
@@ -167,8 +167,8 @@ public class EffectPipelineChangeKernelEffectTest {
 		// 映像ソースを生成
 		final ImageSourcePipeline source = new ImageSourcePipeline(manager, original, null);
 
-		final EffectPipeline pipeline1 = new EffectPipeline(manager, GLEffectDrawer2D.DEFAULT_EFFECT_FACTORY);
-		final EffectPipeline pipeline2 = new EffectPipeline(manager, GLEffectDrawer2D.DEFAULT_EFFECT_FACTORY);
+		final GLEffectPipeline pipeline1 = new GLEffectPipeline(manager, GLEffectDrawer2D.DEFAULT_EFFECT_FACTORY);
+		final GLEffectPipeline pipeline2 = new GLEffectPipeline(manager, GLEffectDrawer2D.DEFAULT_EFFECT_FACTORY);
 
 		final Semaphore sem = new Semaphore(0);
 		final AtomicReference<Bitmap> result = new AtomicReference<>();
@@ -229,9 +229,9 @@ public class EffectPipelineChangeKernelEffectTest {
 		// 映像ソースを生成
 		final ImageSourcePipeline source = new ImageSourcePipeline(manager, original, null);
 
-		final EffectPipeline pipeline1 = new EffectPipeline(manager, GLEffectDrawer2D.DEFAULT_EFFECT_FACTORY);
-		final EffectPipeline pipeline2 = new EffectPipeline(manager, GLEffectDrawer2D.DEFAULT_EFFECT_FACTORY);
-		final EffectPipeline pipeline3 = new EffectPipeline(manager, GLEffectDrawer2D.DEFAULT_EFFECT_FACTORY);
+		final GLEffectPipeline pipeline1 = new GLEffectPipeline(manager, GLEffectDrawer2D.DEFAULT_EFFECT_FACTORY);
+		final GLEffectPipeline pipeline2 = new GLEffectPipeline(manager, GLEffectDrawer2D.DEFAULT_EFFECT_FACTORY);
+		final GLEffectPipeline pipeline3 = new GLEffectPipeline(manager, GLEffectDrawer2D.DEFAULT_EFFECT_FACTORY);
 
 		final Semaphore sem = new Semaphore(0);
 		final AtomicReference<Bitmap> result = new AtomicReference<>();
@@ -321,7 +321,7 @@ public class EffectPipelineChangeKernelEffectTest {
 		assertNotNull(inputSurface);
 
 		// 検証するEffectPipelineを生成
-		final EffectPipeline pipeline1 = new EffectPipeline(manager, GLEffectDrawer2D.DEFAULT_EFFECT_FACTORY);
+		final GLEffectPipeline pipeline1 = new GLEffectPipeline(manager, GLEffectDrawer2D.DEFAULT_EFFECT_FACTORY);
 
 		try {
 			GLPipeline.append(source, pipeline1);
@@ -404,8 +404,8 @@ public class EffectPipelineChangeKernelEffectTest {
 		assertNotNull(inputSurface);
 
 		// 検証するEffectPipelineを生成
-		final EffectPipeline pipeline1 = new EffectPipeline(manager, GLEffectDrawer2D.DEFAULT_EFFECT_FACTORY);
-		final EffectPipeline pipeline2 = new EffectPipeline(manager, GLEffectDrawer2D.DEFAULT_EFFECT_FACTORY);
+		final GLEffectPipeline pipeline1 = new GLEffectPipeline(manager, GLEffectDrawer2D.DEFAULT_EFFECT_FACTORY);
+		final GLEffectPipeline pipeline2 = new GLEffectPipeline(manager, GLEffectDrawer2D.DEFAULT_EFFECT_FACTORY);
 
 		try {
 			GLPipeline.append(source, pipeline1);
@@ -490,9 +490,9 @@ public class EffectPipelineChangeKernelEffectTest {
 		assertNotNull(inputSurface);
 
 		// 検証するEffectPipelineを生成
-		final EffectPipeline pipeline1 = new EffectPipeline(manager, GLEffectDrawer2D.DEFAULT_EFFECT_FACTORY);
-		final EffectPipeline pipeline2 = new EffectPipeline(manager, GLEffectDrawer2D.DEFAULT_EFFECT_FACTORY);
-		final EffectPipeline pipeline3 = new EffectPipeline(manager, GLEffectDrawer2D.DEFAULT_EFFECT_FACTORY);
+		final GLEffectPipeline pipeline1 = new GLEffectPipeline(manager, GLEffectDrawer2D.DEFAULT_EFFECT_FACTORY);
+		final GLEffectPipeline pipeline2 = new GLEffectPipeline(manager, GLEffectDrawer2D.DEFAULT_EFFECT_FACTORY);
+		final GLEffectPipeline pipeline3 = new GLEffectPipeline(manager, GLEffectDrawer2D.DEFAULT_EFFECT_FACTORY);
 
 		try {
 			GLPipeline.append(source, pipeline1);
@@ -554,7 +554,7 @@ public class EffectPipelineChangeKernelEffectTest {
 		// 映像ソースを生成
 		final ImageSourcePipeline source = new ImageSourcePipeline(manager, original, null);
 		// テスト対象のEffectPipelineを生成
-		final EffectPipeline pipeline = new EffectPipeline(manager, GLEffectDrawer2D.DEFAULT_EFFECT_FACTORY);
+		final GLEffectPipeline pipeline = new GLEffectPipeline(manager, GLEffectDrawer2D.DEFAULT_EFFECT_FACTORY);
 
 		final Semaphore sem = new Semaphore(0);
 
@@ -655,7 +655,7 @@ public class EffectPipelineChangeKernelEffectTest {
 		assertNotNull(inputSurface);
 
 		// 検証するEffectPipelineを生成
-		final EffectPipeline pipeline1 = new EffectPipeline(manager, GLEffectDrawer2D.DEFAULT_EFFECT_FACTORY);
+		final GLEffectPipeline pipeline1 = new GLEffectPipeline(manager, GLEffectDrawer2D.DEFAULT_EFFECT_FACTORY);
 
 		// パイプラインを経由した映像の受け取り用にProxyPipelineを生成する
 		final AtomicReference<Bitmap> result1 = new AtomicReference<>();

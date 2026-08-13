@@ -61,3 +61,4 @@ fun <T : GLPipeline> GLPipeline.find(clazz: Class<T>): T? {
 }
 
 typealias ProxyPipeline = GLProxyPipeline
+typealias EffectPipeline = GLEffectPipeline

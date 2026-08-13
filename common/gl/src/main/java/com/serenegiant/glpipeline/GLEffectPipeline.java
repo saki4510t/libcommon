@@ -45,10 +45,10 @@ import static com.serenegiant.gl.GLEffect.EFFECT_NON;
  * パイプライン → EffectPipeline (→ パイプライン)
  *                (→ Surface)
  */
-public class EffectPipeline extends GLProxyPipeline
+public class GLEffectPipeline extends GLProxyPipeline
 	implements GLSurfacePipeline, IMirror, IEffect {
 	private static final boolean DEBUG = false;	// set false on production
-	private static final String TAG = EffectPipeline.class.getSimpleName();
+	private static final String TAG = GLEffectPipeline.class.getSimpleName();
 
 	@NonNull
 	private final GLManager mManager;
@@ -106,7 +106,7 @@ public class EffectPipeline extends GLProxyPipeline
 	 * @throws IllegalStateException
 	 * @throws IllegalArgumentException
 	 */
-	public EffectPipeline(
+	public GLEffectPipeline(
 		@NonNull final GLManager manager)
 		throws IllegalStateException, IllegalArgumentException {
 
@@ -121,7 +121,7 @@ public class EffectPipeline extends GLProxyPipeline
 	 * @throws IllegalStateException
 	 * @throws IllegalArgumentException
 	 */
-	public EffectPipeline(
+	public GLEffectPipeline(
 		@NonNull final GLManager manager,
 		@Nullable final Object surface, @Nullable final Fraction maxFps)
 		throws IllegalStateException, IllegalArgumentException {
@@ -137,7 +137,7 @@ public class EffectPipeline extends GLProxyPipeline
 	 * @throws IllegalStateException
 	 * @throws IllegalArgumentException
 	 */
-	public EffectPipeline(
+	public GLEffectPipeline(
 		@NonNull final GLManager manager, @NonNull final GLEffectDrawer2D.DrawerFactory drawerFactory)
 		throws IllegalStateException, IllegalArgumentException {
 
@@ -154,7 +154,7 @@ public class EffectPipeline extends GLProxyPipeline
 	 * @throws IllegalStateException
 	 * @throws IllegalArgumentException
 	 */
-	public EffectPipeline(
+	public GLEffectPipeline(
 		@NonNull final GLManager manager,
 		@NonNull final GLEffectDrawer2D.DrawerFactory drawerFactory,
 		@PipelineMode final int pipelineMode,

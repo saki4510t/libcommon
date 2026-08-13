@@ -25,7 +25,7 @@ import android.view.Surface;
 
 import com.serenegiant.gl.GLEffect;
 import com.serenegiant.gl.GLManager;
-import com.serenegiant.glpipeline.EffectPipeline;
+import com.serenegiant.glpipeline.GLEffectPipeline;
 import com.serenegiant.glpipeline.GLPipeline;
 import com.serenegiant.glpipeline.GLPipelineSurfaceSource;
 import com.serenegiant.glpipeline.ImageSourcePipeline;
@@ -110,7 +110,7 @@ public class EffectPipelineChangeEffectTest {
 		// 映像ソースを生成
 		final ImageSourcePipeline source = new ImageSourcePipeline(manager, original, null);
 
-		final EffectPipeline pipeline1 = new EffectPipeline(manager);
+		final GLEffectPipeline pipeline1 = new GLEffectPipeline(manager);
 
 		final Semaphore sem = new Semaphore(0);
 		final AtomicReference<Bitmap> result = new AtomicReference<>();
@@ -167,8 +167,8 @@ public class EffectPipelineChangeEffectTest {
 		// 映像ソースを生成
 		final ImageSourcePipeline source = new ImageSourcePipeline(manager, original, null);
 
-		final EffectPipeline pipeline1 = new EffectPipeline(manager);
-		final EffectPipeline pipeline2 = new EffectPipeline(manager);
+		final GLEffectPipeline pipeline1 = new GLEffectPipeline(manager);
+		final GLEffectPipeline pipeline2 = new GLEffectPipeline(manager);
 
 		final Semaphore sem = new Semaphore(0);
 		final AtomicReference<Bitmap> result = new AtomicReference<>();
@@ -229,9 +229,9 @@ public class EffectPipelineChangeEffectTest {
 		// 映像ソースを生成
 		final ImageSourcePipeline source = new ImageSourcePipeline(manager, original, null);
 
-		final EffectPipeline pipeline1 = new EffectPipeline(manager);
-		final EffectPipeline pipeline2 = new EffectPipeline(manager);
-		final EffectPipeline pipeline3 = new EffectPipeline(manager);
+		final GLEffectPipeline pipeline1 = new GLEffectPipeline(manager);
+		final GLEffectPipeline pipeline2 = new GLEffectPipeline(manager);
+		final GLEffectPipeline pipeline3 = new GLEffectPipeline(manager);
 
 		final Semaphore sem = new Semaphore(0);
 		final AtomicReference<Bitmap> result = new AtomicReference<>();
@@ -321,7 +321,7 @@ public class EffectPipelineChangeEffectTest {
 		assertNotNull(inputSurface);
 
 		// 検証するEffectPipelineを生成
-		final EffectPipeline pipeline1 = new EffectPipeline(manager);
+		final GLEffectPipeline pipeline1 = new GLEffectPipeline(manager);
 
 		try {
 			GLPipeline.append(source, pipeline1);
@@ -404,8 +404,8 @@ public class EffectPipelineChangeEffectTest {
 		assertNotNull(inputSurface);
 
 		// 検証するEffectPipelineを生成
-		final EffectPipeline pipeline1 = new EffectPipeline(manager);
-		final EffectPipeline pipeline2 = new EffectPipeline(manager);
+		final GLEffectPipeline pipeline1 = new GLEffectPipeline(manager);
+		final GLEffectPipeline pipeline2 = new GLEffectPipeline(manager);
 
 		try {
 			GLPipeline.append(source, pipeline1);
@@ -490,9 +490,9 @@ public class EffectPipelineChangeEffectTest {
 		assertNotNull(inputSurface);
 
 		// 検証するEffectPipelineを生成
-		final EffectPipeline pipeline1 = new EffectPipeline(manager);
-		final EffectPipeline pipeline2 = new EffectPipeline(manager);
-		final EffectPipeline pipeline3 = new EffectPipeline(manager);
+		final GLEffectPipeline pipeline1 = new GLEffectPipeline(manager);
+		final GLEffectPipeline pipeline2 = new GLEffectPipeline(manager);
+		final GLEffectPipeline pipeline3 = new GLEffectPipeline(manager);
 
 		try {
 			GLPipeline.append(source, pipeline1);
@@ -554,7 +554,7 @@ public class EffectPipelineChangeEffectTest {
 		// 映像ソースを生成
 		final ImageSourcePipeline source = new ImageSourcePipeline(manager, original, null);
 		// テスト対象のEffectPipelineを生成
-		final EffectPipeline pipeline = new EffectPipeline(manager);
+		final GLEffectPipeline pipeline = new GLEffectPipeline(manager);
 
 		final Semaphore sem = new Semaphore(0);
 
@@ -657,7 +657,7 @@ public class EffectPipelineChangeEffectTest {
 		assertNotNull(inputSurface);
 
 		// 検証するEffectPipelineを生成
-		final EffectPipeline pipeline1 = new EffectPipeline(manager);
+		final GLEffectPipeline pipeline1 = new GLEffectPipeline(manager);
 
 		// パイプラインを経由した映像の受け取り用にProxyPipelineを生成する
 		final AtomicReference<Bitmap> result1 = new AtomicReference<>();

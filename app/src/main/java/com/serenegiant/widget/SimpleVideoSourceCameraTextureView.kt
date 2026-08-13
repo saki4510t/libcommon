@@ -38,7 +38,6 @@ import com.serenegiant.glutils.GLFrameAvailableCallback
 import com.serenegiant.math.Fraction
 import com.serenegiant.media.OnFrameAvailableListener
 import com.serenegiant.view.TouchViewTransformer
-import com.serenegiant.widget.SurfaceSourceCameraGLView.Companion
 
 /**
  * VideoSourceを使ってカメラ映像を受け取りSurfacePipelineで描画処理を行うZoomAspectScaledTextureView/ICameraView実装
@@ -342,7 +341,7 @@ class SimpleVideoSourceCameraTextureView @JvmOverloads constructor(
 	get() {
 		val source = mSourcePipeline
 		return if (source != null) {
-			val pipeline = GLPipeline.find(source, EffectPipeline::class.java)
+			val pipeline = GLPipeline.find(source, GLEffectPipeline::class.java)
 			if (DEBUG) Log.v(TAG, "getEffect:$pipeline")
 			pipeline?.effect ?: 0
 		} else {
@@ -356,7 +355,7 @@ class SimpleVideoSourceCameraTextureView @JvmOverloads constructor(
 			post {
 				val source = mSourcePipeline
 				if (source != null) {
-					val pipeline = GLPipeline.find(source, EffectPipeline::class.java)
+					val pipeline = GLPipeline.find(source, GLEffectPipeline::class.java)
 					pipeline?.effect = effect
 				}
 			}
@@ -407,13 +406,18 @@ class SimpleVideoSourceCameraTextureView @JvmOverloads constructor(
 		return when (pipelineMode) {
 			GLPipelineView.EFFECT_PLUS_SURFACE -> {
 				if (DEBUG) Log.v(TAG, "createPipeline:create EffectPipeline & SurfaceRendererPipeline")
-				val effect = EffectPipeline(mGLManager)
+				val effect =
+					GLEffectPipeline(mGLManager)
 				effect.pipeline = SurfaceRendererPipeline(mGLManager, surface, maxFps)
 				effect
 			}
 			GLPipelineView.EFFECT_ONLY -> {
 				if (DEBUG) Log.v(TAG, "createPipeline:create EffectPipeline")
-				EffectPipeline(mGLManager, surface, maxFps)
+				GLEffectPipeline(
+					mGLManager,
+					surface,
+					maxFps
+				)
 			}
 			else -> {
 				if (DEBUG) Log.v(TAG, "createPipeline:create SurfaceRendererPipeline")

@@ -57,7 +57,7 @@ public class SurfaceEffectSourcePipeline
 	@NonNull
 	private final GLSurfaceReceiver mReceiver;
 	@NonNull
-	private final EffectPipeline mEffectPipeline;
+	private final GLEffectPipeline mGLEffectPipeline;
 
 	/**
 	 * コンストラクタ
@@ -106,14 +106,14 @@ public class SurfaceEffectSourcePipeline
 			mManager = manager;
 		}
 		mCallback = callback;
-		mEffectPipeline = new EffectPipeline(
+		mGLEffectPipeline = new GLEffectPipeline(
 			mManager,
 			drawerFactory != null ? drawerFactory : GLEffectDrawer2D.DEFAULT_EFFECT_FACTORY,
 			pipelineMode, null, null
 		);
 		mReceiver = new GLSurfaceReceiver(mManager,
 			width, height,
-			new GLSurfaceReceiver.DefaultCallback(mEffectPipeline) {
+			new GLSurfaceReceiver.DefaultCallback(mGLEffectPipeline) {
 				@Override
 				public void onCreateInputSurface(@NonNull final Surface surface, final int width, final int height) {
 					super.onCreateInputSurface(surface, width, height);
@@ -136,7 +136,7 @@ public class SurfaceEffectSourcePipeline
 		if (isValid()) {
 			mReceiver.release();
 		}
-		mEffectPipeline.release();
+		mGLEffectPipeline.release();
 		if (mOwnManager) {
 			mManager.release();
 		}
@@ -167,7 +167,7 @@ public class SurfaceEffectSourcePipeline
 	 */
 	@Override
 	public void setPipeline(@Nullable final GLPipeline pipeline) {
-		mEffectPipeline.setPipeline(pipeline);
+		mGLEffectPipeline.setPipeline(pipeline);
 	}
 
 	/**
@@ -177,7 +177,7 @@ public class SurfaceEffectSourcePipeline
 	@Nullable
 	@Override
 	public GLPipeline getPipeline() {
-		return mEffectPipeline.getPipeline();
+		return mGLEffectPipeline.getPipeline();
 	}
 
 	/**
@@ -185,8 +185,8 @@ public class SurfaceEffectSourcePipeline
 	 */
 	@Override
 	public void remove() {
-		final GLPipeline pipeline = mEffectPipeline.getPipeline();
-		mEffectPipeline.setPipeline(null);
+		final GLPipeline pipeline = mGLEffectPipeline.getPipeline();
+		mGLEffectPipeline.setPipeline(null);
 		if (pipeline != null) {
 			pipeline.release();
 		}
@@ -197,7 +197,7 @@ public class SurfaceEffectSourcePipeline
 	 */
 	@Override
 	public void refresh() {
-		mEffectPipeline.refresh();
+		mGLEffectPipeline.refresh();
 	}
 
 	/**
@@ -223,7 +223,7 @@ public class SurfaceEffectSourcePipeline
 		if (DEBUG) Log.v(TAG, "resize:");
 		checkValid();
 		mReceiver.resize(width, height);
-		mEffectPipeline.resize(width, height);
+		mGLEffectPipeline.resize(width, height);
 	}
 
 	/**
@@ -245,7 +245,7 @@ public class SurfaceEffectSourcePipeline
 	@Override
 	public boolean isActive() {
 		// 破棄されていない && 子と繋がっている
-		return isValid() && mEffectPipeline.isActive();
+		return isValid() && mGLEffectPipeline.isActive();
 	}
 
 	/**
@@ -274,7 +274,7 @@ public class SurfaceEffectSourcePipeline
 	 */
 	@Override
 	public void setSurface(@Nullable final Object surface) throws IllegalStateException, IllegalArgumentException {
-		mEffectPipeline.setSurface(surface);
+		mGLEffectPipeline.setSurface(surface);
 	}
 
 	/**
@@ -286,7 +286,7 @@ public class SurfaceEffectSourcePipeline
 	 */
 	@Override
 	public void setSurface(@Nullable final Object surface, @Nullable final Fraction maxFps) throws IllegalStateException, IllegalArgumentException {
-		mEffectPipeline.setSurface(surface, maxFps);
+		mGLEffectPipeline.setSurface(surface, maxFps);
 	}
 
 	/**
@@ -295,7 +295,7 @@ public class SurfaceEffectSourcePipeline
 	 */
 	@Override
 	public boolean hasSurface() {
-		return mEffectPipeline.hasSurface();
+		return mGLEffectPipeline.hasSurface();
 	}
 
 	/**
@@ -304,7 +304,7 @@ public class SurfaceEffectSourcePipeline
 	 */
 	@Override
 	public int getId() {
-		return mEffectPipeline.getId();
+		return mGLEffectPipeline.getId();
 	}
 
 	/**
@@ -372,7 +372,7 @@ public class SurfaceEffectSourcePipeline
 		final int width, final int height,
 		final int texId, @NonNull final float[] texMatrix) {
 		// ここには来ないはず, 一応EffectPipeline#onFrameAvailableを呼んでおく
-		mEffectPipeline.onFrameAvailable(isGLES3, isOES, width, height, texId, texMatrix);
+		mGLEffectPipeline.onFrameAvailable(isGLES3, isOES, width, height, texId, texMatrix);
 	}
 
 	//--------------------------------------------------------------------------------
@@ -382,7 +382,7 @@ public class SurfaceEffectSourcePipeline
 	 */
 	@Override
 	public void setEffect(final int effect) {
-		mEffectPipeline.setEffect(effect);
+		mGLEffectPipeline.setEffect(effect);
 	}
 
 	/**
@@ -391,7 +391,7 @@ public class SurfaceEffectSourcePipeline
 	 */
 	@Override
 	public int getEffect() {
-		return mEffectPipeline.getEffect();
+		return mGLEffectPipeline.getEffect();
 	}
 
 	/**
@@ -400,7 +400,7 @@ public class SurfaceEffectSourcePipeline
 	 */
 	@Override
 	public void setParams(@NonNull final float[] params) {
-		mEffectPipeline.setParams(params);
+		mGLEffectPipeline.setParams(params);
 	}
 
 	/**
@@ -411,7 +411,7 @@ public class SurfaceEffectSourcePipeline
 	 */
 	@Override
 	public void setParams(final int effect, @NonNull final float[] params) throws IllegalArgumentException {
-		mEffectPipeline.setParams(effect, params);
+		mGLEffectPipeline.setParams(effect, params);
 	}
 
 	//--------------------------------------------------------------------------------
@@ -421,7 +421,7 @@ public class SurfaceEffectSourcePipeline
 	 */
 	@Override
 	public void setMirror(final int mirror) {
-		mEffectPipeline.setMirror(mirror);
+		mGLEffectPipeline.setMirror(mirror);
 	}
 
 	/**
@@ -430,11 +430,11 @@ public class SurfaceEffectSourcePipeline
 	 */
 	@Override
 	public int getMirror() {
-		return mEffectPipeline.getMirror();
+		return mGLEffectPipeline.getMirror();
 	}
 
 	public void setMvpMatrix(@NonNull @Size(min=16) final float[] matrix, final int offset) {
-		mEffectPipeline.setMvpMatrix(matrix, offset);
+		mGLEffectPipeline.setMvpMatrix(matrix, offset);
 	}
 
 	//--------------------------------------------------------------------------------
