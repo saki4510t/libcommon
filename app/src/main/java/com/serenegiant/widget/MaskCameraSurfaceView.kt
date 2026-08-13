@@ -28,7 +28,7 @@ import android.view.SurfaceHolder
 import android.view.SurfaceView
 import com.serenegiant.camera.CameraConst
 import com.serenegiant.camera.CameraUtils
-import com.serenegiant.glpipeline.MaskPipeline
+import com.serenegiant.glpipeline.GLMaskPipeline
 import com.serenegiant.gl.GLManager
 import com.serenegiant.glpipeline.GLPipelineSurfaceSource
 import com.serenegiant.glpipeline.SurfaceSourcePipeline
@@ -46,7 +46,7 @@ class MaskCameraSurfaceView @JvmOverloads constructor(context: Context?,
 		: SurfaceView(context, attrs, defStyleAttr) {
 
 	private var source: SurfaceSourcePipeline? = null
-	private var pipeline: MaskPipeline? = null
+	private var pipeline: GLMaskPipeline? = null
 	private var mHasSurface = false
 	private var mCamera: Camera? = null
 
@@ -86,7 +86,7 @@ class MaskCameraSurfaceView @JvmOverloads constructor(context: Context?,
 	private fun createPipeline() {
 		if (pipeline == null) {
 			val manager = GLManager()
-			pipeline = MaskPipeline(manager)
+			pipeline = GLMaskPipeline(manager)
 			pipeline!!.setMask(BitmapHelper.genMaskImage(0,
 				CameraDelegator.DEFAULT_PREVIEW_WIDTH, CameraDelegator.DEFAULT_PREVIEW_HEIGHT,
 				60, Color.BLUE,127, 255))

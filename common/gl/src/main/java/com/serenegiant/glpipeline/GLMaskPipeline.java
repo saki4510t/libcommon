@@ -48,9 +48,9 @@ import static com.serenegiant.gl.ShaderConst.*;
  * パイプライン → MaskPipeline (→ パイプライン)
  *                (→ Surface)
  */
-public class MaskPipeline extends GLProxyPipeline implements GLSurfacePipeline {
+public class GLMaskPipeline extends GLProxyPipeline implements GLSurfacePipeline {
 	private static final boolean DEBUG = false;	// set false on production
-	private static final String TAG = MaskPipeline.class.getSimpleName();
+	private static final String TAG = GLMaskPipeline.class.getSimpleName();
 
 	@NonNull
 	private final GLManager mManager;
@@ -92,7 +92,7 @@ public class MaskPipeline extends GLProxyPipeline implements GLSurfacePipeline {
 	 * @throws IllegalStateException
 	 * @throws IllegalArgumentException
 	 */
-	public MaskPipeline(@NonNull final GLManager manager)
+	public GLMaskPipeline(@NonNull final GLManager manager)
 			throws IllegalStateException, IllegalArgumentException {
 		this(manager,  null, null);
 	}
@@ -106,7 +106,7 @@ public class MaskPipeline extends GLProxyPipeline implements GLSurfacePipeline {
 	 * @throws IllegalStateException
 	 * @throws IllegalArgumentException
 	 */
-	public MaskPipeline(
+	public GLMaskPipeline(
 		@NonNull final GLManager manager,
 		@Nullable final Object surface, @Nullable final Fraction maxFps)
 			throws IllegalStateException, IllegalArgumentException {
