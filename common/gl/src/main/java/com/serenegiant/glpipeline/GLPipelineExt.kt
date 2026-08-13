@@ -64,3 +64,4 @@ typealias ProxyPipeline = GLProxyPipeline
 typealias EffectPipeline = GLEffectPipeline
 typealias DrawerPipeline = GLDrawerPipeline
 typealias CapturePipeline = GLCapturePipeline
+typealias DistributePipeline = GLDistributePipeline

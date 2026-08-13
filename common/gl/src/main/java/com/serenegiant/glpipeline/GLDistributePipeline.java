@@ -38,9 +38,9 @@ import androidx.annotation.Size;
  *                → パイプライン
  *                → ...
  */
-public class DistributePipeline implements GLPipeline {
+public class GLDistributePipeline implements GLPipeline {
 	private static final boolean DEBUG = false;	// set false on production
-	private static final String TAG = DistributePipeline.class.getSimpleName();
+	private static final String TAG = GLDistributePipeline.class.getSimpleName();
 
 	private static final int DEFAULT_WIDTH = 640;
 	private static final int DEFAULT_HEIGHT = 480;
@@ -60,7 +60,7 @@ public class DistributePipeline implements GLPipeline {
 	/**
 	 * デフォルトコンストラクタ
 	 */
-	public DistributePipeline() {
+	public GLDistributePipeline() {
 		this(DEFAULT_WIDTH, DEFAULT_HEIGHT);
 	}
 
@@ -69,7 +69,7 @@ public class DistributePipeline implements GLPipeline {
 	 * @param width
 	 * @param height
 	 */
-	protected DistributePipeline(final int width, final int height) {
+	protected GLDistributePipeline(final int width, final int height) {
 		if (DEBUG) Log.v(TAG, "コンストラクタ:");
 		if ((width > 0) || (height > 0)) {
 			mWidth = width;

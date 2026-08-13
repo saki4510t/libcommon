@@ -223,9 +223,9 @@ public class EncodePipeline extends AbstractVideoEncoder implements GLPipeline {
 		} finally {
 			mLock.unlock();
 		}
-		if (parent instanceof DistributePipeline) {
+		if (parent instanceof GLDistributePipeline) {
 			// 親がDistributePipelineの時は自分を取り除くだけ
-			((DistributePipeline) parent).removePipeline(this);
+			((GLDistributePipeline) parent).removePipeline(this);
 		} else if (parent != null) {
 			// その他のGLPipelineの時は下流を繋ぐ
 			parent.setPipeline(pipeline);

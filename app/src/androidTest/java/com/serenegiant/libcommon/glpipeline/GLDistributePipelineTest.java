@@ -23,7 +23,7 @@ import android.graphics.Bitmap;
 import android.util.Log;
 
 import com.serenegiant.gl.GLManager;
-import com.serenegiant.glpipeline.DistributePipeline;
+import com.serenegiant.glpipeline.GLDistributePipeline;
 import com.serenegiant.glpipeline.GLPipeline;
 import com.serenegiant.glpipeline.ImageSourcePipeline;
 import com.serenegiant.graphics.BitmapHelper;
@@ -48,8 +48,8 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 @RunWith(AndroidJUnit4.class)
-public class DistributePipelineTest {
-	private static final String TAG = DistributePipelineTest.class.getSimpleName();
+public class GLDistributePipelineTest {
+	private static final String TAG = GLDistributePipelineTest.class.getSimpleName();
 
 	private static final int WIDTH = 128;
 	private static final int HEIGHT = 128;
@@ -97,7 +97,7 @@ public class DistributePipelineTest {
 		// 映像ソースを生成
 		final ImageSourcePipeline source = new ImageSourcePipeline(manager, original, null);
 
-		final DistributePipeline distributor = new DistributePipeline();
+		final GLDistributePipeline distributor = new GLDistributePipeline();
 		source.setPipeline(distributor);
 
 		final Semaphore sem = new Semaphore(0);

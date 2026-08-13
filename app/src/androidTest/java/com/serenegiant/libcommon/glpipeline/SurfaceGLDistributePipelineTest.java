@@ -48,7 +48,7 @@ import static org.junit.Assert.*;
 import static com.serenegiant.libcommon.TestUtils.*;
 
 @RunWith(AndroidJUnit4.class)
-public class SurfaceDistributePipelineTest {
+public class SurfaceGLDistributePipelineTest {
 	private static final String TAG = SurfaceRendererPipelineTest.class.getSimpleName();
 
 	private static final int WIDTH = 128;
