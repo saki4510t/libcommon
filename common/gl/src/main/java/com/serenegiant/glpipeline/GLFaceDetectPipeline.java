@@ -46,9 +46,9 @@ import androidx.annotation.WorkerThread;
  * パイプライン → FaceDetectPipeline (→ パイプライン)
  *                → 顔認識 → onDetectedコールバック呼び出し
  */
-public class FaceDetectPipeline extends GLProxyPipeline {
+public class GLFaceDetectPipeline extends GLProxyPipeline {
 	private static final boolean DEBUG = false;	// set false on production
-	private static final String TAG = FaceDetectPipeline.class.getSimpleName();
+	private static final String TAG = GLFaceDetectPipeline.class.getSimpleName();
 
 	/**
 	 * 最大fps未指定時のデフォルトの顔検出フレームレート
@@ -134,7 +134,7 @@ public class FaceDetectPipeline extends GLProxyPipeline {
 	 * @param maxDetectNum 顔検出する最大数, 1以上
 	 * @param listener
 	 */
-	public FaceDetectPipeline(
+	public GLFaceDetectPipeline(
 		@NonNull final GLManager manager,
 		@Nullable final Fraction maxFps,
 		@IntRange(from=1) final int maxDetectNum,

@@ -235,21 +235,26 @@ class SimpleVideoSourceCameraTextureView @JvmOverloads constructor(
 					if (enableFaceDetect) {
 						if (DEBUG) Log.v(TAG, "addSurface:create FaceDetectPipeline")
 						val p = GLPipeline.findLast(source)
-						p.pipeline = FaceDetectPipeline(mGLManager, Fraction.FIVE, 1
-						) { /*bitmap,*/ num, faces, width, height ->
-							if (DEBUG) {
-								Log.v(TAG, "onDetected:n=${num}")
-								for (i in 0 until num) {
-									val face: FaceDetector.Face = faces[i]
-									val point = PointF()
-									face.getMidPoint(point)
-									Log.v(TAG, "onDetected:sz((${width}x${height}),num=$i/${num}")
-									Log.v(TAG, "onDetected:Confidence=" + face.confidence())
-									Log.v(TAG, "onDetected:MidPoint.X=" + point.x)
-									Log.v(TAG, "onDetected:MidPoint.Y=" + point.y)
-									Log.v(TAG, "onDetected:EyesDistance=" + face.eyesDistance())
+						p.pipeline =
+							GLFaceDetectPipeline(
+								mGLManager, Fraction.FIVE, 1
+							) { /*bitmap,*/ num, faces, width, height ->
+								if (DEBUG) {
+									Log.v(TAG, "onDetected:n=${num}")
+									for (i in 0 until num) {
+										val face: FaceDetector.Face = faces[i]
+										val point = PointF()
+										face.getMidPoint(point)
+										Log.v(
+											TAG,
+											"onDetected:sz((${width}x${height}),num=$i/${num}"
+										)
+										Log.v(TAG, "onDetected:Confidence=" + face.confidence())
+										Log.v(TAG, "onDetected:MidPoint.X=" + point.x)
+										Log.v(TAG, "onDetected:MidPoint.Y=" + point.y)
+										Log.v(TAG, "onDetected:EyesDistance=" + face.eyesDistance())
+									}
 								}
-							}
 //							val context: Context = context
 //							val outputFile: DocumentFile = if (BuildCheck.isAPI29()) {
 //								// API29以降は対象範囲別ストレージ
@@ -283,7 +288,7 @@ class SimpleVideoSourceCameraTextureView @JvmOverloads constructor(
 //									}
 //								}
 //							}
-						}
+							}
 					}
 				}
 				is GLSurfacePipeline -> {
