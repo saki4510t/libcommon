@@ -66,3 +66,4 @@ typealias DrawerPipeline = GLDrawerPipeline
 typealias CapturePipeline = GLCapturePipeline
 typealias DistributePipeline = GLDistributePipeline
 typealias FaceDetectPipeline = GLFaceDetectPipeline
+typealias HistogramPipeline = GLHistogramPipeline

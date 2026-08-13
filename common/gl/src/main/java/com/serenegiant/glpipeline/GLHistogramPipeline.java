@@ -43,10 +43,10 @@ import androidx.annotation.WorkerThread;
  *                (→ Surface)
  */
 @RequiresApi(api = Build.VERSION_CODES.N)
-public class HistogramPipeline extends GLProxyPipeline
+public class GLHistogramPipeline extends GLProxyPipeline
 	implements GLSurfacePipeline, IMirror {
 	private static final boolean DEBUG = false;	// set false on production
-	private static final String TAG = HistogramPipeline.class.getSimpleName();
+	private static final String TAG = GLHistogramPipeline.class.getSimpleName();
 
 	@NonNull
 	private final GLManager mManager;
@@ -99,7 +99,7 @@ public class HistogramPipeline extends GLProxyPipeline
 	 * @throws IllegalStateException
 	 * @throws IllegalArgumentException
 	 */
-	public HistogramPipeline(
+	public GLHistogramPipeline(
 		@NonNull final GLManager manager,
 		@PipelineMode final int pipelineMode,
 		@Nullable final Object surface, @Nullable final Fraction maxFps)
