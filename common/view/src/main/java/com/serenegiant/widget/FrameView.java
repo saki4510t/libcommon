@@ -465,4 +465,23 @@ public class FrameView extends View {
 	public float getScale() {
 		return mScale;
 	}
+
+	/**
+	 * 外周枠を表示するかどうかを設定
+	 * @param show
+	 */
+	public void setShowOutline(final boolean show) {
+		if (mShowOutline != show) {
+			mShowOutline = show;
+			postInvalidate();
+		}
+	}
+
+	/**
+	 * 外周枠を表示するかどうかを取得
+	 * @return
+	 */
+	public boolean isShowOutline() {
+		return mShowOutline;
+	}
 }
