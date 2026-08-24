@@ -251,6 +251,9 @@ public class MediaStoreUtils {
 			|| ext.equalsIgnoreCase("mp4")
 			|| ext.equalsIgnoreCase("3gp")
 			|| ext.equalsIgnoreCase("h264")
+			|| ext.equalsIgnoreCase("h265")
+			|| ext.equalsIgnoreCase("vp8")
+			|| ext.equalsIgnoreCase("vp9")
 			|| ext.equalsIgnoreCase("mjpeg")) {
 
 			// 動画
