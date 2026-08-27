@@ -1,0 +1,145 @@
+{
+  "formatVersion": "1.1",
+  "component": {
+    "group": "com.serenegiant",
+    "module": "common-camera",
+    "version": "10.5.0",
+    "attributes": {
+      "org.gradle.status": "release"
+    }
+  },
+  "createdBy": {
+    "gradle": {
+      "version": "8.2"
+    }
+  },
+  "variants": [
+    {
+      "name": "releaseApiElements-published",
+      "attributes": {
+        "org.gradle.category": "library",
+        "org.gradle.usage": "java-api",
+        "org.jetbrains.kotlin.platform.type": "androidJvm"
+      },
+      "dependencies": [
+        {
+          "group": "com.serenegiant",
+          "module": "common-core",
+          "version": {
+            "requires": "10.5.0"
+          }
+        },
+        {
+          "group": "com.serenegiant",
+          "module": "common-gl",
+          "version": {
+            "requires": "10.5.0"
+          }
+        },
+        {
+          "group": "org.jetbrains.kotlin",
+          "module": "kotlin-stdlib",
+          "version": {
+            "requires": "1.9.24"
+          }
+        }
+      ],
+      "files": [
+        {
+          "name": "common-camera-10.5.0.aar",
+          "url": "common-camera-10.5.0.aar",
+          "size": 47198,
+          "sha512": "ef30ca0b8667aa88996706fd45a8ea734092322a2b996c79cae793a4e19d90a3cb115a56207059aadfadbeece065c9d9c4013c55772bdeef3b3ce877ebfab47e",
+          "sha256": "0d107cba361a44e39e63bb52988c536e371e00925da34af9fda3629d8685d616",
+          "sha1": "a5b88794164154bcf36b169e04c00021cbc77d42",
+          "md5": "811bb8fa17035ee210876030cc6c7f08"
+        }
+      ]
+    },
+    {
+      "name": "releaseRuntimeElements-published",
+      "attributes": {
+        "org.gradle.category": "library",
+        "org.gradle.usage": "java-runtime",
+        "org.jetbrains.kotlin.platform.type": "androidJvm"
+      },
+      "dependencies": [
+        {
+          "group": "androidx.appcompat",
+          "module": "appcompat",
+          "version": {
+            "requires": "1.6.1"
+          }
+        },
+        {
+          "group": "androidx.core",
+          "module": "core-ktx",
+          "version": {
+            "requires": "1.13.1"
+          }
+        },
+        {
+          "group": "org.jetbrains.kotlinx",
+          "module": "kotlinx-coroutines-android",
+          "version": {
+            "requires": "1.9.0"
+          }
+        },
+        {
+          "group": "com.serenegiant",
+          "module": "common-core",
+          "version": {
+            "requires": "10.5.0"
+          }
+        },
+        {
+          "group": "com.serenegiant",
+          "module": "common-gl",
+          "version": {
+            "requires": "10.5.0"
+          }
+        },
+        {
+          "group": "org.jetbrains.kotlin",
+          "module": "kotlin-stdlib",
+          "version": {
+            "requires": "1.9.24"
+          }
+        }
+      ],
+      "files": [
+        {
+          "name": "common-camera-10.5.0.aar",
+          "url": "common-camera-10.5.0.aar",
+          "size": 47198,
+          "sha512": "ef30ca0b8667aa88996706fd45a8ea734092322a2b996c79cae793a4e19d90a3cb115a56207059aadfadbeece065c9d9c4013c55772bdeef3b3ce877ebfab47e",
+          "sha256": "0d107cba361a44e39e63bb52988c536e371e00925da34af9fda3629d8685d616",
+          "sha1": "a5b88794164154bcf36b169e04c00021cbc77d42",
+          "md5": "811bb8fa17035ee210876030cc6c7f08"
+        }
+      ]
+    },
+    {
+      "name": "releaseSourcesElements-published",
+      "attributes": {
+        "org.gradle.category": "documentation",
+        "org.gradle.dependency.bundling": "external",
+        "org.gradle.docstype": "sources",
+        "org.gradle.libraryelements": "jar",
+        "org.gradle.usage": "java-runtime",
+        "org.jetbrains.kotlin.platform.type": "androidJvm"
+      },
+      "files": [
+        {
+          "name": "common-camera-10.5.0-sources.jar",
+          "url": "common-camera-10.5.0-sources.jar",
+          "size": 50165,
+          "sha512": "09975e2f749a3464060173989a881bae7dcc56ee639732cd43da39c40a17f550cb34bc1a801590f18a39bbc25e028b515197dcb3420088883f9d9e830190f0c6",
+          "sha256": "e7f31345e33916d751a932b8b61d931b2e7ca99fb9958e412cf0e833c63c70af",
+          "sha1": "522acd95eb8b7668dc185dac3731755f5d98ee9b",
+          "md5": "9a4205f9f47ce7a51fb00dee4852a936"
+        }
+      ]
+    }
+  ]
+}
