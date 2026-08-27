@@ -34,15 +34,45 @@ public class VideoConfig implements Parcelable, Cloneable {
 	private static final boolean DEBUG = false;	// set false on production
 	private static final String TAG = VideoConfig.class.getSimpleName();
 
+	/**
+	 * BPP(Bits Per Pixel)の最小値
+	 */
 	public static final float BPP_MIN = 0.01f;
+	/**
+	 * BPP(Bits Per Pixel)の最大値
+	 */
 	public static float BPP_MAX = 0.30f;
 
+	/**
+	 * フレームレートの最小値
+	 */
 	public static final int FPS_MIN = 2;
+	/**
+	 * フレームレートの最大値
+	 */
 	public static final int FPS_MAX = 121;
 
+	/**
+	 * I-frame間隔の最小値
+	 */
 	private static final int IFRAME_MIN = 1;
+	/**
+	 * I-frame間隔の最大値
+	 */
 	private static final int IFRAME_MAX = 30;
 
+	/**
+	 * ビットレートの最小値(bps)
+	 */
+	private static final int BITRATE_MIN = 200000;
+	/**
+	 * ビットレートの最大値(bps)
+	 */
+	private static final int BITRATE_MAX = 20000000;
+
+	/**
+	 * デフォルトのVideoConfig
+	 */
 	public static final VideoConfig DEFAULT_CONFIG = new VideoConfig(
 		0.25f, 10, 10 * 30.0f,
 		30, 30 * 1000L/*30秒*/,
@@ -308,11 +338,11 @@ public class VideoConfig implements Parcelable, Cloneable {
 	 * @return
 	 */
 	private static int calcBitrate(final int width, final int height,
-		final int frameRate, final float bpp) {
+		final int frameRate, final float bpp, final int maxBitrate) {
 
 		int r = (int)(Math.floor(bpp * frameRate * width * height / 1000 / 100) * 100) * 1000;
-		if (r < 200000) r = 200000;
-		else if (r > 20000000) r = 20000000;
+		if (r < BITRATE_MIN) r = BITRATE_MIN;
+		else if (r > maxBitrate) r = maxBitrate;
 //		Log.d(TAG, String.format("bitrate=%d[kbps]", r / 1024));
 		return r;
 	}
@@ -325,7 +355,7 @@ public class VideoConfig implements Parcelable, Cloneable {
 	 * @return
 	 */
 	public int getBitrate(final int width, final int height) {
-		return calcBitrate(width, height, captureFps(), BPP);
+		return calcBitrate(width, height, captureFps(), BPP, BITRATE_MAX);
 	}
 
 	/**
@@ -336,7 +366,7 @@ public class VideoConfig implements Parcelable, Cloneable {
 	 * @return
 	 */
 	public int getBitrate(final int width, final int height, final int frameRate) {
-		return calcBitrate(width, height, frameRate, BPP);
+		return calcBitrate(width, height, frameRate, BPP, BITRATE_MAX);
 	}
 
 	/**
@@ -349,7 +379,7 @@ public class VideoConfig implements Parcelable, Cloneable {
 	public int getBitrate(final int width, final int height,
 		final int frameRate, final float bpp) {
 
-		return calcBitrate(width, height, frameRate, bpp);
+		return calcBitrate(width, height, frameRate, bpp, BITRATE_MAX);
 	}
 
 	/**
