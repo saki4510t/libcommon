@@ -151,13 +151,13 @@ public class FrameView extends View {
 	@Override
 	protected void onDraw(@NonNull Canvas canvas) {
 		super.onDraw(canvas);
+		if (mShowOutline || (mFrameType == FRAME_TYPE_FRAME)) {
+			// 外周枠を描画
+			mPaint.setStrokeWidth(mFrameWidth);
+			mPaint.setColor(mFrameColor);
+			canvas.drawRect(mBoundsRect, mPaint);
+		}
 		if (mFrameType != FRAME_TYPE_NONE) {
-			if (mShowOutline || (mFrameType == FRAME_TYPE_FRAME)) {
-				// 外周枠を描画
-				mPaint.setStrokeWidth(mFrameWidth);
-				mPaint.setColor(mFrameColor);
-				canvas.drawRect(mBoundsRect, mPaint);
-			}
 			mPaint.setStrokeWidth(mScaleWidth);
 			mPaint.setColor(mScaleColor);
 			final float centerX = mCenterX;
