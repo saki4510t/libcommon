@@ -38,8 +38,6 @@ import java.io.IOException
  */
 @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
 class SAFFilerFragment : BaseFragment() {
-	private lateinit var mList: RecyclerViewWithEmptyView
-	private var mAdapter: DocumentTreeRecyclerAdapter? = null
 	override fun onCreateView(
 		inflater: LayoutInflater,
 		container: ViewGroup?,
@@ -48,14 +46,13 @@ class SAFFilerFragment : BaseFragment() {
 		if (DEBUG) Log.v(TAG, "onCreateView:")
 		return inflater.inflate(R.layout.fragment_saf_filer, container, false
 		).apply {
-			mList = findViewById(R.id.list)
+			initView(findViewById(R.id.list))
 		}
 	}
 
 	override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
 		super.onViewCreated(view, savedInstanceState)
 		if (DEBUG) Log.v(TAG, "onViewCreated:")
-		initView()
 	}
 
 	override fun internalOnResume() {
@@ -67,17 +64,18 @@ class SAFFilerFragment : BaseFragment() {
 		if (DEBUG) Log.v(TAG, "internalOnPause:")
 		super.internalOnPause()
 	}
+
 	//--------------------------------------------------------------------------------
 	/**
 	 * 表示を初期化
 	 */
-	private fun initView() {
-		mAdapter = DocumentTreeRecyclerAdapter(
+	private fun initView(listView: RecyclerViewWithEmptyView) {
+		val adapter = DocumentTreeRecyclerAdapter(
 			requireContext(),
 			R.layout.list_item_title, R.id.content,
 			SAFRootTreeDocumentFile.fromContext(requireContext())
 		)
-		mAdapter!!.setListener(
+		adapter.setListener(
 			object : DocumentTreeRecyclerAdapterListener {
 				override fun onItemClick(
 					parent: RecyclerView.Adapter<*>,
@@ -87,7 +85,7 @@ class SAFFilerFragment : BaseFragment() {
 					if (DEBUG) Log.v(TAG, "onItemClick:$item")
 					if (item.isDirectory) {
 						try {
-							mAdapter!!.changeDir(item)
+							adapter.changeDir(item)
 						} catch (e: IOException) {
 							Log.w(TAG, e)
 						}
@@ -106,8 +104,8 @@ class SAFFilerFragment : BaseFragment() {
 					return false
 				}
 			})
-		mList.layoutManager = LinearLayoutManager(requireContext())
-		mList.adapter = mAdapter
+		listView.layoutManager = LinearLayoutManager(requireContext())
+		listView.adapter = adapter
 	}
 
 	companion object {
