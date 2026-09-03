@@ -407,7 +407,7 @@ public class SAFUtils {
 			if (tree != null) {
 				return getInputStream(context, tree, null, mime, name);
 			} else {
-				throw new FileNotFoundException("specifc dir not found");
+				throw new FileNotFoundException("specific dir not found");
 			}
 		} else {
 			throw new UnsupportedOperationException("should be API>=21");
@@ -415,7 +415,7 @@ public class SAFUtils {
 	}
 	
 	/**
-	 * 指定したUriが存在する時にその下に出力用ファイルを生成してOutputStreamとして返す
+	 * 指定したUriが存在する時にその下に出力用ファイルを生成してInputStreamとして返す
 	 * @param context
 	 * @param parent
 	 * @param dirs
