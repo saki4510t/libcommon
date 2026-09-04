@@ -563,7 +563,7 @@ public class SAFUtils {
 	}
 
 
-	private static final String KEY_PREFIX = "SDUtils-";
+	private static final String KEY_PREFIX = "SAFUtils-";
 
 	/**
 	 * uriを保存する際に使用する共有プレファレンスのキー名をドキュメントツリーIDから生成する
