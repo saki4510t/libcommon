@@ -649,17 +649,10 @@ public class SAFUtils {
 
 		final Uri uri = loadUri(context, getKey(treeId));
 		if (uri != null) {
-			boolean found = false;
 			// 恒常的に保持しているUriパーミッションの一覧を取得する
 			final List<UriPermission> list
 				= context.getContentResolver().getPersistedUriPermissions();	// API>=19
-			for (final UriPermission item: list) {
-				if (item.getUri().equals(uri)) {	// API>=19
-					// 指定したドキュメントツリーIDに対応するUriへのパーミッションを恒常的に保持していた時
-					found = true;
-					break;
-				}
-			}
+			boolean found = hasPermission(list, uri);
 			if (found) {
 				return uri;
 			}
