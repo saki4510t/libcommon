@@ -102,7 +102,7 @@ public class SurfaceDrawable extends Drawable {
 	 * Surface/SurfaceTextureを経由して受け取った映像を保持するBitmap
 	 */
 	@NonNull
-	private final Bitmap mBitmap;
+	private Bitmap mBitmap;
 	/**
 	 * Drawable#drawでBitmapをDrawableへ描画する際の変換行列
 	 */
@@ -415,7 +415,16 @@ public class SurfaceDrawable extends Drawable {
 		if (DEBUG) Log.v(TAG, String.format("handleResize:(%d,%d)", width, height));
 		if ((mImageWidth != width) || (mImageHeight != height)) {
 			synchronized (mSync) {
-				mBitmap.reconfigure(width, height, Bitmap.Config.ARGB_8888);
+				try {
+					mBitmap.reconfigure(width, height, Bitmap.Config.ARGB_8888);
+				} catch (final IllegalArgumentException e) {
+					if (DEBUG) Log.w(TAG, e);
+					// Bitmap#reconfigureは元のビットマップが確保しているメモリブロックより
+					// 大きなサイズへ変更しようとするとIllegalArgumentExceptionが発生する。
+					// この場合は諦めて新規にビットマップを生成する
+					mBitmap.recycle();
+					mBitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
+				}
 				final int bytes = width * height * BitmapHelper.getPixelBytes(Bitmap.Config.ARGB_8888);
 				mWorkBuffer = ByteBuffer.allocateDirect(bytes).order(ByteOrder.LITTLE_ENDIAN);
 				handleReleaseOffscreen();
