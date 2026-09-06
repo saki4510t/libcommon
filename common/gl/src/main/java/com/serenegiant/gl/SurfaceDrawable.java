@@ -207,13 +207,15 @@ public class SurfaceDrawable extends Drawable {
 
 	public void release() {
 		if (DEBUG) Log.v(TAG, "release:");
-		mGlManager.getGLHandler().postAtFrontOfQueue(new Runnable() {
-			@Override
-			public void run() {
-				handleReleaseInputSurface();
-			}
-		});
-		ThreadUtils.NoThrowSleep(50L);
+		if (mGlManager.isValid()) {
+			mGlManager.getGLHandler().postAtFrontOfQueue(new Runnable() {
+				@Override
+				public void run() {
+					handleReleaseInputSurface();
+				}
+			});
+			ThreadUtils.NoThrowSleep(50L);
+		}
 		mGlManager.release();
 	}
 
