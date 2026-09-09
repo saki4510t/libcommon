@@ -1,4 +1,4 @@
-package com.serenegiant.gl;
+package com.serenegiant.compute;
 /*
  * libcommon
  * utility/helper classes for myself
@@ -22,6 +22,8 @@ import android.opengl.GLES31;
 import android.os.Build;
 import android.util.Log;
 
+import com.serenegiant.gl.GLUtils;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
 
@@ -31,11 +33,11 @@ import static com.serenegiant.gl.GLUtils.checkGlError;
  * API21/GLES31以降のコンピュートシェーダー関係のヘルパー
  */
 @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
-public class ComputeUtils {
+public class GLComputeUtils {
 	private static final boolean DEBUG = false;	// set false on production
-	private static final String TAG = ComputeUtils.class.getSimpleName();
+	private static final String TAG = GLComputeUtils.class.getSimpleName();
 
-	private ComputeUtils() {
+	private GLComputeUtils() {
 		// インスタンス化をエラーとするためにデフォルトコンストラクタをprivateに
 	}
 

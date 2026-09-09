@@ -28,6 +28,7 @@ import androidx.annotation.IntDef
 import androidx.annotation.RequiresApi
 import androidx.annotation.Size
 import androidx.annotation.WorkerThread
+import com.serenegiant.compute.GLComputeUtils
 import com.serenegiant.gl.GLConst.TexTarget
 import com.serenegiant.gl.GLConst.TexUnit
 import com.serenegiant.graphics.IMirror
@@ -169,7 +170,7 @@ class GLHistogram @WorkerThread @JvmOverloads constructor(
 		if (USB_COMPUTE_SHADER) {
 			mComputeDrawer = null
 			if (DEBUG) Log.v(TAG, "コンストラクタ:create compute shader")
-			mComputeProgram = ComputeUtils.loadShader(COMPUTE_SHADER_HISTOGRAM_COMPUTE_ES31)
+			mComputeProgram = GLComputeUtils.loadShader(COMPUTE_SHADER_HISTOGRAM_COMPUTE_ES31)
 			if (DEBUG) Log.v(TAG, "コンストラクタ:mComputeProgram=$mComputeProgram")
 			muROILoc = GLES31.glGetUniformLocation(mComputeProgram, "uROI")
 			GLUtils.checkGlError("コンストラクタ:glGetUniformLocation(uROI)")
