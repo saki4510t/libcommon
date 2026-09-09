@@ -54,7 +54,6 @@ import androidx.annotation.Nullable;
 import androidx.annotation.Size;
 import androidx.core.content.res.ResourcesCompat;
 
-import static com.serenegiant.graphics.IMirror.*;
 import static com.serenegiant.nio.BufferHelper.SIZEOF_FLOAT_BYTES;
 
 /**
@@ -397,16 +396,26 @@ public class GLUtils implements GLConst {
 	}
 
 	/**
-		 * OpenGL|ESのエラーをチェックしてlogCatに出力する
-		 * @param op
-		 */
-    public static void checkGlError(final String op) {
+	 * OpenGL|ESのエラーをチェックしてlogCatに出力する
+	 * @param op
+	 */
+	public static void checkGlError(final String op) {
+		checkGlError(op, false);
+	}
+
+	/**
+	 * OpenGL|ESのエラーをチェックしてlogCatに出力する
+	 * throwException=trueまたはGLUtils#DEBUG=trueならRuntimeExceptionを投げる
+	 * @param op
+	 * @param throwException エラー発生時に例外生成するかどうか
+	 */
+    public static void checkGlError(final String op, final boolean throwException) {
         final int error = GLES20.glGetError();
         if (error != GLES20.GL_NO_ERROR) {
             final String msg = op + ": glError 0x" + Integer.toHexString(error);
 			Log.e(TAG, msg);
 			Stacktrace.print();
-         	if (DEBUG) {
+         	if (DEBUG || throwException) {
 	            throw new RuntimeException(msg);
 	       	}
         }
