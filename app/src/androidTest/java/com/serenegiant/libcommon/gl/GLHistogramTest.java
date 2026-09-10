@@ -67,6 +67,7 @@ public class GLHistogramTest {
 	/**
 	 * Bitmap → GLTextureSource
 	 * 			→ GLFrameAvailableCallback → GLSurface.wrap → glReadPixels → Bitmap
+	 * コンピュートシェーダーを使ってヒストグラムを計算
 	 */
 	@Test
 	public void glHistogramTest1() {
@@ -77,9 +78,80 @@ public class GLHistogramTest {
 
 		final GLHistogram[] histogram = new GLHistogram[1];
 		manager.runOnGLThread(new Runnable() {
+			// コンピュートシェーダーを使ってヒストグラムを計算
 			@Override
 			public void run() {
-				histogram[0] = new GLHistogram(false);
+				histogram[0] = new GLHistogram(false, 2.0f, false, true);
+			}
+		});
+		// 映像ソース用にImageTextureSourceを生成
+		final GLTextureSource source = new GLTextureSource(manager, original, new Fraction(30));
+		// 映像受け取り用にGLFrameAvailableCallbackをセット
+		final Semaphore sem = new Semaphore(0);
+		final AtomicReference<Bitmap> result = new AtomicReference<>();
+		final AtomicInteger cnt = new AtomicInteger();
+		source.setFrameAvailableListener(new GLFrameAvailableCallback() {
+			@Override
+			public void onFrameAvailable(
+				final boolean isGLES3, final boolean isOES,
+				final int width, final int height,
+				final int texId, @NonNull final float[] texMatrix) {
+				manager.makeDefault();
+				histogram[0].compute(
+					width, height,
+					GLES20.GL_TEXTURE0, texId, texMatrix, 0);
+				manager.makeDefault();
+				histogram[0].draw(
+					width, height,
+					GLES20.GL_TEXTURE0, texId, texMatrix, 0);
+				manager.swap();
+				if (cnt.incrementAndGet() == NUM_FRAMES) {
+					Log.v(TAG, "onFrameAvailable:create Bitmap from texture, texMatrix=" + MatrixUtils.toGLMatrixString(texMatrix));
+					result.set(GLUtils.glCopyTextureToBitmap(
+						false, width, height, texId, texMatrix, null));
+					sem.release();
+				}
+			}
+		});
+		try {
+			assertTrue(sem.tryAcquire(NUM_FRAMES * 50L, TimeUnit.MILLISECONDS));
+			source.release();
+			manager.runOnGLThread(new Runnable() {
+				@Override
+				public void run() {
+					histogram[0].release();
+				}
+			});
+			assertEquals(NUM_FRAMES, cnt.get());
+			final Bitmap resultBitmap = result.get();
+			assertNotNull(resultBitmap);
+			// 元のビットマップと同じかどうかを検証
+			assertTrue(bitmapEquals(original, resultBitmap));
+		} catch (final InterruptedException e) {
+			fail();
+		} finally {
+			histogram[0].release();
+		}
+	}
+
+	/**
+	 * Bitmap → GLTextureSource
+	 * 			→ GLFrameAvailableCallback → GLSurface.wrap → glReadPixels → Bitmap
+	 * フラグメントシェーダーを使ってヒストグラムを計算
+	 */
+	@Test
+	public void glHistogramTest2() {
+		final Bitmap original = BitmapHelper.makeCheckBitmap(
+			WIDTH, HEIGHT, 15, 12, Bitmap.Config.ARGB_8888);
+
+		final GLManager manager = mManager;
+
+		final GLHistogram[] histogram = new GLHistogram[1];
+		manager.runOnGLThread(new Runnable() {
+			// フラグメントシェーダーを使ってヒストグラムを計算
+			@Override
+			public void run() {
+				histogram[0] = new GLHistogram(false, 20.0f, false, false);
 			}
 		});
 		// 映像ソース用にImageTextureSourceを生成

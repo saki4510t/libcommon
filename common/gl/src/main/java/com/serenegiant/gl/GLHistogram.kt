@@ -28,7 +28,9 @@ import androidx.annotation.IntDef
 import androidx.annotation.RequiresApi
 import androidx.annotation.Size
 import androidx.annotation.WorkerThread
-import com.serenegiant.compute.GLComputeUtils
+import com.serenegiant.compute.GLComputeHistogram
+import com.serenegiant.compute.GLFragmentHistogram
+import com.serenegiant.compute.GLHistogramBase
 import com.serenegiant.gl.GLConst.TexTarget
 import com.serenegiant.gl.GLConst.TexUnit
 import com.serenegiant.graphics.IMirror
@@ -36,14 +38,12 @@ import com.serenegiant.graphics.IMirror.MirrorMode
 import com.serenegiant.graphics.MatrixUtils
 import com.serenegiant.system.Time
 import com.serenegiant.nio.BufferHelper
-import java.nio.ByteBuffer
 import java.util.concurrent.locks.ReentrantLock
 import kotlin.concurrent.withLock
 import kotlin.math.min
 
 /**
  * RGBヒストグラム作成のヘルパークラス
- * FIXME コンピュートシェーダーを使うときとフラグメントシェーダーを使うときで分ける
  * OpenGL|ES3.1以降が必要
  * XXX 公式にはAPI>=21でES3.1対応だけど一部端末でES3の機能が抜けている場合があるのでAPI>=24とする
  * ヒストグラム平坦化による補正描画を行う場合には定期的に#compute, ##, #drawを呼び出す必要がある
@@ -55,8 +55,11 @@ import kotlin.math.min
  * ただしequalize=trueの場合はt#drawで常にRGB→HSV→RGBの変換とKUT参照が実行されるためヒストグラム
  * 平坦化補正が不要な場合はequalize=falseで生成するべき
  * @param isOES ソース映像がOESテクスチャかどうか
- * @param maxFps 最大フレームレート デフォルトは2.0fps
+ * @param maxFps ヒストグラムの最大更新頻度 デフォルトは2.0fps
  * @param equalize #drawでヒストグラム平坦化による補正描画を行うかどうか, デフォルトはfalseでヒストグラム平坦化による補正描画は行わない
+ * @param useComputeShader コンピュートシェーダーを使ってヒストグラムを計算するかどうか、
+ *        trueならコンピュートシェーダーを使う、falseならフラグメントシェーダーを使ってヒストグラムを計算する
+ *        デフォルトはtrueでコンピュートシェーダーを使う
  */
 @RequiresApi(api = Build.VERSION_CODES.N)
 class GLHistogram @WorkerThread @JvmOverloads constructor(
@@ -65,12 +68,8 @@ class GLHistogram @WorkerThread @JvmOverloads constructor(
 	@FloatRange(from = 0.0) maxFps: Float = 2.0f,
 	@JvmField
 	val equalize: Boolean = false,
+	private val useComputeShader: Boolean = true,
 ) : IMirror {
-	/**
-	 * ターゲットテクスチャ
-	 * GL_TEXTURE_EXTERNAL_OESまたはGL_TEXTURE_2D
-	 */
-	private val texTarget: Int
 	/**
 	 * ヒストグラムの次回更新予定時間、ナノ秒
 	 */
@@ -84,29 +83,72 @@ class GLHistogram @WorkerThread @JvmOverloads constructor(
 	 */
 	private val mIntervalsDeltaNs: Long
 	/**
-	 * フラグメントシェーダーを使ってヒストグラムの計算を行うためのHistogramDrawer
-	 * USB_COMPUTE_SHADER=trueならnull
+	 * ヒストグラムを計算するためのGLHistogramBase
 	 */
-	private var mComputeDrawer: HistogramDrawer? = null
+	private var mGLCompute: GLHistogramBase? = null
+
 	/**
-	 * 映像とヒストグラムの描画を行うためのHistogramDrawer
+	 * テクスチャターゲット
+	 * GL_TEXTURE_EXTERNAL_OESかGL_TEXTURE_2D
 	 */
-	private val mRendererDrawer: HistogramDrawer
+	@TexTarget
+	val texTarget: Int = if (isOES) GLConst.GL_TEXTURE_EXTERNAL_OES else GLES31.GL_TEXTURE_2D
 	/**
-	 * コンピュートシェーダーのプログラムオブジェクトID
-	 * USB_COMPUTE_SHADER=trueのときのみ有効
+	 * 頂点座標用バッファオブジェクト名
 	 */
-	private val mComputeProgram: Int
+	private var mBufVertex = GLConst.GL_NO_BUFFER
 	/**
-	 * ヒストグラム計算を行うROI(Region of Interest)のロケーション
-	 * USB_COMPUTE_SHADER=trueのときのみ有効
+	 * テクスチャ座標用バッファオブジェクト名
 	 */
-	private val muROILoc: Int
+	private var mBufTexCoord = GLConst.GL_NO_BUFFER
 	/**
-	 * テクスチャ変換行列のロケーション
-	 * 今はUSB_COMPUTE_SHADER=trueのときのみ有効
+	 * 頂点の数
+	 */
+	private val mVertexNum = (min(
+		ShaderConst.DEFAULT_VERTICES_2D.size.toDouble(),
+		ShaderConst.DEFAULT_TEXCOORD_2D.size.toDouble()
+	) / 2).toInt()
+	/**
+	 * 頂点配列のサイズ
+	 */
+	private val mVertexSz = mVertexNum * 2
+	/**
+	 * 頂点座標
+	 */
+	private val pVertex = BufferHelper.createBuffer(ShaderConst.DEFAULT_VERTICES_2D)
+	/**
+	 * テクスチャ座標
+	 */
+	private val pTexCoord = BufferHelper.createBuffer(ShaderConst.DEFAULT_TEXCOORD_2D)
+	private val histogramRGBId: Int
+	val hProgram: Int
+	@Size(value = 16)
+	val mMvpMatrix = FloatArray(16)
+	private var mRelease = false
+	/**
+	 * 頂点座標のlocation
+	 */
+	private val maPositionLoc: Int
+	/**
+	 * テクスチャ座標のlocation
+	 */
+	private val maTextureCoordLoc: Int
+	/**
+	 * モデルビュー変換行列のlocation
+	 */
+	private val muMVPMatrixLoc: Int
+	/**
+	 * テクスチャ座標変換行列のlocation
 	 */
 	private val muTexMatrixLoc: Int
+	/**
+	 * 使用するテクスチャユニットのlocation
+	 */
+	private val muTextureLoc: Int
+	/**
+	 * ヒストグラムを受け取るテクスチャRGBのlocation
+	 */
+	private val muHistogramRGBLoc: Int
 	/**
 	 * ヒストグラム表示領域のロケーション
 	 */
@@ -116,25 +158,9 @@ class GLHistogram @WorkerThread @JvmOverloads constructor(
 	 */
 	private val muHistogramTypeLoc: Int
 	/**
-	 * RGBヒストグラム生成時に頂点座標を飛び飛びにカウントするための変換係数
-	 */
-	private val muStepFactorLoc: Int
-	/**
 	 * 排他制御用
 	 */
 	private val mLock = ReentrantLock()
-	/**
-	 * ヒストグラム計算を行うROI(Region of Interest)
-	 * USB_COMPUTE_SHADER=trueおときのみ有効
-	 * FIXME 今は#compute内で映像全面に設定
-	 */
-	@Size(value = 4)
-	private val mROI = FloatArray(4)
-	/**
-	 * ヒストグラムカウント時のサンプリング間隔
-	 */
-	@Size(value = 2)
-	private val mStepFactor = FloatArray(2)
 	/**
 	 * ヒストグラムの表示領域を保持するfloat配列
 	 * [minU,minV]-[maxU,maxVにヒストグラムを表示する]
@@ -146,63 +172,64 @@ class GLHistogram @WorkerThread @JvmOverloads constructor(
 		0.6f, 0.9f,  // maxU, maxV,
 	)
 	/**
-	 * ヒストグラム受け取り用のテクスチャをゼロクリアまたはLUTをセットするために使うIntBuffer
-	 */
-	private val mClearBuffer = BufferHelper.createBuffer(IntArray(HISTOGRAM_SIZE))
-	/**
-	 * ヒストグラムを受け取るシェーダーストレージバッファオブジェクトID
-	 */
-	private var mHistogramRGBId = GLConst.GL_NO_BUFFER
-	/**
 	 * 現在のミラー設定
 	 */
 	@MirrorMode
 	private var mMirror = IMirror.MIRROR_NORMAL
 
 	init {
-		if (DEBUG) Log.v(TAG, "コンストラクタ:isOES=$isOES,useComputeShader=$USB_COMPUTE_SHADER,maxFps=$maxFps")
-		texTarget = if (isOES) GLConst.GL_TEXTURE_EXTERNAL_OES else GLES31.GL_TEXTURE_2D
+		if (DEBUG) Log.v(TAG, "コンストラクタ:isOES=$isOES,useComputeShader=$useComputeShader,maxFps=$maxFps")
 		mIntervalsNs = Math.round(1000000000.0 / (if (maxFps > 0.0f) maxFps else 2.0f))
 		mIntervalsDeltaNs = -Math.round(mIntervalsNs * 0.03) // 3%ならショートしても良いことにする
 		mNextDrawNs = Time.nanoTime() + mIntervalsNs
-		if (DEBUG) Log.v(TAG, "コンストラクタ:ヒストグラム受け取り用のシェーダーストレージバッファ初期化処理")
-		mHistogramRGBId = initHistogramBuffer()
-		if (USB_COMPUTE_SHADER) {
-			mComputeDrawer = null
-			if (DEBUG) Log.v(TAG, "コンストラクタ:create compute shader")
-			mComputeProgram = GLComputeUtils.loadShader(COMPUTE_SHADER_HISTOGRAM_COMPUTE_ES31)
-			if (DEBUG) Log.v(TAG, "コンストラクタ:mComputeProgram=$mComputeProgram")
-			muROILoc = GLES31.glGetUniformLocation(mComputeProgram, "uROI")
-			GLUtils.checkGlError("コンストラクタ:glGetUniformLocation(uROI)")
-			muTexMatrixLoc = GLES31.glGetUniformLocation(mComputeProgram, "uTexMatrix")
-			GLUtils.checkGlError("コンストラクタ:glGetUniformLocation(uTexMatrix)")
-			muStepFactorLoc = GLES31.glGetUniformLocation(mComputeProgram, "uStepFactor")
-			GLUtils.checkGlError("glGetUniformLocation(uStepFactor)")
-			if (DEBUG) Log.v(TAG, "コンストラクタ:muROILoc=$muROILoc,muTexMatrixLoc=$muTexMatrixLoc")
+		val compute = if (useComputeShader) {
+			if (DEBUG) Log.v(TAG, "コンストラクタ:create GLComputeHistogram")
+			GLComputeHistogram(isOES)
 		} else {
-			mComputeProgram = -1
-			muROILoc = -1
-			muTexMatrixLoc = -1
-			mComputeDrawer = HistogramDrawer(
-				isOES, mHistogramRGBId,
-				VERTEX_SHADER_STEPPED_ES31,
-				FRAGMENT_SHADER_HISTOGRAM_CNT_SSBO_ES31
-			)
-			muStepFactorLoc = GLES31.glGetUniformLocation(mComputeDrawer!!.hProgram, "uStepFactor")
-			GLUtils.checkGlError("glGetUniformLocation(uStepFactor)")
-		}
+			if (DEBUG) Log.v(TAG, "コンストラクタ:create GLFragmentHistogram")
+			GLFragmentHistogram(isOES)
+		} // if (useComputeShader) {
+		mGLCompute = compute
+		histogramRGBId = compute.histogramBufferId
 		if (DEBUG) Log.v(TAG, "コンストラクタ:create mRendererDrawer,isOES=$isOES,equalize=$equalize")
-		mRendererDrawer = HistogramDrawer(
-			isOES, mHistogramRGBId,
+		if (DEBUG) Log.v(TAG, "コンストラクタ:create shader")
+		hProgram = GLUtils.loadShader(
 			ShaderConst.VERTEX_SHADER_ES31,
-			if (equalize) FRAGMENT_SHADER_MIX_SSBO_EQ_ES31 else FRAGMENT_SHADER_MIX_SSBO_ES31
+			if (equalize) FRAGMENT_SHADER_MIX_SSBO_EQ_ES31 else FRAGMENT_SHADER_MIX_SSBO_ES31)
+		GLES31.glUseProgram(hProgram)
+		// locationの取得処理
+		maPositionLoc = GLES31.glGetAttribLocation(hProgram, "aPosition")
+		GLUtils.checkGlError("glGetAttribLocation(aPosition)", DEBUG)
+		maTextureCoordLoc = GLES31.glGetAttribLocation(hProgram, "aTextureCoord")
+		GLUtils.checkGlError("glGetAttribLocation(aTextureCoord)", DEBUG)
+		muMVPMatrixLoc = GLES31.glGetUniformLocation(hProgram, "uMVPMatrix")
+		GLUtils.checkGlError("glGetUniformLocation(uMVPMatrix)", DEBUG)
+		muTexMatrixLoc = GLES31.glGetUniformLocation(hProgram, "uTexMatrix")
+		GLUtils.checkGlError("glGetUniformLocation(uTexMatrix)", DEBUG)
+		muTextureLoc = GLES31.glGetUniformLocation(hProgram, "sTexture")
+		GLUtils.checkGlError("glGetAttribLocation(sTexture)", DEBUG)
+		muHistogramRGBLoc = GLES31.glGetUniformLocation(hProgram, "uHistogramRGB")
+		GLUtils.checkGlError("glGetUniformLocation(uHistogramRGB)", DEBUG)
+		muEmbedRegionLoc = GLES31.glGetUniformLocation(hProgram, "uEmbedRegion")
+		GLUtils.checkGlError("コンストラクタ:glGetUniformLocation(sTexture2)", DEBUG)
+		muHistogramTypeLoc = GLES31.glGetUniformLocation(hProgram, "uHistogramType")
+		GLUtils.checkGlError("コンストラクタ:glGetUniformLocation(uHistogramType)", DEBUG)
+		if (DEBUG) Log.v(TAG,
+			"コンストラクタ:aPosition=" + maPositionLoc
+				+ ",aTextureCoord=" + maTextureCoordLoc
+				+ ",uMVPMatrix=" + muMVPMatrixLoc
+				+ ",uTexMatrix=" + muTexMatrixLoc
+				+ ",sTexture=" + muTextureLoc
+				+ ",uHistogramRGB=" + muHistogramRGBLoc
 		)
-		muEmbedRegionLoc = GLES31.glGetUniformLocation(mRendererDrawer.hProgram, "uEmbedRegion")
-		GLUtils.checkGlError("コンストラクタ:glGetUniformLocation(sTexture2)")
-		muHistogramTypeLoc = GLES31.glGetUniformLocation(mRendererDrawer.hProgram, "uHistogramType")
-		GLUtils.checkGlError("コンストラクタ:glGetUniformLocation(uHistogramType)")
-		mStepFactor[0] = 4.0f
-		mStepFactor[1] = 3.0f
+		// テクスチャ変換行列とモデルビュー変換行列の初期化処理
+		Matrix.setIdentityM(mMvpMatrix, 0)
+		GLES31.glUniformMatrix4fv(muMVPMatrixLoc, 1, false, mMvpMatrix, 0)
+		GLUtils.checkGlError("glUniformMatrix4fv(muMVPMatrixLoc)", DEBUG)
+		GLES31.glUniformMatrix4fv(muTexMatrixLoc, 1, false, mMvpMatrix, 0)
+		GLUtils.checkGlError("glUniformMatrix4fv(muTexMatrixLoc)", DEBUG)
+		// テクスチャ座標と頂点座標の初期化処理
+		updateVertices()
 		if (!isOES) {
 			mirror = IMirror.MIRROR_VERTICAL
 		}
@@ -229,37 +256,9 @@ class GLHistogram @WorkerThread @JvmOverloads constructor(
 		val result = (startTimeNs - mNextDrawNs) > mIntervalsDeltaNs
 		if (result) {
 			mNextDrawNs = startTimeNs + mIntervalsNs
-			clearHistogramBuffer()
-			if (USB_COMPUTE_SHADER) {
-				GLES31.glUseProgram(mComputeProgram)
-				// ステップファクターをセット
-				GLES31.glUniform2fv(muStepFactorLoc, 1, mStepFactor, 0)
-				// ROIをセット、今はテクスチャ全面をカウント対象とする, (0,0)-(width,height)
-				mROI[0] = 0f
-				mROI[1] = 0f
-				mROI[2] = width.toFloat()
-				mROI[3] = height.toFloat()
-				GLES31.glUniform2fv(muROILoc, 2, mROI, 0)
-				// テクスチャ変換行列をバインド
-				GLES31.glUniformMatrix4fv(muTexMatrixLoc, 1, false, texMatrix, texOffset)
-				// ヒストグラム用バッファをバインド
-				GLES31.glBindBufferBase(GLES31.GL_SHADER_STORAGE_BUFFER, 1, mHistogramRGBId)
-				// ソース映像のテクスチャをバインド
-				GLES31.glActiveTexture(GLES31.GL_TEXTURE0)
-				if (DEBUG) GLUtils.checkGlError("draw:glActiveTexture,texUnit=$texUnit")
-				GLES31.glBindTexture(texTarget, texId)
-				if (DEBUG) GLUtils.checkGlError("draw:glBindTexture,texUnit=$texUnit")
-//				GLES31.glBindImageTexture(0, texId, 0, false, 0, GLES31.GL_READ_ONLY, GLES31.GL_RGBA8);
-//				if (DEBUG) GLUtils.checkGlError("draw:glBindImageTexture");
-				// コンピュート実行
-				GLES31.glDispatchCompute((width + 15) / 16, (height + 15) / 16, 1)
-				if (DEBUG) GLUtils.checkGlError("draw:glDispatchCompute")
-				GLES31.glMemoryBarrier(GLES31.GL_SHADER_STORAGE_BARRIER_BIT or GLES31.GL_BUFFER_UPDATE_BARRIER_BIT)
-			} else {
-				GLES31.glUseProgram(mComputeDrawer!!.hProgram)
-				// ステップファクターをセット
-				GLES31.glUniform2fv(muStepFactorLoc, 1, mStepFactor, 0)
-				mComputeDrawer!!.draw(texUnit, texId, texMatrix, texOffset)
+			mGLCompute?.let { compute ->
+				compute.setROI(0.0f, 0.0f, width.toFloat(), height.toFloat())
+				compute.compute(width, height, GLES31.GL_TEXTURE0, texId, texMatrix, texOffset)
 			}
 		}
 
@@ -288,15 +287,38 @@ class GLHistogram @WorkerThread @JvmOverloads constructor(
 		@TexUnit texUnit: Int, texId: Int,
 		@Size(min = 16) texMatrix: FloatArray?, texOffset: Int
 	) {
-		GLES31.glUseProgram(mRendererDrawer.hProgram)
+		GLES31.glUseProgram(hProgram)
+		if (DEBUG) GLUtils.checkGlError("draw:glUseProgram", DEBUG)
 		// ヒストグラムテクスチャをバインド
 		GLES31.glActiveTexture(GLES31.GL_TEXTURE3)
+		if (DEBUG) GLUtils.checkGlError("draw:glActiveTexture", DEBUG)
 		mLock.withLock {
 			GLES31.glUniform4fv(muEmbedRegionLoc, 1, mHistogramRegion, 0)
+			GLES31.glUniform1i(muHistogramTypeLoc, histogramType)
 		}
-		GLES31.glUniform1i(muHistogramTypeLoc, histogramType)
-		if (DEBUG) GLUtils.checkGlError("draw:glUniform4fv,loc=$muEmbedRegionLoc")
-		mRendererDrawer.draw(texUnit, texId, texMatrix, texOffset)
+		if (DEBUG) GLUtils.checkGlError("draw:glUniform4fv,loc=$muEmbedRegionLoc", DEBUG)
+		if (texMatrix != null) {
+			// テクスチャ変換行列が指定されている時
+			GLES31.glUniformMatrix4fv(muTexMatrixLoc, 1, false, texMatrix, texOffset)
+		}
+		if (muMVPMatrixLoc >= 0) {
+			GLES31.glUniformMatrix4fv(muMVPMatrixLoc, 1, false, mMvpMatrix, 0)
+		}
+		// ヒストグラムデータ用のテクスチャ/バッファをバインド
+		GLES31.glBindBufferBase(GLES31.GL_SHADER_STORAGE_BUFFER, 1, histogramRGBId)
+		if (DEBUG) GLUtils.checkGlError("bindTexture:glBindBufferBase", DEBUG)
+		// 映像ソースのテクスチャをバインド
+		GLES31.glActiveTexture(texUnit)
+		if (DEBUG) GLUtils.checkGlError("bindTexture:glActiveTexture,texUnit=$texUnit,loc=$muTextureLoc", DEBUG)
+		GLES31.glBindTexture(texTarget, texId)
+		if (DEBUG) GLUtils.checkGlError("bindTexture:glBindTexture,texUnit=$texUnit,loc=$muTextureLoc", DEBUG)
+		GLES31.glUniform1i(muTextureLoc, GLUtils.gLTextureUnit2Index(texUnit))
+		if (DEBUG) GLUtils.checkGlError("bindTexture:glUniform1i,texUnit=$texUnit,loc=$muTextureLoc", DEBUG)
+		// 描画実行
+		GLES31.glDrawArrays(GLES31.GL_TRIANGLE_STRIP, 0, mVertexNum)
+		// 描画終了処理
+		GLES31.glBindTexture(texTarget, 0)
+		GLES31.glUseProgram(0)
 	}
 
 	/**
@@ -306,14 +328,20 @@ class GLHistogram @WorkerThread @JvmOverloads constructor(
 	@WorkerThread
 	fun release() {
 		if (DEBUG) Log.v(TAG, "release:")
-		mComputeDrawer?.release()
-		if (mComputeProgram >= 0) {
-			GLES31.glDeleteProgram(mComputeProgram)
-		}
-		mRendererDrawer.release()
-		if (mHistogramRGBId > GLConst.GL_NO_BUFFER) {
-			GLUtils.deleteBuffer(mHistogramRGBId)
-			mHistogramRGBId = GLConst.GL_NO_BUFFER
+		mGLCompute?.release()
+		mGLCompute = null
+		if (!mRelease) {
+			mRelease = true
+			if (DEBUG) Log.v(TAG, "release:")
+			if (mBufVertex > GLConst.GL_NO_BUFFER) {
+				GLUtils.deleteBuffer(mBufVertex)
+				mBufVertex = GLConst.GL_NO_BUFFER
+			}
+			if (mBufTexCoord > GLConst.GL_NO_BUFFER) {
+				GLUtils.deleteBuffer(mBufTexCoord)
+				mBufTexCoord = GLConst.GL_NO_BUFFER
+			}
+			GLES31.glDeleteProgram(hProgram)
 		}
 	}
 
@@ -326,9 +354,7 @@ class GLHistogram @WorkerThread @JvmOverloads constructor(
 		mLock.withLock {
 			if (mMirror != mirror) {
 				mMirror = mirror
-//				MatrixUtils.setMirror(mHistogramDrawer.mMvpMatrix, mirror);
-//				mRendererDrawer.setMirror(mirror);
-				MatrixUtils.setMirror(mRendererDrawer.mMvpMatrix, mirror)
+				MatrixUtils.setMirror(mMvpMatrix, 0, mirror)
 			}
 		}
 	}
@@ -371,9 +397,8 @@ class GLHistogram @WorkerThread @JvmOverloads constructor(
 	@AnyThread
 	fun setStepFactor(
 		@FloatRange(from = 1.0) sx: Float, @FloatRange(from = 1.0) sy: Float) {
-		mLock.withLock {
-			mStepFactor[0] = if (sx >= 1.0) sx else 4.0f
-			mStepFactor[1] = if (sy >= 1.0) sy else 3.0f
+		mGLCompute?.let { compute ->
+			compute.setStepFactor(sx, sy)
 		}
 	}
 
@@ -384,57 +409,6 @@ class GLHistogram @WorkerThread @JvmOverloads constructor(
 	var histogramType: Int = HISTOGRAM_RGB
 
 	/**
-	 * ヒストグラムデータを取得する
-	 * EGL|GLコンテキストの存在するスレッド上で実行すること
-	 */
-	@Size(value = HISTOGRAM_SIZE.toLong())
-	@WorkerThread
-	fun getHistogram(): IntArray {
-		return readHistogram(null)
-	}
-
-	/**
-	 * シェーダーストレージバッファのヒストグラムデータを指定したIntバッファへ読み込む
-	 * EGL|GLコンテキストの存在するスレッド上で実行すること
-	 * @param buffer nullまたはHISTOGRAM_SIZEより小さい場合は内部で新しく生成する
-	 * @return
-	 */
-	@Size(value = HISTOGRAM_SIZE.toLong())
-	@WorkerThread
-	fun readHistogram(buffer: IntArray?): IntArray {
-		val buf = if ((buffer == null) || (buffer.size < HISTOGRAM_SIZE)) {
-			IntArray(HISTOGRAM_SIZE)
-		} else {
-			buffer
-		}
-		if (mHistogramRGBId != GLConst.GL_NO_BUFFER) {
-			GLES31.glBindBuffer(GLES31.GL_SHADER_STORAGE_BUFFER, mHistogramRGBId)
-			val mapped = GLES31.glMapBufferRange(
-				GLES31.GL_SHADER_STORAGE_BUFFER,
-				0, HISTOGRAM_BYTES,	// lengthはバイト数なので注意
-				GLES31.GL_MAP_READ_BIT)
-			if (mapped is ByteBuffer) {
-				mapped.asIntBuffer().get(buf)
-			}
-			GLES31.glUnmapBuffer(GLES31.GL_SHADER_STORAGE_BUFFER)
-			GLES31.glBindBuffer(GLES31.GL_SHADER_STORAGE_BUFFER, 0)
-		} else {
-			throw IllegalStateException("No histogram buffer")
-		}
-
-		return buf
-	}
-
-	/**
-	 * ヒストグラム平均化補正時にヒストグラムデータを読み込むためのIntArray
-	 */
-	private val mReadBuffer = IntArray(HISTOGRAM_SIZE)
-	/**
-	 * LUT計算時のワーク
-	 */
-	private val mDist = FloatArray(256)
-
-	/**
 	 * ヒストグラム平坦化用のLUTを計算
 	 * 累積分布関数でLUTを計算する
 	 * EGL|GLコンテキストの存在するスレッド上で実行すること
@@ -442,22 +416,9 @@ class GLHistogram @WorkerThread @JvmOverloads constructor(
 	@OptIn(ExperimentalUnsignedTypes::class)
 	@WorkerThread
 	fun equalize() {
-		val work = readHistogram(mReadBuffer).asUIntArray()	// XXX #asUIntArrayはOptInが必要
-		var total = 0.0f	// ヒストグラムの全ピクセル数
-		for (ix in 0..255) {
-			val rgb = work[ix] + work[ix + 256] + work[ix + 512]	// R[ix] + G[ix] + B[ix]
-			total += rgb.toFloat()
-			mDist[ix] = rgb.toFloat()
+		mGLCompute?.let { compute ->
+			compute.equalize()
 		}
-		mClearBuffer.limit(mClearBuffer.capacity())
-		mClearBuffer.position(LUT_INDEX)
-		var sum = 0.0f
-		for (ix in 0..255) {
-			sum += mDist[ix] / total	// 正規化ヒストグラムの累積頻度を計算
-			mClearBuffer.put((sum * 255.0f).toInt())	// 0..255に変換してセット
-		}
-		mClearBuffer.position(LUT_INDEX)
-		setLUT()
 	}
 
 	/**
@@ -465,327 +426,46 @@ class GLHistogram @WorkerThread @JvmOverloads constructor(
 	 */
 	@WorkerThread
 	fun resetEqualize() {
-		mClearBuffer.limit(mClearBuffer.capacity())
-		mClearBuffer.position(LUT_INDEX)
-		for (ix in 0..255) {
-			mClearBuffer.put(ix)
+		mGLCompute?.let { compute ->
+			compute.resetEqualize()
 		}
-		mClearBuffer.position(LUT_INDEX)
-		setLUT()
 	}
 
 	/**
-	 * ヒストグラムのデータを保持しているシェーダーストレージバッファオブジェクトのIDを取得する
+	 * 頂点座標をセット
 	 */
-	fun getHistogramBufferId(): Int {
-		return mHistogramRGBId
-	}
-
-	private fun resetClearBuffer() {
-		mClearBuffer.clear()
-		mClearBuffer.position(mClearBuffer.capacity())
-		mClearBuffer.flip()
-	}
-
-	/**
-	 * ヒストグラム受け取り用のシェーダーストレージバッファオブジェクトを生成
-	 * EGL|GLコンテキストの存在するスレッド上で実行すること
-	 * @return ヒストグラム受け取り用のシェーダーストレージバッファオブジェクトID
-	 */
-	@WorkerThread
-	private fun initHistogramBuffer(): Int {
-		if (DEBUG) Log.v(TAG, "initHistogramBuffer:")
-		// バッファオブジェクトを生成
-		val histogramBuffer = IntArray(1)
-		GLES31.glGenBuffers(1, histogramBuffer, 0)
-		GLUtils.checkGlError("initHistogramBuffer:glGenBuffers")
-		// 操作するバッファを指定
-		GLES31.glBindBuffer(GLES31.GL_SHADER_STORAGE_BUFFER, histogramBuffer[0])
-		GLUtils.checkGlError("initHistogramBuffer:glBindBuffer")
-		// デフォルトのLUTをセット
-		mClearBuffer.clear()
-		mClearBuffer.position(LUT_INDEX)
-		for (ix in 0..255) {
-			mClearBuffer.put(ix)
-		}
-		mClearBuffer.position(mClearBuffer.capacity())
-		mClearBuffer.flip()
-		GLES31.glBufferData(
-			GLES31.GL_SHADER_STORAGE_BUFFER,
-			HISTOGRAM_BYTES,  // sizeはバイト数なので注意
-			mClearBuffer,
-			GLES31.GL_DYNAMIC_COPY
-		)
-		GLUtils.checkGlError("initHistogramBuffer:glBufferData")
-		// バッファの指定をクリア
-		GLES31.glBindBuffer(GLES31.GL_SHADER_STORAGE_BUFFER, 0)
-		GLUtils.checkGlError("initHistogramBuffer:glBindBuffer(0)")
-		return histogramBuffer[0]
-	}
-
-	/**
-	 * ヒストグラム受け取り用のシェーダーストレージバッファオブジェクトをクリアする
-	 * EGL|GLコンテキストの存在するスレッド上で実行すること
-	 * @return
-	 */
-	@WorkerThread
-	private fun clearHistogramBuffer() {
-		// 操作するバッファを指定
-		// 以降バッファIDとして0を指定するまではGL_SHADER_STORAGE_BUFFERを
-		// 指定したバッファの操作は全てこのbufferIDで示すバッファに対して行われる
-		GLES31.glBindBuffer(GLES31.GL_SHADER_STORAGE_BUFFER, mHistogramRGBId)
-		if (DEBUG) GLUtils.checkGlError("clearAndBindHistogramBuffer:glBindBuffer($mHistogramRGBId)")
-		resetClearBuffer()
-		GLES31.glBufferSubData(
-			GLES31.GL_SHADER_STORAGE_BUFFER,
-			0, HISTOGRAM_BYTES,  // sizeはバイト数なので注意
-			mClearBuffer
-		)
-		if (DEBUG) GLUtils.checkGlError("clearAndBindHistogramBuffer:glBufferData")
-		// バッファの指定をクリア
-		GLES31.glBindBuffer(GLES31.GL_SHADER_STORAGE_BUFFER, 0)
-		if (DEBUG) GLUtils.checkGlError("clearAndBindHistogramBuffer:glBindBuffer(0)")
-	}
-
-	/**
-	 * ヒストグラム平坦化補正用のLUTをセットする
-	 * mClearBufferからヒストグラムのカウント用シェーダーストレージバッファオブジェクトのインデックス1280-1535をセットする
-	 * EGL|GLコンテキストの存在するスレッド上で実行すること
-	 */
-	@WorkerThread
-	private fun setLUT() {
-		// #glReadPixels, #glBufferData, #glBufferSubDataなどのGLESのバッファ関係の関数では
-		// Bufferのlimit/positionの操作は無視されてる気がする
-		mClearBuffer.limit(mClearBuffer.capacity())
-		mClearBuffer.position(LUT_INDEX)
-		// シェーダーストレージバッファオブジェクトのLUT領域を更新
-		GLES31.glBindBuffer(GLES31.GL_SHADER_STORAGE_BUFFER, mHistogramRGBId)
-		if (DEBUG) GLUtils.checkGlError("setLUT:glBindBuffer($mHistogramRGBId)")
-		GLES31.glBufferSubData(
-			GLES31.GL_SHADER_STORAGE_BUFFER,
-			LUT_INDEX * BufferHelper.SIZEOF_INT_BYTES, 256 * BufferHelper.SIZEOF_INT_BYTES,  // sizeはバイト数なので注意
-			mClearBuffer
-		)
-		if (DEBUG) GLUtils.checkGlError("setLUT:glBufferData")
-		// バッファの指定をクリア
-		GLES31.glBindBuffer(GLES31.GL_SHADER_STORAGE_BUFFER, 0)
-	}
-
-	/**
-	 * RGBヒストグラムのカウント・描画用
-	 * @param isOES ソース映像がOESテクスチャかどうか
-	 * @param histogramRGBId ヒストグラムデータ用のシェーダーストレージバッファオブジェクトID
-	 * @param vss 頂点シェーダー文字列
-	 * @param fss フラグメントシェーダー文字列
-	 */
-	private class HistogramDrawer(
-		isOES: Boolean, private val histogramRGBId: Int,
-		vss: String,
-		fss: String) {
-		/**
-		 * テクスチャターゲット
-		 * GL_TEXTURE_EXTERNAL_OESかGL_TEXTURE_2D
-		 */
-		@TexTarget
-		val texTarget: Int = if (isOES) GLConst.GL_TEXTURE_EXTERNAL_OES else GLES31.GL_TEXTURE_2D
-
-		/**
-		 * 頂点座標用バッファオブジェクト名
-		 */
-		private var mBufVertex = GLConst.GL_NO_BUFFER
-
-		/**
-		 * テクスチャ座標用バッファオブジェクト名
-		 */
-		private var mBufTexCoord = GLConst.GL_NO_BUFFER
-
-		/**
-		 * 頂点の数
-		 */
-		private val mVertexNum = (min(
-			ShaderConst.DEFAULT_VERTICES_2D.size.toDouble(),
-			ShaderConst.DEFAULT_TEXCOORD_2D.size.toDouble()
-		) / 2).toInt()
-
-		/**
-		 * 頂点配列のサイズ
-		 */
-		private val mVertexSz = mVertexNum * 2
-
-		/**
-		 * 頂点座標
-		 */
-		private val pVertex = BufferHelper.createBuffer(ShaderConst.DEFAULT_VERTICES_2D)
-
-		/**
-		 * テクスチャ座標
-		 */
-		private val pTexCoord = BufferHelper.createBuffer(ShaderConst.DEFAULT_TEXCOORD_2D)
-		val hProgram: Int
-
-		@Size(value = 16)
-		val mMvpMatrix = FloatArray(16)
-		private var mRelease = false
-
-		/**
-		 * 頂点座標のlocation
-		 */
-		private val maPositionLoc: Int
-
-		/**
-		 * テクスチャ座標のlocation
-		 */
-		private val maTextureCoordLoc: Int
-
-		/**
-		 * モデルビュー変換行列のlocation
-		 */
-		private val muMVPMatrixLoc: Int
-
-		/**
-		 * テクスチャ座標変換行列のlocation
-		 */
-		private val muTexMatrixLoc: Int
-
-		/**
-		 * 使用するテクスチャユニットのlocation
-		 */
-		private val muTextureLoc: Int
-
-		/**
-		 * ヒストグラムを受け取るテクスチャRGBのlocation
-		 */
-		private val muHistogramRGBLoc: Int
-
-		init {
-			if (DEBUG) Log.v(TAG, "コンストラクタ:create shader")
-			hProgram = GLUtils.loadShader(vss, fss)
-			GLES31.glUseProgram(hProgram)
-			// locationの取得処理
-			maPositionLoc = GLES31.glGetAttribLocation(hProgram, "aPosition")
-			GLUtils.checkGlError("glGetAttribLocation(aPosition)")
-			maTextureCoordLoc = GLES31.glGetAttribLocation(hProgram, "aTextureCoord")
-			GLUtils.checkGlError("glGetAttribLocation(aTextureCoord)")
-			muMVPMatrixLoc = GLES31.glGetUniformLocation(hProgram, "uMVPMatrix")
-			GLUtils.checkGlError("glGetUniformLocation(uMVPMatrix)")
-			muTexMatrixLoc = GLES31.glGetUniformLocation(hProgram, "uTexMatrix")
-			GLUtils.checkGlError("glGetUniformLocation(uTexMatrix)")
-			muTextureLoc = GLES31.glGetUniformLocation(hProgram, "sTexture")
-			GLUtils.checkGlError("glGetAttribLocation(sTexture)")
-			muHistogramRGBLoc = GLES31.glGetUniformLocation(hProgram, "uHistogramRGB")
-			GLUtils.checkGlError("glGetUniformLocation(uHistogramRGB)")
-			if (DEBUG) Log.v(TAG,
-				"コンストラクタ:aPosition=" + maPositionLoc
-					+ ",aTextureCoord=" + maTextureCoordLoc
-					+ ",uMVPMatrix=" + muMVPMatrixLoc
-					+ ",uTexMatrix=" + muTexMatrixLoc
-					+ ",sTexture=" + muTextureLoc
-					+ ",uHistogramRGB=" + muHistogramRGBLoc
-			)
-			// テクスチャ変換行列とモデルビュー変換行列の初期化処理
-			Matrix.setIdentityM(mMvpMatrix, 0)
-			GLES31.glUniformMatrix4fv(muMVPMatrixLoc, 1, false, mMvpMatrix, 0)
-			GLUtils.checkGlError("glUniformMatrix4fv(muMVPMatrixLoc)")
-			GLES31.glUniformMatrix4fv(muTexMatrixLoc, 1, false, mMvpMatrix, 0)
-			GLUtils.checkGlError("glUniformMatrix4fv(muTexMatrixLoc)")
-			// テクスチャ座標と頂点座標の初期化処理
-			updateVertices()
-		}
-
-		/**
-		 * ヒストグラムのカウント実行
-		 * EGL|GLコンテキストの存在するスレッド上で実行すること
-		 * @param texUnit テクスチャユニット
-		 * @param texId テクスチャID
-		 * @param texMatrix テクスチャ変換行列
-		 * @param texOffset テクスチャ変換行列のオフセット
-		 */
-		fun draw(
-			@TexUnit texUnit: Int, texId: Int,
-			@Size(min = 16) texMatrix: FloatArray?, texOffset: Int
-		) {
-//			if (DEBUG) Log.v(TAG, "draw:");
-			// 描画準備
-			GLES31.glUseProgram(hProgram)
-			if (texMatrix != null) {
-				// テクスチャ変換行列が指定されている時
-				GLES31.glUniformMatrix4fv(muTexMatrixLoc, 1, false, texMatrix, texOffset)
-			}
-			if (muMVPMatrixLoc >= 0) {
-				GLES31.glUniformMatrix4fv(muMVPMatrixLoc, 1, false, mMvpMatrix, 0)
-			}
-			// ヒストグラムデータ用のテクスチャ/バッファをバインド
-			GLES31.glBindBufferBase(GLES31.GL_SHADER_STORAGE_BUFFER, 1, histogramRGBId)
-			// 映像ソースのテクスチャをバインド
-			GLES31.glActiveTexture(texUnit)
-			if (DEBUG) GLUtils.checkGlError("bindTexture:glActiveTexture,texUnit=$texUnit,loc=$muTextureLoc")
-			GLES31.glBindTexture(texTarget, texId)
-			if (DEBUG) GLUtils.checkGlError("bindTexture:glBindTexture,texUnit=$texUnit,loc=$muTextureLoc")
-			GLES31.glUniform1i(muTextureLoc, GLUtils.gLTextureUnit2Index(texUnit))
-			if (DEBUG) GLUtils.checkGlError("bindTexture:glUniform1i,texUnit=$texUnit,loc=$muTextureLoc")
-			// 描画実行
-			GLES31.glDrawArrays(GLES31.GL_TRIANGLE_STRIP, 0, mVertexNum)
-			// 描画終了処理
-			GLES31.glBindTexture(texTarget, 0)
-			GLES31.glUseProgram(0)
-		}
-
-		/**
-		 * 頂点座標をセット
-		 */
-		fun updateVertices() {
-			if (DEBUG) Log.v(TAG, "updateVertices:")
-			if (USE_VBO) {
-				if (mBufVertex <= GLConst.GL_NO_BUFFER) {
-					pVertex.clear()
-					mBufVertex = GLUtils.createBuffer(GLES31.GL_ARRAY_BUFFER, pVertex, GLES31.GL_STATIC_DRAW)
-					if (DEBUG) Log.v(TAG, "updateVertices:create buffer object for vertex,$mBufVertex")
-				}
-				if (mBufTexCoord <= GLConst.GL_NO_BUFFER) {
-					pTexCoord.clear()
-					mBufTexCoord = GLUtils.createBuffer(GLES31.GL_ARRAY_BUFFER, pTexCoord, GLES31.GL_STATIC_DRAW)
-					if (DEBUG) Log.v(TAG, "updateVertices:create buffer object for tex coord,$mBufTexCoord")
-				}
-				// 頂点座標をセット
-				GLES31.glBindBuffer(GLES31.GL_ARRAY_BUFFER, mBufVertex)
-				GLES31.glVertexAttribPointer(maPositionLoc, 2, GLES31.GL_FLOAT, false, 0, 0)
-				GLES31.glEnableVertexAttribArray(maPositionLoc)
-				// テクスチャ座標をセット
-				GLES31.glBindBuffer(GLES31.GL_ARRAY_BUFFER, mBufTexCoord)
-				GLES31.glVertexAttribPointer(maTextureCoordLoc, 2, GLES31.GL_FLOAT, false, 0, 0)
-				GLES31.glEnableVertexAttribArray(maTextureCoordLoc)
-			} else {
-				// 頂点座標をセット
+	private fun updateVertices() {
+		if (DEBUG) Log.v(TAG, "updateVertices:")
+		if (USE_VBO) {
+			if (mBufVertex <= GLConst.GL_NO_BUFFER) {
 				pVertex.clear()
-				GLES31.glVertexAttribPointer(maPositionLoc, 2, GLES31.GL_FLOAT, false, mVertexSz, pVertex)
-				GLES31.glEnableVertexAttribArray(maPositionLoc)
-				// テクスチャ座標をセット
+				mBufVertex = GLUtils.createBuffer(GLES31.GL_ARRAY_BUFFER, pVertex, GLES31.GL_STATIC_DRAW)
+				if (DEBUG) Log.v(TAG, "updateVertices:create buffer object for vertex,$mBufVertex")
+			}
+			if (mBufTexCoord <= GLConst.GL_NO_BUFFER) {
 				pTexCoord.clear()
-				GLES31.glVertexAttribPointer(maTextureCoordLoc, 2, GLES31.GL_FLOAT, false, mVertexSz, pTexCoord)
-				GLES31.glEnableVertexAttribArray(maTextureCoordLoc)
+				mBufTexCoord = GLUtils.createBuffer(GLES31.GL_ARRAY_BUFFER, pTexCoord, GLES31.GL_STATIC_DRAW)
+				if (DEBUG) Log.v(TAG, "updateVertices:create buffer object for tex coord,$mBufTexCoord")
 			}
+			// 頂点座標をセット
+			GLES31.glBindBuffer(GLES31.GL_ARRAY_BUFFER, mBufVertex)
+			GLES31.glVertexAttribPointer(maPositionLoc, 2, GLES31.GL_FLOAT, false, 0, 0)
+			GLES31.glEnableVertexAttribArray(maPositionLoc)
+			// テクスチャ座標をセット
+			GLES31.glBindBuffer(GLES31.GL_ARRAY_BUFFER, mBufTexCoord)
+			GLES31.glVertexAttribPointer(maTextureCoordLoc, 2, GLES31.GL_FLOAT, false, 0, 0)
+			GLES31.glEnableVertexAttribArray(maTextureCoordLoc)
+		} else {
+			// 頂点座標をセット
+			pVertex.clear()
+			GLES31.glVertexAttribPointer(maPositionLoc, 2, GLES31.GL_FLOAT, false, mVertexSz, pVertex)
+			GLES31.glEnableVertexAttribArray(maPositionLoc)
+			// テクスチャ座標をセット
+			pTexCoord.clear()
+			GLES31.glVertexAttribPointer(maTextureCoordLoc, 2, GLES31.GL_FLOAT, false, mVertexSz, pTexCoord)
+			GLES31.glEnableVertexAttribArray(maTextureCoordLoc)
 		}
-
-		/**
-		 * 関係するリソースを破棄
-		 * EGL|GLコンテキストの存在するスレッド上で実行すること
-		 */
-		fun release() {
-			if (!mRelease) {
-				mRelease = true
-				if (DEBUG) Log.v(TAG, "release:")
-				if (mBufVertex > GLConst.GL_NO_BUFFER) {
-					GLUtils.deleteBuffer(mBufVertex)
-					mBufVertex = GLConst.GL_NO_BUFFER
-				}
-				if (mBufTexCoord > GLConst.GL_NO_BUFFER) {
-					GLUtils.deleteBuffer(mBufTexCoord)
-					mBufTexCoord = GLConst.GL_NO_BUFFER
-				}
-				GLES31.glDeleteProgram(hProgram)
-			}
-		}
-	} // HistogramDrawer
+	}
 
 	companion object {
 		private const val DEBUG = false // set false on production
@@ -836,148 +516,6 @@ class GLHistogram @WorkerThread @JvmOverloads constructor(
 		private const val USE_VBO = true
 
 		/**
-		 * コンピュートシェーダーを使ってヒストグラムをカウントするかどうか
-		 * XXX コンピュートシェーダーを使ってもフラグメントシェーダーを使ってもかなり処理が重いので
-		 *     ヒストグラムの更新頻度を下げても結構カクツク
-		 */
-		private const val USB_COMPUTE_SHADER = true
-
-		/**
-		 * ヒストグラム平均化補正時のLUTの先頭インデックス
-		 */
-		private const val LUT_INDEX = 1280
-		/**
-		 * ヒストグラムのデータ長
-		 * インデックス0-255:		R
-		 * インデックス256-511:	G
-		 * インデックス512-767:	B
-		 * インデックス768-1023:	I
-		 * インデックス1024:		R max(未計算)
-		 * インデックス1025:		G max(未計算)
-		 * インデックス1026:		B max(未計算)
-		 * インデックス1027:		I max
-		 * インデックス1028:		max
-		 * インデックス1280-1535:	ヒストグラム平坦化のLUT
-		 */
-		private const val HISTOGRAM_SIZE = 256 * 6
-		/**
-		 * ヒストグラムのデータサイズのバイト数
-		 */
-		private const val HISTOGRAM_BYTES = HISTOGRAM_SIZE * BufferHelper.SIZEOF_INT_BYTES
-
-		/**
-		 * RGBヒストグラムカウント用のモデルビュー変換行列とテクスチャ変換行列適用する頂点シェーダー
-		 * for ES3
-		 */
-		private const val VERTEX_SHADER_STEPPED_ES31 =
-			"""
-			#version 310 es
-			uniform mat4 uMVPMatrix;
-			uniform mat4 uTexMatrix;
-			uniform highp vec2 uStepFactor;
-			in highp vec4 aPosition;
-			in highp vec4 aTextureCoord;
-			out highp vec2 vTextureCoord;
-			void main() {
-				gl_Position = uMVPMatrix * aPosition;
-				vTextureCoord = (uTexMatrix * aTextureCoord).xy * uStepFactor;
-			}
-			"""
-
-		/**
-		 * RGBヒストグラムのカウント用フラグメントシェーダー
-		 * Geminiのレスポンスから作成
-		 */
-		private const val FRAGMENT_SHADER_HISTOGRAM_CNT_SSBO_ES31 =
-			"""
-			#version 310 es
-			#extension GL_ANDROID_extension_pack_es31a : require
-			#define STEP (255.0)
-			precision highp float;
-			precision highp int;
-			
-			in vec2 vTextureCoord;
-			uniform sampler2D sTexture;
-			layout(std430, binding = 1) buffer Histogram {
-				uint counts[256 * 6];
-			};
-			const highp vec3 conv = vec3(0.2125, 0.7154, 0.0721);
-
-			void main() {
-				if ((vTextureCoord.x < 0.0) || (vTextureCoord.x > 1.0)
-					|| (vTextureCoord.y < 0.0) || (vTextureCoord.y > 1.0)) return;
-				vec4 color = texture(sTexture, vTextureCoord);
-			
-				// Assuming color values are in the range [0.0, 1.0]
-				// Convert to integer intensity [0, STEP]
-				uint indexR = uint(color.r * STEP);
-				uint indexG = uint(color.g * STEP);
-				uint indexB = uint(color.b * STEP);
-				uint indexI = uint(dot(color.rgb, conv) * STEP);
-			
-				// Atomically increment the histogram bins
-				uint countsR = atomicAdd(counts[       indexR], 1u) + 1u;
-				uint countsG = atomicAdd(counts[256u + indexG], 1u) + 1u;
-				uint countsB = atomicAdd(counts[512u + indexB], 1u) + 1u;
-				uint countsI = atomicAdd(counts[768u + indexI], 1u) + 1u;
-				// 最大値を更新
-	//			atomicMax(counts[1024u], countsR);
-	//			atomicMax(counts[1025u], countsG);
-	//			atomicMax(counts[1026u], countsB);
-				atomicMax(counts[1027u], countsI);
-				atomicMax(counts[1028u], max(max(countsR, countsG), countsB));
-			}	
-			"""
-
-		/**
-		 * RGBヒストグラムをカウントするためのコンピュートシェーダー
-		 */
-		private const val COMPUTE_SHADER_HISTOGRAM_COMPUTE_ES31 =
-			"""
-			#version 310 es
-			#extension GL_ANDROID_extension_pack_es31a : require
-			#define STEP (255.0)
-			precision highp float;
-			precision highp int;
-	
-			layout (local_size_x = 16, local_size_y = 16) in;
-			
-			layout(binding = 0) uniform sampler2D srcImage;
-			layout(std430, binding = 1) buffer Histogram {
-				uint counts[256 * 5];
-			};
-			uniform vec2 uROI[2];
-			uniform mat4 uTexMatrix;
-			uniform highp vec2 uStepFactor;
-			const highp vec3 conv = vec3(0.2125, 0.7154, 0.0721);
-			void main() {
-				vec4 pos = vec4(vec2(gl_GlobalInvocationID.xy), 0.0, 1.0);
-				vec2 uv = (uTexMatrix * pos).xy * uStepFactor;
-				if ((uv.x < uROI[0].x) || (uv.x >= uROI[1].x) || (uv.y < uROI[0].y) || (uv.y >= uROI[1].y)) return;
-				vec4 color = texture(srcImage, uv / uROI[1]);
-			
-				// Assuming color values are in the range [0.0, 1.0]
-				// Convert to integer intensity [0, STEP]
-				uint indexR = uint(color.r * STEP);
-				uint indexG = uint(color.g * STEP);
-				uint indexB = uint(color.b * STEP);
-				uint indexI = uint(dot(color.rgb, conv) * STEP);
-			
-				// Atomically increment the histogram bins
-				uint countsR = atomicAdd(counts[       indexR], 1u) + 1u;
-				uint countsG = atomicAdd(counts[256u + indexG], 1u) + 1u;
-				uint countsB = atomicAdd(counts[512u + indexB], 1u) + 1u;
-				uint countsI = atomicAdd(counts[768u + indexI], 1u) + 1u;
-				// 最大値を更新
-	//			atomicMax(counts[1024u], countsR);
-	//			atomicMax(counts[1025u], countsG);
-	//			atomicMax(counts[1026u], countsB);
-				atomicMax(counts[1027u], countsI);
-				atomicMax(counts[1028u], max(max(countsR, countsG), countsB));
-			}
-			"""
-
-		/**
 		 * 元映像にRGBヒストグラムを合成して描画するフラグメントシェーダー
 		 * これは今は使っていない
 		 */
@@ -1025,7 +563,7 @@ class GLHistogram @WorkerThread @JvmOverloads constructor(
 			"""
 
 		/**
-		 * 元映像のテクスチャとストグラムを合成して表示するフラグメントシェーダー
+		 * 元映像のテクスチャとヒストグラムを合成して表示するフラグメントシェーダー
 		 */
 		private const val FRAGMENT_SHADER_MIX_SSBO_ES31 =
 			"""
