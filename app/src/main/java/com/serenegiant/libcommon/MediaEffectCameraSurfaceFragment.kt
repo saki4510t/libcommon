@@ -376,6 +376,60 @@ class MediaEffectCameraSurfaceFragment : BaseFragment() {
 			}
 		},
 		object : MyEffectsBuilder {
+			override fun name(): String { return "EFFECT_KERNEL_SOBEL2_V" }
+			override fun buildEffects(effectContext: EffectContext): MutableList<IMediaEffect> {
+				return mutableListOf(MediaEffectGLEffect(GLEffect.EFFECT_KERNEL_SOBEL2_V))
+			}
+		},
+		object : MyEffectsBuilder {
+			override fun name(): String { return "EFFECT_KERNEL_PREWITT_HV" }
+			override fun buildEffects(effectContext: EffectContext): MutableList<IMediaEffect> {
+				return mutableListOf(MediaEffectGLEffect(GLEffect.EFFECT_KERNEL_PREWITT_HV))
+			}
+		},
+		object : MyEffectsBuilder {
+			override fun name(): String { return "EFFECT_KERNEL_ROBERTS_HV" }
+			override fun buildEffects(effectContext: EffectContext): MutableList<IMediaEffect> {
+				return mutableListOf(MediaEffectGLEffect(GLEffect.EFFECT_KERNEL_ROBERTS_HV))
+			}
+		},
+		object : MyEffectsBuilder {
+			override fun name(): String { return "EFFECT_KERNEL_EDGE_ENHANCE4/EFFECT_KERNEL_SHARPNESS" }
+			override fun buildEffects(effectContext: EffectContext): MutableList<IMediaEffect> {
+				return mutableListOf(MediaEffectGLEffect(GLEffect.EFFECT_KERNEL_SHARPNESS))
+			}
+		},
+		object : MyEffectsBuilder {
+			override fun name(): String { return "EFFECT_KERNEL_EDGE_ENHANCE8" }
+			override fun buildEffects(effectContext: EffectContext): MutableList<IMediaEffect> {
+				return mutableListOf(MediaEffectGLEffect(GLEffect.EFFECT_KERNEL_EDGE_ENHANCE8))
+			}
+		},
+		object : MyEffectsBuilder {
+			override fun name(): String { return "EFFECT_KERNEL_SMOOTH" }
+			override fun buildEffects(effectContext: EffectContext): MutableList<IMediaEffect> {
+				return mutableListOf(MediaEffectGLEffect(GLEffect.EFFECT_KERNEL_SMOOTH))
+			}
+		},
+		object : MyEffectsBuilder {
+			override fun name(): String { return "EFFECT_KERNEL_GAUSSIAN" }
+			override fun buildEffects(effectContext: EffectContext): MutableList<IMediaEffect> {
+				return mutableListOf(MediaEffectGLEffect(GLEffect.EFFECT_KERNEL_GAUSSIAN))
+			}
+		},
+		object : MyEffectsBuilder {
+			override fun name(): String { return "EFFECT_KERNEL_LAPLACIAN4" }
+			override fun buildEffects(effectContext: EffectContext): MutableList<IMediaEffect> {
+				return mutableListOf(MediaEffectGLEffect(GLEffect.EFFECT_KERNEL_LAPLACIAN4))
+			}
+		},
+		object : MyEffectsBuilder {
+			override fun name(): String { return "EFFECT_KERNEL_LAPLACIAN8" }
+			override fun buildEffects(effectContext: EffectContext): MutableList<IMediaEffect> {
+				return mutableListOf(MediaEffectGLEffect(GLEffect.EFFECT_KERNEL_LAPLACIAN8))
+			}
+		},
+		object : MyEffectsBuilder {
 			override fun name(): String { return "EFFECT_BIN" }
 			override fun buildEffects(effectContext: EffectContext): MutableList<IMediaEffect> {
 				return mutableListOf(MediaEffectGLEffect(GLEffect.EFFECT_BIN))
