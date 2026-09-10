@@ -32,6 +32,7 @@ import com.serenegiant.gl.GLConst
 import com.serenegiant.gl.GLUtils
 import com.serenegiant.nio.BufferHelper
 import java.nio.ByteBuffer
+import java.nio.ByteOrder
 import java.util.concurrent.locks.ReentrantLock
 import kotlin.concurrent.withLock
 
@@ -166,7 +167,8 @@ abstract class GLHistogramBase @WorkerThread constructor(
 				GLES31.GL_MAP_READ_BIT)
 			if (DEBUG) GLUtils.checkGlError("readHistogram:glMapBufferRange", DEBUG)
 			if (mapped is ByteBuffer) {
-				mapped.asIntBuffer().get(buf)
+				mapped.order(ByteOrder.nativeOrder())	// ここでバイトオーダーを指定しないといけない!
+					.asIntBuffer().get(buf)
 			} else if (DEBUG) {
 				Log.d(TAG, "readHistogram:glMapBufferRange returned null")
 			}
