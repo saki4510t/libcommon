@@ -159,22 +159,14 @@ class MediaEffectCameraSurfaceFragment : BaseFragment() {
 		object : MyEffectsBuilder {
 			override fun name(): String { return "MediaEffectAutoFix" }
 			override fun buildEffects(effectContext: EffectContext): MutableList<IMediaEffect> {
-				return mutableListOf(
-					MediaEffectAutoFix(
-						effectContext,
-						0.5f
-					)
-				)
+				return mutableListOf(MediaEffectAutoFix(effectContext, 0.5f))
 			}
 		},
 		object : MyEffectsBuilder {
 			override fun name(): String { return "AutoFix+Crop" }
 			override fun buildEffects(effectContext: EffectContext): MutableList<IMediaEffect> {
 				return mutableListOf(
-					MediaEffectAutoFix(
-						effectContext,
-						0.5f
-					),
+					MediaEffectAutoFix(effectContext,0.5f),
 					MediaEffectCrop(effectContext,
 						CameraDelegator.DEFAULT_PREVIEW_WIDTH / 4, CameraDelegator.DEFAULT_PREVIEW_HEIGHT / 4,
 						CameraDelegator.DEFAULT_PREVIEW_WIDTH / 2, CameraDelegator.DEFAULT_PREVIEW_HEIGHT / 2),
@@ -194,22 +186,19 @@ class MediaEffectCameraSurfaceFragment : BaseFragment() {
 			override fun name(): String { return "MediaEffectBitmapOverlay" }
 			override fun buildEffects(effectContext: EffectContext): MutableList<IMediaEffect> {
 				return mutableListOf(
-					MediaEffectBitmapOverlay(effectContext,
-					BitmapHelper.genMaskImage(0,
-						CameraDelegator.DEFAULT_PREVIEW_WIDTH, CameraDelegator.DEFAULT_PREVIEW_HEIGHT,
-						60, Color.BLUE,127, 255)
-				)
+					MediaEffectBitmapOverlay(
+						effectContext,
+						BitmapHelper.genMaskImage(0,
+							CameraDelegator.DEFAULT_PREVIEW_WIDTH, CameraDelegator.DEFAULT_PREVIEW_HEIGHT,
+							60, Color.BLUE,127, 255)
+					)
 				)
 			}
 		},
 		object : MyEffectsBuilder {
 			override fun name(): String { return "MediaEffectBlackWhite" }
 			override fun buildEffects(effectContext: EffectContext): MutableList<IMediaEffect> {
-				return mutableListOf(
-					MediaEffectBlackWhite(
-						effectContext
-					)
-				)
+				return mutableListOf(MediaEffectBlackWhite(effectContext))
 			}
 		},
 		object : MyEffectsBuilder {
@@ -222,10 +211,11 @@ class MediaEffectCameraSurfaceFragment : BaseFragment() {
 			override fun name(): String { return "MediaEffectCrop" }
 			override fun buildEffects(effectContext: EffectContext): MutableList<IMediaEffect> {
 				return mutableListOf(
-					MediaEffectCrop(effectContext,
-					CameraDelegator.DEFAULT_PREVIEW_WIDTH / 4, CameraDelegator.DEFAULT_PREVIEW_HEIGHT / 4,
-					CameraDelegator.DEFAULT_PREVIEW_WIDTH / 2, CameraDelegator.DEFAULT_PREVIEW_HEIGHT / 2
-				)
+					MediaEffectCrop(
+						effectContext,
+						CameraDelegator.DEFAULT_PREVIEW_WIDTH / 4, CameraDelegator.DEFAULT_PREVIEW_HEIGHT / 4,
+						CameraDelegator.DEFAULT_PREVIEW_WIDTH / 2, CameraDelegator.DEFAULT_PREVIEW_HEIGHT / 2
+					)
 				)
 			}
 		},
@@ -245,9 +235,10 @@ class MediaEffectCameraSurfaceFragment : BaseFragment() {
 			override fun name(): String { return "MediaEffectDuoTone(0xffff0000,0xff00ff00)" }
 			override fun buildEffects(effectContext: EffectContext): MutableList<IMediaEffect> {
 				return mutableListOf(
-					MediaEffectDuoTone(effectContext,
-					0xffff0000.toInt(), 0xff00ff00.toInt()
-				)
+					MediaEffectDuoTone(
+						effectContext,
+						0xffff0000.toInt(), 0xff00ff00.toInt()
+					)
 				)
 			}
 		},
@@ -273,23 +264,13 @@ class MediaEffectCameraSurfaceFragment : BaseFragment() {
 		object : MyEffectsBuilder {
 			override fun name(): String { return "MediaEffectFlipVertical" }
 			override fun buildEffects(effectContext: EffectContext): MutableList<IMediaEffect> {
-				return mutableListOf(
-					MediaEffectFlipVertical(
-						effectContext
-					)
-				)
+				return mutableListOf(MediaEffectFlipVertical(effectContext))
 			}
 		},
 		object : MyEffectsBuilder {
 			override fun name(): String { return "MediaEffectFlip(true,true)" }
 			override fun buildEffects(effectContext: EffectContext): MutableList<IMediaEffect> {
-				return mutableListOf(
-					MediaEffectFlip(
-						effectContext,
-						true,
-						true
-					)
-				)
+				return mutableListOf(MediaEffectFlip(effectContext, true, true))
 			}
 		},
 		object : MyEffectsBuilder {
@@ -301,11 +282,7 @@ class MediaEffectCameraSurfaceFragment : BaseFragment() {
 		object : MyEffectsBuilder {
 			override fun name(): String { return "MediaEffectGrayScale" }
 			override fun buildEffects(effectContext: EffectContext): MutableList<IMediaEffect> {
-				return mutableListOf(
-					MediaEffectGrayScale(
-						effectContext
-					)
-				)
+				return mutableListOf(MediaEffectGrayScale(effectContext))
 			}
 		},
 		object : MyEffectsBuilder {
@@ -323,20 +300,17 @@ class MediaEffectCameraSurfaceFragment : BaseFragment() {
 		object : MyEffectsBuilder {
 			override fun name(): String { return "MediaEffectNull" }
 			override fun buildEffects(effectContext: EffectContext): MutableList<IMediaEffect> {
-				return mutableListOf(
-					MediaEffectNull(
-						effectContext
-					)
-				)
+				return mutableListOf(MediaEffectNull(effectContext))
 			}
 		},
 		object : MyEffectsBuilder {
 			override fun name(): String { return "MediaEffectRedEye" }
 			override fun buildEffects(effectContext: EffectContext): MutableList<IMediaEffect> {
 				return mutableListOf(
-					MediaEffectRedEye(effectContext,
-					floatArrayOf(0.33f, 0.33f, 0.66f, 0.33f)	// これは適当
-				)
+					MediaEffectRedEye(
+						effectContext,
+						floatArrayOf(0.33f, 0.33f, 0.66f, 0.33f)	// これは適当
+					)
 				)
 			}
 		},
@@ -349,22 +323,13 @@ class MediaEffectCameraSurfaceFragment : BaseFragment() {
 		object : MyEffectsBuilder {
 			override fun name(): String { return "MediaEffectSaturate(0.5)" }
 			override fun buildEffects(effectContext: EffectContext): MutableList<IMediaEffect> {
-				return mutableListOf(
-					MediaEffectSaturate(
-						effectContext,
-						0.5f
-					)
-				)
+				return mutableListOf(MediaEffectSaturate(effectContext, 0.5f))
 			}
 		},
 		object : MyEffectsBuilder {
 			override fun name(): String { return "MediaEffectSepia" }
 			override fun buildEffects(effectContext: EffectContext): MutableList<IMediaEffect> {
-				return mutableListOf(
-					MediaEffectSepia(
-						effectContext
-					)
-				)
+				return mutableListOf(MediaEffectSepia(effectContext))
 			}
 		},
 		object : MyEffectsBuilder {
@@ -382,34 +347,19 @@ class MediaEffectCameraSurfaceFragment : BaseFragment() {
 		object : MyEffectsBuilder {
 			override fun name(): String { return "MediaEffectTemperature(0.75)" }
 			override fun buildEffects(effectContext: EffectContext): MutableList<IMediaEffect> {
-				return mutableListOf(
-					MediaEffectTemperature(
-						effectContext,
-						0.75f
-					)
-				)
+				return mutableListOf(MediaEffectTemperature(effectContext, 0.75f))
 			}
 		},
 		object : MyEffectsBuilder {
 			override fun name(): String { return "MediaEffectTint(0xff00ffff)" }
 			override fun buildEffects(effectContext: EffectContext): MutableList<IMediaEffect> {
-				return mutableListOf(
-					MediaEffectTint(
-						effectContext,
-						0xff00ffff.toInt()
-					)
-				)
+				return mutableListOf(MediaEffectTint(effectContext, 0xff00ffff.toInt()))
 			}
 		},
 		object : MyEffectsBuilder {
 			override fun name(): String { return "MediaEffectVignette(0.5)" }
 			override fun buildEffects(effectContext: EffectContext): MutableList<IMediaEffect> {
-				return mutableListOf(
-					MediaEffectVignette(
-						effectContext,
-						0.5f
-					)
-				)
+				return mutableListOf(MediaEffectVignette(effectContext, 0.5f))
 			}
 		},
 		// OpenGL|ESでの映像フィルタ処理
@@ -452,11 +402,7 @@ class MediaEffectCameraSurfaceFragment : BaseFragment() {
 		object : MyEffectsBuilder {
 			override fun name(): String { return "MediaEffectGLCanny(0.5)" }
 			override fun buildEffects(effectContext: EffectContext): MutableList<IMediaEffect> {
-				return mutableListOf(
-					MediaEffectGLCanny(
-						0.5f
-					)
-				)
+				return mutableListOf(MediaEffectGLCanny(0.5f))
 			}
 		},
 		object : MyEffectsBuilder {
@@ -494,7 +440,7 @@ class MediaEffectCameraSurfaceFragment : BaseFragment() {
 			override fun buildEffects(effectContext: EffectContext): MutableList<IMediaEffect> {
 				return mutableListOf(
 					MediaEffectGLColorCorrection().apply {
-					setGamma(2.0f)
+						setGamma(2.0f)
 				})
 			}
 		},
@@ -503,7 +449,7 @@ class MediaEffectCameraSurfaceFragment : BaseFragment() {
 			override fun buildEffects(effectContext: EffectContext): MutableList<IMediaEffect> {
 				return mutableListOf(
 					MediaEffectGLColorCorrection().apply {
-					setGamma(0.6f)
+						setGamma(0.6f)
 				})
 			}
 		},
@@ -512,7 +458,7 @@ class MediaEffectCameraSurfaceFragment : BaseFragment() {
 			override fun buildEffects(effectContext: EffectContext): MutableList<IMediaEffect> {
 				return mutableListOf(
 					MediaEffectGLColorCorrection().apply {
-					setContrast(-0.5f)
+						setContrast(-0.5f)
 				})
 			}
 		},
@@ -521,7 +467,7 @@ class MediaEffectCameraSurfaceFragment : BaseFragment() {
 			override fun buildEffects(effectContext: EffectContext): MutableList<IMediaEffect> {
 				return mutableListOf(
 					MediaEffectGLColorCorrection().apply {
-					setContrast(0.5f)
+						setContrast(0.5f)
 				})
 			}
 		},
@@ -530,7 +476,7 @@ class MediaEffectCameraSurfaceFragment : BaseFragment() {
 			override fun buildEffects(effectContext: EffectContext): MutableList<IMediaEffect> {
 				return mutableListOf(
 					MediaEffectGLColorCorrection().apply {
-					setSigmoid(10.0f, 0.5f)
+						setSigmoid(10.0f, 0.5f)
 				})
 			}
 		},
@@ -539,7 +485,7 @@ class MediaEffectCameraSurfaceFragment : BaseFragment() {
 			override fun buildEffects(effectContext: EffectContext): MutableList<IMediaEffect> {
 				return mutableListOf(
 					MediaEffectGLColorCorrection().apply {
-					setSigmoid(5.0f, 0.8f)
+						setSigmoid(5.0f, 0.8f)
 				})
 			}
 		},
@@ -552,11 +498,7 @@ class MediaEffectCameraSurfaceFragment : BaseFragment() {
 		object : MyEffectsBuilder {
 			override fun name(): String { return "MediaEffectGLDilation(2)" }
 			override fun buildEffects(effectContext: EffectContext): MutableList<IMediaEffect> {
-				return mutableListOf(
-					MediaEffectGLDilation(
-						2
-					)
-				)
+				return mutableListOf(MediaEffectGLDilation(2))
 			}
 		},
 		object : MyEffectsBuilder {
@@ -642,11 +584,7 @@ class MediaEffectCameraSurfaceFragment : BaseFragment() {
 		object : MyEffectsBuilder {
 			override fun name(): String { return "MediaEffectGLSaturate(0.5)" }
 			override fun buildEffects(effectContext: EffectContext): MutableList<IMediaEffect> {
-				return mutableListOf(
-					MediaEffectGLSaturate(
-						0.5f
-					)
-				)
+				return mutableListOf(MediaEffectGLSaturate(0.5f))
 			}
 		},
 		object : MyEffectsBuilder {
