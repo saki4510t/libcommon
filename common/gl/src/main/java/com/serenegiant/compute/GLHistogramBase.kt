@@ -35,6 +35,8 @@ import java.nio.ByteBuffer
 import java.nio.ByteOrder
 import java.util.concurrent.locks.ReentrantLock
 import kotlin.concurrent.withLock
+import kotlin.math.min
+import kotlin.math.roundToInt
 
 /**
  * コンピュートシェーダーまたはフラグメントシェーダーを使ったヒストグラムの生成処理の共通部分
@@ -82,7 +84,7 @@ abstract class GLHistogramBase @WorkerThread constructor(
 	/**
 	 * LUT計算時のワーク
 	 */
-	private val mDist = FloatArray(256)
+	private val mDist = DoubleArray(256)
 
 	init {
 		if (DEBUG) Log.v(TAG, "コンストラクタ:isOES=$isOES")
@@ -190,19 +192,27 @@ abstract class GLHistogramBase @WorkerThread constructor(
 	@WorkerThread
 	fun equalize() {
 		val work = readHistogram(mReadBuffer).asUIntArray()	// XXX #asUIntArrayはOptInが必要
-		var total = 0.0f	// ヒストグラムの全ピクセル数
+		// XXX 輝度で計算してもRGBの各成分で計算しても、全体が暗くて色調が乏しいときに過剰に補正がかかってしまう
+		//     色調が乏しいときはグレースケールにするほうが良いのかも
+		// 累積度数分布と合計画素数を計算
+		var total = 0.0	// ヒストグラムの全ピクセル数
 		for (ix in 0..255) {
+			// RGBそれぞれの画素数分布の合計で計算する時
 			val rgb = work[ix] + work[ix + 256] + work[ix + 512]	// R[ix] + G[ix] + B[ix]
-			total += rgb.toFloat()
-			mDist[ix] = rgb.toFloat()
+			total += rgb.toDouble()
+			mDist[ix] = total
+//			// 輝度の画素数分布から計算する時
+//			val intensity = work[ix + 768]
+//			total += intensity.toDouble()
+//			mDist[ix] = total
 		}
 //		if (DEBUG) Log.v(TAG, "equalize:${mDist.contentToString()}")
+		//
 		mClearBuffer.limit(mClearBuffer.capacity())
 		mClearBuffer.position(LUT_INDEX)
-		var sum = 0.0f
 		for (ix in 0..255) {
-			sum += mDist[ix] / total	// 正規化ヒストグラムの累積頻度を計算
-			mClearBuffer.put((sum * 255.0f).toInt())	// 0..255に変換してセット
+			val eq = mDist[ix] / total	// 正規化ヒストグラムの累積頻度を計算
+			mClearBuffer.put(min(255, (eq * 255.0).roundToInt()))	// 0..255に変換してセット
 		}
 		mClearBuffer.position(LUT_INDEX)
 		setLUT()
