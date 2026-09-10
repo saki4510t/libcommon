@@ -168,30 +168,6 @@ class MediaEffectCameraSurfaceFragment : BaseFragment() {
 			}
 		},
 		object : MyEffectsBuilder {
-			override fun name(): String { return "EFFECT_ADAPTIVE_BIN" }
-			override fun buildEffects(effectContext: EffectContext): MutableList<IMediaEffect> {
-				return mutableListOf(MediaEffectGLEffect(GLEffect.EFFECT_ADAPTIVE_BIN))
-			}
-		},
-		object : MyEffectsBuilder {
-			override fun name(): String { return "EFFECT_KERNEL_SOBEL_HV" }
-			override fun buildEffects(effectContext: EffectContext): MutableList<IMediaEffect> {
-				return mutableListOf(MediaEffectGLEffect(GLEffect.EFFECT_KERNEL_SOBEL_HV))
-			}
-		},
-		object : MyEffectsBuilder {
-			override fun name(): String { return "EFFECT_BIN" }
-			override fun buildEffects(effectContext: EffectContext): MutableList<IMediaEffect> {
-				return mutableListOf(MediaEffectGLEffect(GLEffect.EFFECT_BIN))
-			}
-		},
-		object : MyEffectsBuilder {
-			override fun name(): String { return "EFFECT_KERNEL_CANNY_ENHANCE" }
-			override fun buildEffects(effectContext: EffectContext): MutableList<IMediaEffect> {
-				return mutableListOf(MediaEffectGLEffect(GLEffect.EFFECT_KERNEL_CANNY_ENHANCE))
-			}
-		},
-		object : MyEffectsBuilder {
 			override fun name(): String { return "AutoFix+Crop" }
 			override fun buildEffects(effectContext: EffectContext): MutableList<IMediaEffect> {
 				return mutableListOf(
@@ -437,6 +413,30 @@ class MediaEffectCameraSurfaceFragment : BaseFragment() {
 			}
 		},
 		// OpenGL|ESでの映像フィルタ処理
+		object : MyEffectsBuilder {
+			override fun name(): String { return "EFFECT_ADAPTIVE_BIN" }
+			override fun buildEffects(effectContext: EffectContext): MutableList<IMediaEffect> {
+				return mutableListOf(MediaEffectGLEffect(GLEffect.EFFECT_ADAPTIVE_BIN))
+			}
+		},
+		object : MyEffectsBuilder {
+			override fun name(): String { return "EFFECT_KERNEL_SOBEL_HV" }
+			override fun buildEffects(effectContext: EffectContext): MutableList<IMediaEffect> {
+				return mutableListOf(MediaEffectGLEffect(GLEffect.EFFECT_KERNEL_SOBEL_HV))
+			}
+		},
+		object : MyEffectsBuilder {
+			override fun name(): String { return "EFFECT_BIN" }
+			override fun buildEffects(effectContext: EffectContext): MutableList<IMediaEffect> {
+				return mutableListOf(MediaEffectGLEffect(GLEffect.EFFECT_BIN))
+			}
+		},
+		object : MyEffectsBuilder {
+			override fun name(): String { return "EFFECT_KERNEL_CANNY_ENHANCE" }
+			override fun buildEffects(effectContext: EffectContext): MutableList<IMediaEffect> {
+				return mutableListOf(MediaEffectGLEffect(GLEffect.EFFECT_KERNEL_CANNY_ENHANCE))
+			}
+		},
 		object : MyEffectsBuilder {
 			override fun name(): String { return "MediaEffectGLAlphaBlend(0.5)" }
 			override fun buildEffects(effectContext: EffectContext): MutableList<IMediaEffect> {
