@@ -159,16 +159,12 @@ abstract class GLHistogramBase @WorkerThread constructor(
 		val bufId = histogramBufferId
 		if (bufId != GLConst.GL_NO_BUFFER) {
 			GLES31.glBindBuffer(GLES31.GL_SHADER_STORAGE_BUFFER, bufId)
-			if (DEBUG) GLUtils.checkGlError("readHistogram:glBindBuffer",
-				DEBUG
-			)
+			if (DEBUG) GLUtils.checkGlError("readHistogram:glBindBuffer", DEBUG)
 			val mapped = GLES31.glMapBufferRange(
 				GLES31.GL_SHADER_STORAGE_BUFFER,
 				0, HISTOGRAM_BYTES,	// lengthはバイト数なので注意
 				GLES31.GL_MAP_READ_BIT)
-			if (DEBUG) GLUtils.checkGlError("readHistogram:glMapBufferRange",
-				DEBUG
-			)
+			if (DEBUG) GLUtils.checkGlError("readHistogram:glMapBufferRange", DEBUG)
 			if (mapped is ByteBuffer) {
 				mapped.asIntBuffer().get(buf)
 			} else if (DEBUG) {
@@ -272,9 +268,7 @@ abstract class GLHistogramBase @WorkerThread constructor(
 		// 以降バッファIDとして0を指定するまではGL_SHADER_STORAGE_BUFFERを
 		// 指定したバッファの操作は全てこのbufferIDで示すバッファに対して行われる
 		GLES31.glBindBuffer(GLES31.GL_SHADER_STORAGE_BUFFER, histogramBufferId)
-		if (DEBUG) GLUtils.checkGlError("clearAndBindHistogramBuffer:glBindBuffer($histogramBufferId)",
-			DEBUG
-		)
+		if (DEBUG) GLUtils.checkGlError("clearAndBindHistogramBuffer:glBindBuffer($histogramBufferId)", DEBUG)
 		resetClearBuffer()
 		GLES31.glBufferSubData(
 			GLES31.GL_SHADER_STORAGE_BUFFER,
@@ -284,9 +278,7 @@ abstract class GLHistogramBase @WorkerThread constructor(
 		if (DEBUG) GLUtils.checkGlError("clearAndBindHistogramBuffer:glBufferData", DEBUG)
 		// バッファの指定をクリア
 		GLES31.glBindBuffer(GLES31.GL_SHADER_STORAGE_BUFFER, 0)
-		if (DEBUG) GLUtils.checkGlError("clearAndBindHistogramBuffer:glBindBuffer(0)",
-			DEBUG
-		)
+		if (DEBUG) GLUtils.checkGlError("clearAndBindHistogramBuffer:glBindBuffer(0)", DEBUG)
 	}
 
 	private fun resetClearBuffer() {
@@ -308,13 +300,13 @@ abstract class GLHistogramBase @WorkerThread constructor(
 		mClearBuffer.position(LUT_INDEX)
 		// シェーダーストレージバッファオブジェクトのLUT領域を更新
 		GLES31.glBindBuffer(GLES31.GL_SHADER_STORAGE_BUFFER, histogramBufferId)
-		if (DEBUG) GLUtils.checkGlError("setLUT:glBindBuffer($histogramBufferId)")
+		if (DEBUG) GLUtils.checkGlError("setLUT:glBindBuffer($histogramBufferId)", DEBUG)
 		GLES31.glBufferSubData(
 			GLES31.GL_SHADER_STORAGE_BUFFER,
 			LUT_INDEX * BufferHelper.SIZEOF_INT_BYTES, 256 * BufferHelper.SIZEOF_INT_BYTES,  // sizeはバイト数なので注意
 			mClearBuffer
 		)
-		if (DEBUG) GLUtils.checkGlError("setLUT:glBufferData")
+		if (DEBUG) GLUtils.checkGlError("setLUT:glBufferData", DEBUG)
 		// バッファの指定をクリア
 		GLES31.glBindBuffer(GLES31.GL_SHADER_STORAGE_BUFFER, 0)
 	}
