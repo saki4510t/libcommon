@@ -1,0 +1,109 @@
+package com.serenegiant.mediaeffect;
+/*
+ * libcommon
+ * utility/helper classes for myself
+ *
+ * Copyright (c) 2014-2026 saki t_saki@serenegiant.com
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ *  You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
+ */
+
+import android.opengl.GLES20;
+import android.os.Build;
+import android.util.Log;
+
+import com.serenegiant.gl.GLFocus;
+import com.serenegiant.gl.GLOffscreen;
+import com.serenegiant.graphics.IMirror;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.RequiresApi;
+
+@RequiresApi(api = Build.VERSION_CODES.N)
+public class MediaEffectGLFocus implements IMediaEffect, IMirror  {
+	private static final boolean DEBUG = true;
+	private static final String TAG = MediaEffectGLFocus.class.getSimpleName();
+
+	private final GLFocus mFocus;
+	private GLOffscreen mOutputOffscreen;
+	private volatile boolean mEnabled = true;
+
+	/**
+	 * コンストラクタ
+	 * @param isOES
+	 * @param maxFps フォーカス強度分布の最大更新頻度
+	 */
+	public MediaEffectGLFocus(
+		final boolean isOES,
+		final float maxFps) {
+		mFocus = new GLFocus(isOES, maxFps);
+	}
+
+	@Override
+	public void setMirror(final int mirror) {
+		mFocus.setMirror(mirror);
+	}
+
+	@Override
+	public int getMirror() {
+		return mFocus.getMirror();
+	}
+
+	@Override
+	public void apply(@NonNull final IMediaSource src) {
+		if (!mEnabled) return;
+		final GLOffscreen output = src.getOutputTargetTexture();
+		final int[] srcTexIds = src.getSourceTexId();
+		final int width = output.getWidth();;
+		final int height = output.getHeight();
+		output.makeCurrent();
+		if (mFocus.compute(
+			width, height,
+			GLES20.GL_TEXTURE1, srcTexIds[0], src.getTexMatrix(), 0)) {
+		}
+		output.makeCurrent();
+		try {
+			mFocus.draw(
+				output.getWidth(), output.getHeight(),
+				GLES20.GL_TEXTURE0, srcTexIds[0], src.getTexMatrix(), 0);
+		} finally {
+			output.swap();
+		}
+	}
+
+	@Override
+	public void release() {
+		if (DEBUG) Log.v(TAG, "release:");
+		mFocus.release();
+		if (mOutputOffscreen != null) {
+			mOutputOffscreen.release();
+			mOutputOffscreen = null;
+		}
+	}
+
+	@Override
+	public IMediaEffect resize(final int width, final int height) {
+		return this;
+	}
+
+	@Override
+	public boolean enabled() {
+		return mEnabled;
+	}
+
+	@Override
+	public IMediaEffect setEnable(final boolean enable) {
+		mEnabled = enable;
+		return this;
+	}
+}
