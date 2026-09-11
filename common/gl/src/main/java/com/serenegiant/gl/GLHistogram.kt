@@ -256,7 +256,7 @@ class GLHistogram @WorkerThread @JvmOverloads constructor(
 		if (result) {
 			mNextDrawNs = startTimeNs + mIntervalsNs
 			mGLCompute?.let { compute ->
-				compute.setROI(0.0f, 0.0f, width.toFloat(), height.toFloat())
+				compute.setROI(0, 0, width, height)
 				compute.compute(width, height, GLES31.GL_TEXTURE0, texId, texMatrix, texOffset)
 			}
 		}

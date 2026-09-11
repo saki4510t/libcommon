@@ -62,11 +62,6 @@ abstract class GLHistogramBase @WorkerThread constructor(
 	 */
 	internal val mLock = ReentrantLock()
 	/**
-	 * ヒストグラム計算を行うROI(Region of Interest)
-	 */
-	@Size(value = 4)
-	internal val mROI = FloatArray(4)
-	/**
 	 * ヒストグラムカウント時のサンプリング間隔
 	 */
 	@Size(value = 2)
@@ -102,27 +97,6 @@ abstract class GLHistogramBase @WorkerThread constructor(
 			GLUtils.deleteBuffer(bufferId)
 		}
 		if (DEBUG) Log.v(TAG, "release:finished")
-	}
-
-	/**
-	 * (x1,y1)-(x2,y2)を対角とする矩形をROI(Region of Interest)として指定する
-	 * @param x1
-	 * @param y1
-	 * @param x2
-	 * @param y2
-	 */
-	@AnyThread
-	fun setROI(
-		x1: Float, y1: Float,
-		x2: Float, y2: Float
-	) {
-//		if (DEBUG) Log.v(TAG, "setROI:($x1,$y1)-($x2,$y2)")
-		mLock.withLock {
-			mROI[0] = x1
-			mROI[1] = y1
-			mROI[2] = x2
-			mROI[3] = y2
-		}
 	}
 
 	/**

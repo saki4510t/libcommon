@@ -22,6 +22,7 @@ import android.opengl.GLES31
 import android.opengl.Matrix
 import android.os.Build
 import android.util.Log
+import androidx.annotation.AnyThread
 import androidx.annotation.RequiresApi
 import androidx.annotation.Size
 import androidx.annotation.WorkerThread
@@ -29,6 +30,7 @@ import com.serenegiant.gl.GLConst
 import com.serenegiant.gl.GLUtils
 import com.serenegiant.gl.ShaderConst
 import com.serenegiant.nio.BufferHelper
+import kotlin.concurrent.withLock
 import kotlin.math.min
 
 /**
@@ -106,6 +108,11 @@ class GLFragmentHistogram  @WorkerThread constructor(
 	 * RGBヒストグラム生成時に頂点座標を飛び飛びにカウントするための変換係数
 	 */
 	private val muStepFactorLoc: Int
+	/**
+	 * ヒストグラム計算を行うROI(Region of Interest)
+	 */
+	@Size(value = 4)
+	private val mROI = FloatArray(4)
 
 	init {
 		if (DEBUG) Log.v(TAG, "コンストラクタ:create shader")
@@ -165,6 +172,27 @@ class GLFragmentHistogram  @WorkerThread constructor(
 		}
 		super.release()
 		if (DEBUG) Log.v(TAG, "release:finished")
+	}
+
+	/**
+	 * (x1,y1)-(x2,y2)を対角とする矩形をROI(Region of Interest)として指定する
+	 * @param x1
+	 * @param y1
+	 * @param x2
+	 * @param y2
+	 */
+	@AnyThread
+	override fun setROI(
+		x1: Int, y1: Int,
+		x2: Int, y2: Int
+	) {
+//		if (DEBUG) Log.v(TAG, "setROI:($x1,$y1)-($x2,$y2)")
+		mLock.withLock {
+			mROI[0] = x1.toFloat()
+			mROI[1] = y1.toFloat()
+			mROI[2] = x2.toFloat()
+			mROI[3] = y2.toFloat()
+		}
 	}
 
 	/**

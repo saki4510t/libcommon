@@ -21,7 +21,6 @@ package com.serenegiant.compute
 import android.opengl.GLES31
 import android.os.Build
 import android.util.Log
-import androidx.annotation.AnyThread
 import androidx.annotation.CallSuper
 import androidx.annotation.RequiresApi
 import androidx.annotation.Size
@@ -33,7 +32,6 @@ import com.serenegiant.nio.BufferHelper
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
 import java.util.concurrent.locks.ReentrantLock
-import kotlin.concurrent.withLock
 
 /**
  * コンピュートシェーダーまたはフラグメントシェーダーを使ったフォーカス強度分布計算の共通部分
@@ -59,11 +57,6 @@ abstract class GLFocusBase @WorkerThread constructor(
 	 * 排他制御用
 	 */
 	internal val mLock = ReentrantLock()
-	/**
-	 * フォーカス強度分布計算を行うROI(Region of Interest)
-	 */
-	@Size(value = 4)
-	internal val mROI = FloatArray(4)
 	/**
 	 * フォーカス強度分布受け取り用のバッファをゼロクリアセットするために使うIntBuffer
 	 */
@@ -93,27 +86,6 @@ abstract class GLFocusBase @WorkerThread constructor(
 		if (DEBUG) Log.v(TAG, "release:")
 		releaseFocusBuffer()
 		if (DEBUG) Log.v(TAG, "release:finished")
-	}
-
-	/**
-	 * (x1,y1)-(x2,y2)を対角とする矩形をROI(Region of Interest)として指定する
-	 * @param x1
-	 * @param y1
-	 * @param x2
-	 * @param y2
-	 */
-	@AnyThread
-	fun setROI(
-		x1: Float, y1: Float,
-		x2: Float, y2: Float
-	) {
-//		if (DEBUG) Log.v(TAG, "setROI:($x1,$y1)-($x2,$y2)")
-		mLock.withLock {
-			mROI[0] = x1
-			mROI[1] = y1
-			mROI[2] = x2
-			mROI[3] = y2
-		}
 	}
 
 	/**

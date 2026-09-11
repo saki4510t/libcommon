@@ -21,9 +21,11 @@ package com.serenegiant.compute
 import android.opengl.GLES31
 import android.os.Build
 import android.util.Log
+import androidx.annotation.AnyThread
 import androidx.annotation.RequiresApi
 import androidx.annotation.Size
 import androidx.annotation.WorkerThread
+import com.serenegiant.compute.GLFragmentHistogram.Companion
 import com.serenegiant.gl.GLConst.TexUnit
 import com.serenegiant.gl.GLUtils
 import kotlin.concurrent.withLock
@@ -57,6 +59,11 @@ class GLComputeHistogram @WorkerThread constructor(
 	 * RGBヒストグラム生成時に頂点座標を飛び飛びにカウントするための変換係数ロケーション
 	 */
 	private val muStepFactorLoc: Int
+	/**
+	 * ヒストグラム計算を行うROI(Region of Interest)
+	 */
+	@Size(value = 4)
+	private val mROI = FloatArray(4)
 
 	init {
 		if (DEBUG) Log.v(TAG, "コンストラクタ:isOES=$isOES")
@@ -85,6 +92,29 @@ class GLComputeHistogram @WorkerThread constructor(
 		}
 		super.release()
 		if (DEBUG) Log.v(TAG, "release:finished")
+	}
+
+	/**
+	 * (x1,y1)-(x2,y2)を対角とする矩形をROI(Region of Interest)として指定する
+	 * 各値は映像サイズベースで全映像を対象にするなら(0, 0)-(width, height)
+	 * x1<=x2またはy1<=y2の場合の動作は未定義
+	 * @param x1
+	 * @param y1
+	 * @param x2
+	 * @param y2
+	 */
+	@AnyThread
+	override fun setROI(
+		x1: Int, y1: Int,
+		x2: Int, y2: Int
+	) {
+//		if (DEBUG) Log.v(TAG, "setROI:($x1,$y1)-($x2,$y2)")
+		mLock.withLock {
+			mROI[0] = x1.toFloat()
+			mROI[1] = y1.toFloat()
+			mROI[2] = x2.toFloat()
+			mROI[3] = y2.toFloat()
+		}
 	}
 
 	/**
@@ -125,6 +155,8 @@ class GLComputeHistogram @WorkerThread constructor(
 		if (DEBUG) GLUtils.checkGlError("compute:glActiveTexture,texUnit=$texUnit", DEBUG)
 		GLES31.glBindTexture(mTexTarget, texId)
 		if (DEBUG) GLUtils.checkGlError("compute:glBindTexture,texId=$texId", DEBUG)
+		GLES31.glUniform1i(0, GLUtils.gLTextureUnit2Index(texUnit))
+		if (DEBUG) GLUtils.checkGlError("bindTexture:glUniform1i,texUnit=$texUnit,loc=0",DEBUG)
 //		GLES31.glBindImageTexture(0, texId, 0, false, 0, GLES31.GL_READ_ONLY, GLES31.GL_RGBA8);
 //		if (DEBUG) GLUtils.checkGlError("compute:glBindImageTexture", DEBUG);
 		// コンピュート実行

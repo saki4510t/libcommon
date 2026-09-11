@@ -231,11 +231,11 @@ class GLFocus @WorkerThread constructor(
 			mNextDrawNs = startTimeNs + mIntervalsNs
 			mGLCompute?.let { compute ->
 				// とりあえず映像全面で計算
-				compute.setROI(0.0f, 0.0f, width.toFloat(), height.toFloat())
+				compute.setROI(0, 0, width, height)
 //				// こっちは画面中央の1/4領域
-//				val w = width.toFloat() / 4.0f
-//				val h = height.toFloat() / 4.0f
-//				compute.setROI(w * 1.5f, h * 1.5f, w * 2.5f, h * 2.5f)
+//				val w = width / 4
+//				val h = height / 4
+//				compute.setROI(w * 3 / 2, h * 3 / 2, w * 5 / 2, h * 5 / 2)
 				compute.compute(width, height, GLES31.GL_TEXTURE0, texId, texMatrix, texOffset)
 
 				// FIXME テスト用にフォーカス強度分布の分散を計算

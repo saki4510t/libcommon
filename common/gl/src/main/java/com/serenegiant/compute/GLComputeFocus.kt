@@ -21,7 +21,9 @@ package com.serenegiant.compute
 import android.opengl.GLES31
 import android.os.Build
 import android.util.Log
+import androidx.annotation.AnyThread
 import androidx.annotation.RequiresApi
+import androidx.annotation.Size
 import androidx.annotation.WorkerThread
 import com.serenegiant.gl.GLUtils
 import com.serenegiant.gl.ShaderConst
@@ -56,7 +58,11 @@ class GLComputeFocus @WorkerThread constructor(
 	 * テクセルオフセットのロケーション
 	 */
 	private val muTexOffsetLoc: Int
-
+	/**
+	 * フォーカス強度分布計算を行うROI(Region of Interest)
+	 */
+	@Size(value = 4)
+	private val mROI = FloatArray(4)
 	/**
 	 * カーネル関数
 	 */
@@ -83,7 +89,6 @@ class GLComputeFocus @WorkerThread constructor(
 
 	override fun release() {
 		if (DEBUG) Log.v(TAG, "release:")
-		if (DEBUG) Log.v(TAG, "release:")
 		if (mComputeProgram >= 0) {
 			GLES31.glDeleteProgram(mComputeProgram)
 			mComputeProgram = -1
@@ -92,6 +97,30 @@ class GLComputeFocus @WorkerThread constructor(
 		if (DEBUG) Log.v(TAG, "release:finished")
 	}
 
+	/**
+	 * (x1,y1)-(x2,y2)を対角とする矩形をROI(Region of Interest)として指定する
+	 * 各値は映像サイズベースで全映像を対象にするなら(0, 0)-(width, height)
+	 * x1<=x2またはy1<=y2の場合の動作は未定義
+	 * @param x1
+	 * @param y1
+	 * @param x2
+	 * @param y2
+	 */
+	@AnyThread
+	override fun setROI(
+		x1: Int, y1: Int,
+		x2: Int, y2: Int
+	) {
+//		if (DEBUG) Log.v(TAG, "setROI:($x1,$y1)-($x2,$y2)")
+		mLock.withLock {
+			mROI[0] = x1.toFloat()
+			mROI[1] = y1.toFloat()
+			mROI[2] = x2.toFloat()
+			mROI[3] = y2.toFloat()
+		}
+	}
+
+	@WorkerThread
 	override fun compute(
 		width: Int,
 		height: Int,

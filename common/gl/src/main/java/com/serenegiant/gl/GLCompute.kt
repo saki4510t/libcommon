@@ -18,6 +18,7 @@ package com.serenegiant.gl
 *  limitations under the License.
 */
 
+import androidx.annotation.AnyThread
 import androidx.annotation.Size
 import androidx.annotation.WorkerThread
 import com.serenegiant.gl.GLConst.TexUnit
@@ -32,6 +33,21 @@ interface GLCompute {
 	 */
 	@WorkerThread
 	fun release()
+
+	/**
+	 * (x1,y1)-(x2,y2)を対角とする矩形をROI(Region of Interest)として指定する
+	 * 各値は映像サイズベースで全映像を対象にするなら(0, 0)-(width, height)
+	 * x1<=x2またはy1<=y2の場合の動作は未定義
+	 * @param x1
+	 * @param y1
+	 * @param x2
+	 * @param y2
+	 */
+	@AnyThread
+	fun setROI(
+		x1: Int, y1: Int,
+		x2: Int, y2: Int
+	)
 
 	/**
 	 * 計算実行計算
