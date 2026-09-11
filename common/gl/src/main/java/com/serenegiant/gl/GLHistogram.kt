@@ -120,8 +120,14 @@ class GLHistogram @WorkerThread @JvmOverloads constructor(
 	 * テクスチャ座標
 	 */
 	private val pTexCoord = BufferHelper.createBuffer(ShaderConst.DEFAULT_TEXCOORD_2D)
+	/**
+	 * GLHistogramBaseで生成したヒストグラムデータを保持しているシェーダーストレージバッファオブジェクトのID
+	 */
 	private val histogramRGBId: Int
-	val hProgram: Int
+	/**
+	 * 元映像(と必要に応じてヒストグラム)を描画するためのシェーダー
+	 */
+	private val hProgram: Int
 	@Size(value = 16)
 	val mMvpMatrix = FloatArray(16)
 	private var mRelease = false
@@ -145,10 +151,6 @@ class GLHistogram @WorkerThread @JvmOverloads constructor(
 	 * 使用するテクスチャユニットのlocation
 	 */
 	private val muTextureLoc: Int
-	/**
-	 * ヒストグラムを受け取るテクスチャRGBのlocation
-	 */
-	private val muHistogramRGBLoc: Int
 	/**
 	 * ヒストグラム表示領域のロケーション
 	 */
@@ -208,8 +210,6 @@ class GLHistogram @WorkerThread @JvmOverloads constructor(
 		GLUtils.checkGlError("glGetUniformLocation(uTexMatrix)", DEBUG)
 		muTextureLoc = GLES31.glGetUniformLocation(hProgram, "sTexture")
 		GLUtils.checkGlError("glGetAttribLocation(sTexture)", DEBUG)
-		muHistogramRGBLoc = GLES31.glGetUniformLocation(hProgram, "uHistogramRGB")
-		GLUtils.checkGlError("glGetUniformLocation(uHistogramRGB)", DEBUG)
 		muEmbedRegionLoc = GLES31.glGetUniformLocation(hProgram, "uEmbedRegion")
 		GLUtils.checkGlError("コンストラクタ:glGetUniformLocation(sTexture2)", DEBUG)
 		muHistogramTypeLoc = GLES31.glGetUniformLocation(hProgram, "uHistogramType")
@@ -220,7 +220,6 @@ class GLHistogram @WorkerThread @JvmOverloads constructor(
 				+ ",uMVPMatrix=" + muMVPMatrixLoc
 				+ ",uTexMatrix=" + muTexMatrixLoc
 				+ ",sTexture=" + muTextureLoc
-				+ ",uHistogramRGB=" + muHistogramRGBLoc
 		)
 		// テクスチャ変換行列とモデルビュー変換行列の初期化処理
 		Matrix.setIdentityM(mMvpMatrix, 0)
@@ -289,9 +288,6 @@ class GLHistogram @WorkerThread @JvmOverloads constructor(
 	) {
 		GLES31.glUseProgram(hProgram)
 		if (DEBUG) GLUtils.checkGlError("draw:glUseProgram", DEBUG)
-		// ヒストグラムテクスチャをバインド
-		GLES31.glActiveTexture(GLES31.GL_TEXTURE3)
-		if (DEBUG) GLUtils.checkGlError("draw:glActiveTexture", DEBUG)
 		mLock.withLock {
 			GLES31.glUniform4fv(muEmbedRegionLoc, 1, mHistogramRegion, 0)
 			GLES31.glUniform1i(muHistogramTypeLoc, histogramType)
