@@ -59,6 +59,7 @@ import com.serenegiant.mediaeffect.MediaEffectGLEmboss
 import com.serenegiant.mediaeffect.MediaEffectGLErosion
 import com.serenegiant.mediaeffect.MediaEffectGLExposure
 import com.serenegiant.mediaeffect.MediaEffectGLExtraction
+import com.serenegiant.mediaeffect.MediaEffectGLFocus
 import com.serenegiant.mediaeffect.MediaEffectGLHistogram
 import com.serenegiant.mediaeffect.MediaEffectGLMaskedAlphaBlend
 import com.serenegiant.mediaeffect.MediaEffectGLMedian3x3
@@ -600,6 +601,16 @@ class MediaEffectCameraSurfaceFragment : BaseFragment() {
 			override fun buildEffects(effectContext: EffectContext): MutableList<IMediaEffect> {
 				return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
 					mutableListOf(MediaEffectGLHistogram(false, true))
+				} else {
+					super.buildEffects(effectContext)
+				}
+			}
+		},
+		object : MyEffectsBuilder {
+			override fun name(): String { return "MediaEffectGLFocus(false,2.0f)" }
+			override fun buildEffects(effectContext: EffectContext): MutableList<IMediaEffect> {
+				return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+					mutableListOf(MediaEffectGLFocus(false, 2.0f))
 				} else {
 					super.buildEffects(effectContext)
 				}
