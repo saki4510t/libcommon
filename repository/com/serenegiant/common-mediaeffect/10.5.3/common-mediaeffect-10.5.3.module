@@ -1,0 +1,145 @@
+{
+  "formatVersion": "1.1",
+  "component": {
+    "group": "com.serenegiant",
+    "module": "common-mediaeffect",
+    "version": "10.5.3",
+    "attributes": {
+      "org.gradle.status": "release"
+    }
+  },
+  "createdBy": {
+    "gradle": {
+      "version": "8.2"
+    }
+  },
+  "variants": [
+    {
+      "name": "releaseApiElements-published",
+      "attributes": {
+        "org.gradle.category": "library",
+        "org.gradle.usage": "java-api",
+        "org.jetbrains.kotlin.platform.type": "androidJvm"
+      },
+      "dependencies": [
+        {
+          "group": "com.serenegiant",
+          "module": "common-core",
+          "version": {
+            "requires": "10.5.3"
+          }
+        },
+        {
+          "group": "com.serenegiant",
+          "module": "common-gl",
+          "version": {
+            "requires": "10.5.3"
+          }
+        },
+        {
+          "group": "org.jetbrains.kotlin",
+          "module": "kotlin-stdlib",
+          "version": {
+            "requires": "1.9.24"
+          }
+        }
+      ],
+      "files": [
+        {
+          "name": "common-mediaeffect-10.5.3.aar",
+          "url": "common-mediaeffect-10.5.3.aar",
+          "size": 77822,
+          "sha512": "d081fee4f3666f8ecb0a617cc64d8f4b1d1743622edeeffdf979faa1262d23a8946a716235af2745e77b9466dfae3f32ec820dc6e7e18044e0eb27c33e13a3e2",
+          "sha256": "42f31c647111f0c164d359e14a2c717815bb82827f9c8aa1c1f71d0e79fefddb",
+          "sha1": "3fed153d0b4cafc60e4e55eab541be6d4312cef5",
+          "md5": "16d0b0d6f0f9dffbfa398720beded350"
+        }
+      ]
+    },
+    {
+      "name": "releaseRuntimeElements-published",
+      "attributes": {
+        "org.gradle.category": "library",
+        "org.gradle.usage": "java-runtime",
+        "org.jetbrains.kotlin.platform.type": "androidJvm"
+      },
+      "dependencies": [
+        {
+          "group": "androidx.appcompat",
+          "module": "appcompat",
+          "version": {
+            "requires": "1.6.1"
+          }
+        },
+        {
+          "group": "androidx.core",
+          "module": "core-ktx",
+          "version": {
+            "requires": "1.13.1"
+          }
+        },
+        {
+          "group": "org.jetbrains.kotlinx",
+          "module": "kotlinx-coroutines-android",
+          "version": {
+            "requires": "1.9.0"
+          }
+        },
+        {
+          "group": "com.serenegiant",
+          "module": "common-core",
+          "version": {
+            "requires": "10.5.3"
+          }
+        },
+        {
+          "group": "com.serenegiant",
+          "module": "common-gl",
+          "version": {
+            "requires": "10.5.3"
+          }
+        },
+        {
+          "group": "org.jetbrains.kotlin",
+          "module": "kotlin-stdlib",
+          "version": {
+            "requires": "1.9.24"
+          }
+        }
+      ],
+      "files": [
+        {
+          "name": "common-mediaeffect-10.5.3.aar",
+          "url": "common-mediaeffect-10.5.3.aar",
+          "size": 77822,
+          "sha512": "d081fee4f3666f8ecb0a617cc64d8f4b1d1743622edeeffdf979faa1262d23a8946a716235af2745e77b9466dfae3f32ec820dc6e7e18044e0eb27c33e13a3e2",
+          "sha256": "42f31c647111f0c164d359e14a2c717815bb82827f9c8aa1c1f71d0e79fefddb",
+          "sha1": "3fed153d0b4cafc60e4e55eab541be6d4312cef5",
+          "md5": "16d0b0d6f0f9dffbfa398720beded350"
+        }
+      ]
+    },
+    {
+      "name": "releaseSourcesElements-published",
+      "attributes": {
+        "org.gradle.category": "documentation",
+        "org.gradle.dependency.bundling": "external",
+        "org.gradle.docstype": "sources",
+        "org.gradle.libraryelements": "jar",
+        "org.gradle.usage": "java-runtime",
+        "org.jetbrains.kotlin.platform.type": "androidJvm"
+      },
+      "files": [
+        {
+          "name": "common-mediaeffect-10.5.3-sources.jar",
+          "url": "common-mediaeffect-10.5.3-sources.jar",
+          "size": 178077,
+          "sha512": "2e34f29a4b91a507b915f23b410c09b7b9bf2299e0314837f9d1966374b1919182bd190147ace40f09b8701f74c1d4bb246856a6d360deddad3182638d180e16",
+          "sha256": "447fd17f41c5815017fde91270002719b948f5eaf79d293c14968fcac5d10320",
+          "sha1": "54444ab668409c380207ddf9add1e8d888d36270",
+          "md5": "c9f49c1a50136701f9bac128eeeec7a2"
+        }
+      ]
+    }
+  ]
+}
