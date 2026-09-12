@@ -153,6 +153,7 @@ public class SurfaceDrawable extends Drawable {
 	 * Drawableの外形サイズ
 	 */
 	private int mWidth, mHeight;
+	private volatile boolean mReleased = false;
 
 	/**
 	 * コンストラクタ
@@ -207,7 +208,9 @@ public class SurfaceDrawable extends Drawable {
 
 	public void release() {
 		if (DEBUG) Log.v(TAG, "release:");
+		mReleased = true;
 		if (mGlManager.isValid()) {
+			mGLHandler.removeCallbacksAndMessages(null);
 			mGlManager.getGLHandler().postAtFrontOfQueue(new Runnable() {
 				@Override
 				public void run() {
@@ -330,6 +333,7 @@ public class SurfaceDrawable extends Drawable {
 
 	@WorkerThread
 	protected boolean handleMessage(@NonNull final Message msg) {
+		if (mReleased) return true;
 		switch (msg.what) {
 		case REQUEST_DRAW ->  {
 			handleDrawOnGL();
@@ -355,14 +359,16 @@ public class SurfaceDrawable extends Drawable {
 	@WorkerThread
 	protected void handleDrawOnGL() {
 		if (DEBUG && ((++drawCnt % 100) == 0)) Log.v(TAG, "handleDraw:" + drawCnt);
+		final SurfaceTexture st = mInputTexture;
+		if (st == null) return;
 		try {
 			mGlManager.makeDefault();
 			GLES20.glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 			GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT);
-			mInputTexture.updateTexImage();
-			mInputTexture.getTransformMatrix(mTexMatrix);
+			st.updateTexImage();
+			st.getTransformMatrix(mTexMatrix);
 		} catch (final Exception e) {
-			Log.e(TAG, "handleDraw:thread id =" + Thread.currentThread().getId(), e);
+			Log.w(TAG, "handleDraw:thread id =" + Thread.currentThread().getId(), e);
 			mGlManager.swap();
 			return;
 		}
