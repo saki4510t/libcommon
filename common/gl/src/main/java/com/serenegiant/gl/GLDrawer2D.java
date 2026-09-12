@@ -362,7 +362,7 @@ public class GLDrawer2D implements GLConst {
 	public void rotate(final int degrees) {
 		mLock.lock();
 		try {
-			MatrixUtils.rotate(mMvpMatrix, degrees);
+			MatrixUtils.rotate(mMvpMatrix, 0, degrees);
 		} finally {
 			mLock.unlock();
 		}
