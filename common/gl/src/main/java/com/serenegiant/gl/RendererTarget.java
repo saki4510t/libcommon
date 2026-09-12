@@ -195,7 +195,7 @@ public class RendererTarget implements IMirror {
 		final int _mirror = mirror % IMirror.MIRROR_NUM;
 		if (_mirror != mMirror) {
 			mMirror = _mirror;
-			MatrixUtils.setMirror(mMvpMatrix, _mirror);
+			MatrixUtils.setMirror(mMvpMatrix, 0, _mirror);
 		}
 	}
 

@@ -339,7 +339,7 @@ public class GLDrawer2D implements GLConst {
 		mMirror = mirror;
 		mLock.lock();
 		try {
-			MatrixUtils.setMirror(mMvpMatrix, mirror);
+			MatrixUtils.setMirror(mMvpMatrix, 0, mirror);
 		} finally {
 			mLock.unlock();
 		}

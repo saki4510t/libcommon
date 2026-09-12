@@ -426,7 +426,7 @@ class DistributorCameraGLSurfaceView @JvmOverloads constructor(
 						 1.0f)
 				}
 			}
-			MatrixUtils.setMirror(mMvpMatrix, IMirror.MIRROR_VERTICAL)
+			MatrixUtils.setMirror(mMvpMatrix, 0, IMirror.MIRROR_VERTICAL)
 			mDrawer?.setMvpMatrix(mMvpMatrix, 0)
 		}
 

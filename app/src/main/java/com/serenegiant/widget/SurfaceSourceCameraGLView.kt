@@ -103,7 +103,7 @@ class SurfaceSourceCameraGLView @JvmOverloads constructor(
 				if (mDrawer != null) {
 					if (DEBUG) Log.v(TAG, "applyTransformMatrix:"
 						+ MatrixUtils.toGLMatrixString(transform))
-					MatrixUtils.setMirror(mMvpMatrix, IMirror.MIRROR_VERTICAL)
+					MatrixUtils.setMirror(mMvpMatrix, 0, IMirror.MIRROR_VERTICAL)
 					mDrawer!!.setMvpMatrix(mMvpMatrix, 0)
 				}
 			}

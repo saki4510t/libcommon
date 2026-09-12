@@ -204,7 +204,7 @@ public class MediaEffectGLDrawer implements IMirror {
         // モデルビュー変換行列を初期化
 		Matrix.setIdentityM(mMvpMatrix, 0);
 		if (!isOES) {
-			MatrixUtils.setMirror(mMvpMatrix, MIRROR_VERTICAL);
+			MatrixUtils.setMirror(mMvpMatrix, 0, MIRROR_VERTICAL);
 		}
 		//
 		if (muMVPMatrixLoc >= 0) {
@@ -236,7 +236,7 @@ public class MediaEffectGLDrawer implements IMirror {
 	public void setMirror(@MirrorMode final int mirror) {
 		if (mMirror != mirror) {
 			mMirror = mirror;
-			MatrixUtils.setMirror(mMvpMatrix, mirror);
+			MatrixUtils.setMirror(mMvpMatrix, 0, mirror);
 		}
 	}
 

@@ -66,7 +66,7 @@ public class MatrixTest {
 		for (int i = 0; i < IMirror.MIRROR_NUM; i++) {
 			android.opengl.Matrix.setIdentityM(mat, 0);
 			matrix.reset();
-			MatrixUtils.setMirror(mat, i);
+			MatrixUtils.setMirror(mat, 0, i);
 			MatrixUtils.setMirror(matrix, i);
 			assertTrue(compare(matrix, mat, true));
 			final float[] glMat = MatrixUtils.toGLMatrix(matrix);
