@@ -756,13 +756,13 @@ public abstract class AbstractDistributeTask implements IMirror {
 			for (int i = 0; i < n; i++) {
 				final RendererTarget target = mTargets.valueAt(i);
 				if ((target != null) && target.isValid()) {
-					MatrixUtils.setRotation(target.getMvpMatrix(), degree);
+					MatrixUtils.setRotation(target.getMvpMatrix(), 0, degree);
 				}
 			}
 		} else {
 			final RendererTarget target = mTargets.get(id);
 			if ((target != null) && target.isValid()) {
-				MatrixUtils.setRotation(target.getMvpMatrix(), degree);
+				MatrixUtils.setRotation(target.getMvpMatrix(), 0, degree);
 			}
 		}
 	}
